@@ -1,0 +1,1049 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Whiteout Buff Scheduler — SvS Ministry Appointments</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --night:#0a1420; --panel:#101f30; --panel-2:#152a40; --line:#23405c;
+  --ice:#e7f2fa; --steel:#8aa3b8; --ember:#f59a48; --ember-hot:#ffb56b;
+  --aurora:#63e2b7; --danger:#ff8896; --shadow:0 18px 44px rgba(2,8,16,.5);
+  --r:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1200px 500px at 78% -140px, rgba(99,226,183,.10), transparent 60%),
+    radial-gradient(900px 420px at 12% -160px, rgba(90,140,220,.14), transparent 60%),
+    var(--night);
+  color:var(--ice);
+  font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:17px; line-height:1.55;
+  min-height:100vh;
+}
+.wrap{max-width:980px;margin:0 auto;padding:28px 20px 80px}
+header.site{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.brand{
+  font-family:"Bricolage Grotesque",system-ui,sans-serif;
+  font-weight:800;font-size:clamp(26px,4.4vw,40px);letter-spacing:.2px;line-height:1.08;
+}
+.brand .flake{color:var(--ember)}
+.tagline{color:var(--steel);font-size:15px}
+.aurora-rule{
+  height:3px;border-radius:3px;margin:14px 0 26px;
+  background:linear-gradient(90deg,#3d6ea8, var(--aurora) 34%, var(--ember) 78%, #3d6ea8);
+  background-size:220% 100%;
+}
+@media (prefers-reduced-motion: no-preference){
+  .aurora-rule{animation:aurora 14s linear infinite}
+  @keyframes aurora{0%{background-position:0% 0}100%{background-position:220% 0}}
+}
+.steps{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 22px;padding:0;list-style:none}
+.steps li{
+  flex:1 1 240px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  padding:12px 14px;display:flex;gap:12px;align-items:flex-start;
+}
+.steps .n{
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:800;color:var(--ember);
+  font-size:22px;line-height:1;padding-top:2px;
+}
+.steps b{display:block;font-size:15.5px}
+.steps span{color:var(--steel);font-size:14px}
+
+/* ------- drop zone: the furnace window ------- */
+.drop{
+  position:relative;border-radius:18px;padding:44px 24px;text-align:center;cursor:pointer;
+  background:linear-gradient(180deg, rgba(21,42,64,.75), rgba(16,31,48,.9));
+  border:2px dashed #3b5f86; outline:none;
+  transition:border-color .25s ease, background .25s ease, transform .15s ease;
+  box-shadow:var(--shadow);
+}
+.drop:hover,.drop:focus-visible{border-color:var(--aurora)}
+.drop:focus-visible{box-shadow:0 0 0 3px rgba(99,226,183,.45), var(--shadow)}
+.drop.dragover{border-color:var(--ember);background:linear-gradient(180deg, rgba(45,58,52,.85), rgba(26,34,40,.92));transform:scale(1.005)}
+.drop.lit{border-style:solid;border-color:var(--ember)}
+.drop h2{
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:700;margin:10px 0 6px;
+  font-size:clamp(20px,3.2vw,27px);
+}
+.drop p{margin:4px auto;max-width:560px;color:var(--steel);font-size:15.5px}
+.drop .or{margin-top:14px}
+.btn{
+  display:inline-block;border:0;border-radius:12px;cursor:pointer;
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:16.5px;
+  padding:12px 22px;color:#1c1206;background:linear-gradient(180deg,var(--ember-hot),var(--ember));
+  box-shadow:0 6px 18px rgba(245,154,72,.28);
+}
+.btn:hover{filter:brightness(1.06)}
+.btn:focus-visible{outline:3px solid rgba(255,181,107,.6);outline-offset:2px}
+.btn.big{font-size:18px;padding:14px 28px}
+.btn[disabled]{opacity:.55;cursor:default}
+.ghost{
+  background:transparent;color:var(--ice);border:1px solid var(--line);box-shadow:none;
+  font-weight:700;
+}
+.flame{font-size:38px;filter:saturate(1.1)}
+input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+
+/* ------- options ------- */
+details.opts{margin:18px 0 0;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}
+details.opts summary{
+  cursor:pointer;padding:12px 16px;font-weight:700;color:var(--steel);list-style:none;
+  font-size:15px;
+}
+details.opts summary::-webkit-details-marker{display:none}
+details.opts summary::before{content:"▸ ";color:var(--ember)}
+details.opts[open] summary::before{content:"▾ "}
+.optgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;padding:4px 16px 16px}
+.opt label{display:block;font-size:14px;color:var(--steel);margin-bottom:4px}
+.opt select,.opt input[type=number]{
+  width:100%;background:var(--panel-2);color:var(--ice);border:1px solid var(--line);
+  border-radius:10px;padding:8px 10px;font:inherit;font-size:15px;
+}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:15px;padding-top:4px}
+.check input{width:18px;height:18px;accent-color:var(--ember);margin-top:3px}
+
+/* ------- status + results ------- */
+.status{margin:20px 0;padding:14px 16px;border-radius:var(--r);display:none;font-size:15.5px}
+.status.show{display:block}
+.status.err{background:rgba(255,136,150,.1);border:1px solid rgba(255,136,150,.45);color:#ffd3d9}
+.status.ok{background:rgba(99,226,183,.08);border:1px solid rgba(99,226,183,.4)}
+.results{display:none;margin-top:26px}
+.results.show{display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin:0 0 20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.card .k{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:30px;line-height:1.1}
+.card .k.ember{color:var(--ember)} .card .k.aurora{color:var(--aurora)}
+.card .l{color:var(--steel);font-size:13.5px;margin-top:3px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;margin:0 0 18px}
+.panel h3{font-family:"Bricolage Grotesque",sans-serif;margin:0 0 8px;font-size:18px}
+.panel h3 .dot{color:var(--ember)}
+.panel ul{margin:6px 0 2px;padding-left:20px}
+.panel li{margin:5px 0;font-size:15px}
+.panel li .who{font-weight:700}
+.muted{color:var(--steel)}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.92em}
+
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.tab{
+  border:1px solid var(--line);background:var(--panel);color:var(--ice);border-radius:999px;
+  padding:8px 16px;cursor:pointer;font:inherit;font-size:15px;font-weight:700;
+}
+.tab[aria-selected="true"]{background:var(--ember);border-color:var(--ember);color:#1c1206}
+.daywrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r)}
+table{border-collapse:collapse;width:100%;background:var(--panel);font-size:15px}
+th,td{padding:8px 12px;border-bottom:1px solid rgba(35,64,92,.6);text-align:left;vertical-align:top}
+th{
+  font-family:"Bricolage Grotesque",sans-serif;font-size:13.5px;letter-spacing:.4px;
+  text-transform:uppercase;color:var(--steel);position:sticky;top:0;background:var(--panel-2);
+}
+tr:last-child td{border-bottom:0}
+td.time{font-family:"IBM Plex Mono",ui-monospace,monospace;white-space:nowrap;color:var(--aurora)}
+td.empty-slot{color:#3f5a76}
+.note{color:var(--ember-hot);font-size:13.5px;display:block;margin-top:2px}
+.dl{margin:22px 0 8px;text-align:center}
+.dl p{color:var(--steel);font-size:14px;margin-top:10px}
+footer.site{margin-top:44px;color:var(--steel);font-size:13.5px;border-top:1px solid var(--line);padding-top:18px}
+footer.site b{color:var(--ice)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="site">
+  <div class="brand"><span class="flake">❄</span> Whiteout Buff Scheduler</div>
+  <div class="tagline">SvS ministry appointments — Construction · Research · Troops</div>
+</header>
+<div class="aurora-rule" role="presentation"></div>
+
+<ol class="steps">
+  <li><span class="n">1</span><div><b>Drop your survey file</b><span>The Excel file you downloaded from your Microsoft Forms responses.</span></div></li>
+  <li><span class="n">2</span><div><b>Check the schedule</b><span>Everyone is placed inside the times they said they're free.</span></div></li>
+  <li><span class="n">3</span><div><b>Download for Excel</b><span>A finished workbook with one sheet per buff day, ready to share.</span></div></li>
+</ol>
+
+<div class="drop" id="drop" tabindex="0" role="button"
+     aria-label="Drop your survey Excel file here, or press Enter to choose a file">
+  <div class="flame" aria-hidden="true">🔥</div>
+  <h2>Drop your survey file here</h2>
+  <p>Use the response file from Microsoft Forms (<span class="mono">.xlsx</span> or <span class="mono">.csv</span>).
+     Nothing is uploaded anywhere — everything happens right here on your computer.</p>
+  <div class="or"><button class="btn" id="pickBtn" type="button">Choose file…</button></div>
+  <input type="file" id="fileInput" accept=".xlsx,.xlsm,.csv" aria-hidden="true">
+</div>
+
+<details class="opts">
+  <summary>Options (fine as they are — open only if you need to change something)</summary>
+  <div class="optgrid">
+    <div class="opt">
+      <label for="optMax">Appointments per player for the whole event</label>
+      <select id="optMax">
+        <option value="3" selected>Up to one on each buff day (recommended)</option>
+        <option value="2">At most 2 in total</option>
+        <option value="1">Only 1 in total (strict fairness)</option>
+      </select>
+    </div>
+    <div class="opt">
+      <label for="optSlot">Length of each appointment</label>
+      <select id="optSlot">
+        <option value="30" selected>30 minutes (standard)</option>
+        <option value="20">20 minutes</option>
+        <option value="15">15 minutes</option>
+        <option value="60">60 minutes</option>
+      </select>
+    </div>
+    <div class="opt">
+      <label for="optStart">Schedule day runs from</label>
+      <select id="optStart"></select>
+    </div>
+    <div class="opt">
+      <label for="optEnd">…until (UTC)</label>
+      <select id="optEnd"></select>
+    </div>
+    <div class="opt check">
+      <input type="checkbox" id="optNames" checked>
+      <label for="optNames" style="margin:0">Include in-game player names in the downloaded schedule (emails are never included)</label>
+    </div>
+    <div class="opt check">
+      <input type="checkbox" id="optWishes" checked>
+      <label for="optWishes" style="margin:0">When it doesn't cost any points, honor time wishes written in the comments</label>
+    </div>
+  </div>
+</details>
+
+<div class="status" id="status" role="status" aria-live="polite"></div>
+
+<section class="results" id="results" aria-label="Schedule results">
+  <div class="cards">
+    <div class="card"><div class="k aurora" id="cPlayers">–</div><div class="l">players placed</div></div>
+    <div class="card"><div class="k" id="cAppointments">–</div><div class="l">appointments made</div></div>
+    <div class="card"><div class="k ember" id="cPoints">–</div><div class="l">estimated prep points</div></div>
+    <div class="card"><div class="k" id="cResponses">–</div><div class="l">survey responses read</div></div>
+  </div>
+
+  <div class="dl">
+    <button class="btn big" id="downloadBtn" type="button">Download the schedule (.xlsx)</button>
+    <p>Opens in Excel or Google Sheets. One sheet per buff day, plus a summary and a notes page for you.</p>
+  </div>
+
+  <div class="panel" id="attentionPanel" hidden>
+    <h3><span class="dot">●</span> Needs a quick look from you</h3>
+    <ul id="attentionList"></ul>
+  </div>
+
+  <div class="panel" id="commentsPanel" hidden>
+    <h3><span class="dot">●</span> What people wrote in the comments</h3>
+    <p class="muted" style="margin:0 0 6px;font-size:14px">These are also on the “Scheduler notes” sheet in your download, so you can double-check special requests.</p>
+    <ul id="commentsList"></ul>
+  </div>
+
+  <h3 style="font-family:'Bricolage Grotesque',sans-serif;margin:26px 0 10px">The schedule</h3>
+  <div class="tabs" id="dayTabs" role="tablist"></div>
+  <div class="daywrap"><table id="dayTable" aria-live="polite">
+    <thead><tr><th>Time (UTC)</th><th>Player</th><th>Alliance</th><th>Player ID</th></tr></thead>
+    <tbody></tbody>
+  </table></div>
+</section>
+
+<footer class="site">
+  <p><b>How the schedule is chosen.</b> Every submitted availability window is treated as a hard rule.
+  Within those rules, the tool finds the arrangement with the highest total estimated prep points
+  (speedups count 30 points per minute; Fire Crystals 2,000; Refined Fire Crystals 30,000; Fire Shards 1,000),
+  counting each player's general speedups once across the whole event — then fills as many remaining
+  slots as possible, favoring players with the fewest free times. The math behind it is an exact
+  optimizer, not a rough sort, so no shuffling of appointments could score higher.</p>
+  <p><b>Privacy.</b> The downloaded schedule contains time, player ID, alliance, and (optional) in-game name — never emails. The survey file never leaves this page.</p>
+</footer>
+</div>
+
+<script>
+/* =============================== CORE-BEGIN ===============================
+   Pure logic, no DOM. Mirrors SortingAlgorithm_v3.py so the two can be
+   cross-verified. All solver weights use BigInt: layering is exact.        */
+"use strict";
+
+const DAY_SPECS = [
+  { key:"construction", label:"Construction Day", aliases:["construction","build","building"], defaultWeekday:"Monday" },
+  { key:"research",     label:"Research Day",     aliases:["research","tech","technology"],    defaultWeekday:"Tuesday" },
+  { key:"training",     label:"Troop Training Day", aliases:["training","troop","troops","education"], defaultWeekday:"Thursday" },
+];
+const POINTS_PER_SPEEDUP_MINUTE = 30;
+const POINTS_PER_FIRE_CRYSTAL = 2000;
+const POINTS_PER_REFINED_FIRE_CRYSTAL = 30000;
+const POINTS_PER_FIRE_CRYSTAL_SHARD = 1000;
+
+function normalizeText(v){
+  if (v === null || v === undefined) return "";
+  let t = String(v).normalize("NFKD").replace(/\u00a0/g," ").replace(/&/g," and ");
+  t = t.toLowerCase();
+  t = t.replace(/[^a-z0-9]+/g," ");
+  return t.replace(/\s+/g," ").trim();
+}
+const compactText = v => normalizeText(v).replace(/ /g,"");
+function isBlank(v){ return v === null || v === undefined || String(v).trim() === ""; }
+
+function canonicalPlayerId(v){
+  if (isBlank(v)) return "";
+  if (typeof v === "number"){
+    if (!isFinite(v)) return "";
+    if (Number.isInteger(v)) return String(v);
+    return String(v);
+  }
+  let t = String(v).trim();
+  if (/^\d+\.0$/.test(t)) t = t.slice(0,-2);
+  return t;
+}
+const canonicalTag = v => isBlank(v) ? "" : String(v).trim().replace(/\s+/g," ");
+
+function parseNumber(v){
+  if (isBlank(v)) return 0;
+  if (typeof v === "number") return isFinite(v) ? Math.max(0,v) : 0;
+  const text = String(v).trim().toLowerCase().replace(/,/g,"").replace(/\$/g,"");
+  const m = text.match(/[-+]?\d+(?:\.\d+)?/);
+  if (!m) return 0;
+  let n = parseFloat(m[0]);
+  const suffix = text.slice(m.index + m[0].length).trim();
+  if (suffix.startsWith("k")) n *= 1e3;
+  else if (suffix.startsWith("m")) n *= 1e6;
+  else if (suffix.startsWith("b")) n *= 1e9;
+  return Math.max(0, n);
+}
+
+function headerMatchScore(header, aliases){
+  const norm = normalizeText(header);
+  const compact = norm.replace(/ /g,"");
+  const tokens = new Set(norm.split(" ").filter(Boolean));
+  let best = 0;
+  for (const alias of aliases){
+    const an = normalizeText(alias);
+    const ac = an.replace(/ /g,"");
+    if (!an) continue;
+    const at = an.split(" ").filter(Boolean);
+    if (norm === an || compact === ac) best = Math.max(best, 1000);
+    else if (norm.includes(an) || compact.includes(ac)) best = Math.max(best, 700 + Math.min(200, ac.length));
+    else if (at.length && at.every(t => tokens.has(t))) best = Math.max(best, 500 + 20*at.length);
+  }
+  return best;
+}
+
+function resolveBestColumn(columns, aliases, {excluded=[], minScore=500} = {}){
+  const scored = [];
+  columns.forEach((col, i) => {
+    const norm = normalizeText(col);
+    if (excluded.some(t => norm.includes(normalizeText(t)))) return;
+    const s = headerMatchScore(col, aliases);
+    if (s >= minScore) scored.push([s, -i, col]);
+  });
+  if (!scored.length) return null;
+  scored.sort((a,b) => b[0]-a[0] || b[1]-a[1]);
+  return scored[0][2];
+}
+
+/* ----- time parsing ----- */
+const CLOCK = "(?:2[0-4]|[01]?\\d)(?:\\s*[:.]\\s*[0-5]\\d)?\\s*(?:a\\.?m\\.?|p\\.?m\\.?)?";
+const RANGE_RE = new RegExp(`(${CLOCK})\\s*(?:-|–|—|to|until|through)\\s*(${CLOCK})`, "gi");
+const SINGLE_TIME_RE = new RegExp(`^\\s*(${CLOCK})\\s*(?:utc)?\\s*$`, "i");
+
+function parseClockToken(token, allow24){
+  let t = token.toLowerCase().replace(/\s+/g,"");
+  let ampm = null;
+  if (/(a\.?m\.?)$/.test(t)){ ampm="am"; t=t.replace(/a\.?m\.?$/,""); }
+  else if (/(p\.?m\.?)$/.test(t)){ ampm="pm"; t=t.replace(/p\.?m\.?$/,""); }
+  let hour, minute;
+  const sep = t.match(/^(\d{1,2})[:.]([0-5]\d)$/);
+  if (sep){ hour = parseInt(sep[1],10); minute = parseInt(sep[2],10); }
+  else { hour = parseInt(t,10); minute = 0; if (!/^\d{1,2}$/.test(t)) return null; }
+  if (isNaN(hour) || isNaN(minute) || minute<0 || minute>59) return null;
+  if (ampm){
+    if (hour<1 || hour>12) return null;
+    if (ampm==="am") hour = hour===12 ? 0 : hour;
+    else hour = hour===12 ? 12 : hour+12;
+  } else {
+    if (hour===24 && minute===0 && allow24) return 1440;
+    if (hour<0 || hour>23) return null;
+  }
+  return hour*60 + minute;
+}
+function minutesToClock(m){ const n=((m%1440)+1440)%1440; return String(Math.floor(n/60)).padStart(2,"0")+":"+String(n%60).padStart(2,"0"); }
+function slotLabel(start, slotMinutes){ return `${minutesToClock(start)}\u2013${minutesToClock((start+slotMinutes)%1440)}`; }
+
+function rangeToSlotStarts(start, end, slotMinutes){
+  if (start === 1440) start = 0;
+  const all = new Set(); for (let s=0; s<1440; s+=slotMinutes) all.add(s);
+  if (end === start) return all;                       // 00:00-00:00 = all day
+  const intervals = end > start ? [[start,end]] : [[start,1440],[0,end]];
+  const slots = new Set();
+  for (const [a,b] of intervals)
+    for (let s=0; s<1440; s+=slotMinutes)
+      if (s>=a && s+slotMinutes<=b) slots.add(s);
+  return slots;
+}
+
+function parseTimeRanges(text){
+  // Returns [ [startMin,endMin], ... ] for every recognizable range.
+  const src = String(text).replace(/\b(?:UTC|GMT)\b/gi,"");
+  const out = [];
+  RANGE_RE.lastIndex = 0;
+  let m;
+  while ((m = RANGE_RE.exec(src)) !== null){
+    const a = parseClockToken(m[1], false);
+    const b = parseClockToken(m[2], true);
+    if (a===null || b===null) continue;
+    out.push([a, b===1440 ? 0 : b, b===1440]);
+  }
+  return out;
+}
+
+function parseAvailability(value, slotMinutes){
+  if (isBlank(value)) return new Set();               // empty = unavailable
+  const norm = normalizeText(value);
+  if (["all day","any time","anytime","open availability"].some(p => norm.includes(p)))
+    return rangeToSlotStarts(0,0,slotMinutes);
+  const slots = new Set();
+  for (const [a,b,was24] of parseTimeRanges(value)){
+    const end = was24 ? 1440 : b;                      // "…-24:00" means end of day
+    if (end === 1440){
+      for (let s=0; s<1440; s+=slotMinutes) if (s>=a && s+slotMinutes<=1440) slots.add(s);
+    } else {
+      for (const s of rangeToSlotStarts(a, end, slotMinutes)) slots.add(s);
+    }
+  }
+  if (!slots.size){
+    const single = String(value).replace(/\b(?:UTC|GMT)\b/gi,"").trim().match(SINGLE_TIME_RE);
+    if (single){
+      const s = parseClockToken(single[1], false);
+      if (s!==null && s % slotMinutes === 0) slots.add(s);
+    }
+  }
+  return slots;
+}
+
+/* ----- speedup durations ----- */
+const DURATION_RE = /(\d+(?:\.\d+)?)\s*(days?|d|hours?|hrs?|hr|h|minutes?|mins?|min|m)\b/gi;
+function parseSpeedupMinutes(value, numericUnit){
+  if (isBlank(value)) return 0;
+  if (typeof value === "number"){
+    if (!isFinite(value) || value < 0) return 0;
+    return Math.round(unitToMinutes(value, numericUnit));
+  }
+  let text = String(value).trim().toLowerCase().replace(/,/g,"");
+  if (!text) return 0;
+  const range = text.match(/^\s*(\d+(?:\.\d+)?)\s*[-\u2013\u2014~]\s*\d+(?:\.\d+)?\s*/);
+  if (range) text = range[1] + text.slice(range[0].length);   // conservative lower bound
+  let total = 0, any = false, m;
+  DURATION_RE.lastIndex = 0;
+  while ((m = DURATION_RE.exec(text)) !== null){
+    any = true;
+    const n = parseFloat(m[1]); const u = m[2][0];
+    total += u==="d" ? n*1440 : u==="h" ? n*60 : n;
+  }
+  if (any) return Math.max(0, Math.round(total));
+  const clock = text.match(/^\s*(\d{1,4})\s*:\s*([0-5]\d)\s*$/);
+  if (clock) return parseInt(clock[1],10)*60 + parseInt(clock[2],10);
+  let n = parseFloat(text);
+  if (isNaN(n)){
+    const first = text.match(/\d+(?:\.\d+)?/);
+    if (!first) return 0;
+    n = parseFloat(first[0]);
+  }
+  if (!isFinite(n) || n < 0) return 0;
+  return Math.round(unitToMinutes(n, numericUnit));
+}
+function unitToMinutes(v, unit){ return unit==="days" ? v*1440 : unit==="hours" ? v*60 : v; }
+function unitFromHeader(header){
+  const t = new Set(normalizeText(header).split(" "));
+  if (t.has("minute")||t.has("minutes")||t.has("mins")) return "minutes";
+  if (t.has("hour")||t.has("hours")||t.has("hrs")) return "hours";
+  if (t.has("day")||t.has("days")) return "days";
+  return "days";
+}
+const headerIsFinalPoints = h => { const n=normalizeText(h); return n.includes("score")||n.includes("point"); };
+function resourceValueToPoints(value, header){
+  if (headerIsFinalPoints(header)) return Math.max(0, Math.round(parseNumber(value)));
+  return Math.max(0, parseSpeedupMinutes(value, unitFromHeader(header)) * POINTS_PER_SPEEDUP_MINUTE);
+}
+
+/* ----- column aliases (mirrors v3) ----- */
+const ID_ALIASES = ["chief id","player id","governor id","user id","id from chief page"];
+const TAG_ALIASES = ["alliance name","alliance tag","player tag","chief tag","alliance","tag"];
+const NAME_ALIASES = ["player name","in game name","ingame name","chief name","character name"];
+const TIMESTAMP_ALIASES = ["completion time","timestamp","submitted at","submission time"];
+const SELECTED_ALIASES = ["which ministry appointments","ministry appointments you would like to apply for",
+  "appointments you would like to apply for","desired buffs","selected buffs","apply for multiple selections allowed"];
+const AVAIL_ALIASES = ["what time range can you use the appointment buffs","what time range can you use the appointment buff",
+  "general availability","available time range","preferred time range","time range can you use"];
+const GENERAL_ALIASES = ["general speedups","general speedup","general su","general"];
+const RFC_ALIASES = ["refined fire crystal","refined fire crystals"];
+const FC_ALIASES = ["fire crystals","fire crystal","how many fire crystals","fc count"];
+const SHARD_ALIASES = ["fire crystal shards","fire crystal shard","fire shards","fire shard","fc shards","fc shard","shards for research"];
+const COMMENT_ALIASES = ["any additional comments","additional comments","comments","notes","anything else"];
+const RESOURCE_EXCLUDE = ["time slot","time range","what time","availability","appointment","apply for","selected buff","which ministry","plan to use"];
+function dayResourceAliases(day){
+  if (day.key==="construction") return ["construction points","construction score","construction speedups","construction speedup","construction su","construction","build speedups"];
+  if (day.key==="research") return ["research points","research score","research speedups","research speedup","research su","research"];
+  return ["training points","troop training points","training score","training speedups","troop speedups","troop training speedups","training su","training","troop"];
+}
+
+function buildMapping(headers){
+  const columns = headers.map(h => String(h ?? ""));
+  const warnings = [];
+  const idColumn = resolveBestColumn(columns, ID_ALIASES);
+  if (!idColumn) throw new SchedulerError(
+    "I couldn't find the Player ID column in this file. It should be the survey question that asks for the player's ID.");
+  const tagColumn = resolveBestColumn(columns, TAG_ALIASES, {excluded:["time","email"]});
+  const nameColumn = resolveBestColumn(columns, NAME_ALIASES, {excluded:["alliance","email"]});
+  const timestampColumn = resolveBestColumn(columns, TIMESTAMP_ALIASES);
+  const selectedColumn = resolveBestColumn(columns, SELECTED_ALIASES);
+  const commentColumn = resolveBestColumn(columns, COMMENT_ALIASES);
+  const generalColumn = resolveBestColumn(columns, GENERAL_ALIASES,
+    {excluded:["availability","time slot","time range","what time","plan"], minScore:650});
+  const rfcColumn = resolveBestColumn(columns, RFC_ALIASES, {minScore:650});
+  const shardColumn = resolveBestColumn(columns, SHARD_ALIASES, {minScore:650});
+  const fcColumn = resolveBestColumn(columns, FC_ALIASES, {excluded:["refined","shard"]});
+
+  const dayResource = {};
+  for (const day of DAY_SPECS){
+    const scored = [];
+    columns.forEach((col,i) => {
+      const norm = normalizeText(col);
+      if (RESOURCE_EXCLUDE.some(t => norm.includes(t))) return;
+      let s = headerMatchScore(col, dayResourceAliases(day));
+      if (s < 500) return;
+      if (norm.includes("score")||norm.includes("point")) s += 300;
+      else if (norm.includes("speedup")||/\bsu\b/.test(norm)) s += 150;
+      scored.push([s,-i,col]);
+    });
+    if (!scored.length) throw new SchedulerError(
+      `I couldn't find the ${day.label.toLowerCase()} speedups column. It's usually a question like "How much ${day.key==="training"?"troop training":day.key} speed up time do you have?"`);
+    scored.sort((a,b)=>b[0]-a[0]||b[1]-a[1]);
+    dayResource[day.key] = scored[0][2];
+  }
+
+  const availColumn = resolveBestColumn(columns, AVAIL_ALIASES, {minScore:650});
+  const dayAvail = {};
+  for (const day of DAY_SPECS){
+    const direct = resolveBestColumn(columns,
+      day.aliases.flatMap(a => [`${a} availability`,`${a} time slots`,`${a} time slot`,`${a} preferred time`,`${a} time range`]),
+      {minScore:650});
+    dayAvail[day.key] = direct || availColumn;
+  }
+  if (DAY_SPECS.some(d => !dayAvail[d.key])) throw new SchedulerError(
+    "I couldn't find the availability question (the one asking which time ranges people can use the buff).");
+
+  if (!generalColumn) warnings.push("No “general speedups” question was found, so no shared general pool is counted.");
+  if (!tagColumn) warnings.push("No alliance column was found — the schedule will show IDs and names only.");
+  return { columns, idColumn, tagColumn, nameColumn, timestampColumn, selectedColumn,
+           commentColumn, generalColumn, rfcColumn, shardColumn, fcColumn, dayResource, dayAvail, warnings };
+}
+
+class SchedulerError extends Error {}
+
+function excelSerialToMs(v){
+  // Excel serial day number -> epoch ms (1899-12-30 origin)
+  return Math.round((v - 25569) * 86400 * 1000);
+}
+function parseTimestampValue(v){
+  if (isBlank(v)) return null;
+  if (typeof v === "number" && isFinite(v) && v >= 20000 && v <= 80000) return excelSerialToMs(v);
+  const d = Date.parse(String(v));
+  return isNaN(d) ? null : d;
+}
+function parseSelectedDays(v){
+  if (isBlank(v)) return new Set();
+  const norm = normalizeText(v);
+  if (["all appointments","all buffs","all three"].some(p => norm.includes(p)) || norm === "all")
+    return new Set(DAY_SPECS.map(d => d.key));
+  const out = new Set();
+  for (const day of DAY_SPECS)
+    if (day.aliases.some(a => norm.includes(a))) out.add(day.key);
+  return out;
+}
+function extractWeekdayLabels(values){
+  // From strings like "Construction (Monday);Research (Tuesday)".
+  const labels = {};
+  const re = /(construction|build|research|tech|troop|train|education)[^();]*\(([^)]+)\)/gi;
+  for (const v of values){
+    if (isBlank(v)) continue;
+    let m; re.lastIndex = 0;
+    while ((m = re.exec(String(v))) !== null){
+      const kw = m[1].toLowerCase(); const wd = m[2].trim();
+      const key = kw.startsWith("res")||kw.startsWith("tech") ? "research"
+                : kw.startsWith("con")||kw.startsWith("build") ? "construction" : "training";
+      if (!labels[key] && /day/i.test(wd) === false) labels[key] = wd;
+    }
+  }
+  return labels;
+}
+
+function buildPlayers(rows, mapping, slotMinutes){
+  // rows: array of objects keyed by header text. Dedupe by ID, latest wins.
+  const withIds = [];
+  rows.forEach((row, order) => {
+    const pid = canonicalPlayerId(row[mapping.idColumn]);
+    if (!pid) return;
+    const ts = mapping.timestampColumn ? parseTimestampValue(row[mapping.timestampColumn]) : null;
+    withIds.push({ row, order, pid, ts });
+  });
+  if (!withIds.length) throw new SchedulerError("No valid player IDs were found in the file.");
+  const byId = new Map();
+  const duplicates = [];
+  for (const entry of withIds){
+    const prev = byId.get(entry.pid);
+    if (!prev) { byId.set(entry.pid, entry); continue; }
+    const keepNew = (entry.ts ?? -Infinity) >= (prev.ts ?? -Infinity);
+    duplicates.push(entry.pid);
+    if (keepNew) byId.set(entry.pid, entry);
+  }
+  const kept = [...byId.values()].sort((a,b) => a.order - b.order);
+
+  const players = kept.map((entry) => {
+    const { row } = entry;
+    const basePoints = {};
+    for (const day of DAY_SPECS)
+      basePoints[day.key] = resourceValueToPoints(row[mapping.dayResource[day.key]], mapping.dayResource[day.key]);
+    if (mapping.fcColumn)
+      basePoints.construction += Math.round(parseNumber(row[mapping.fcColumn]) * POINTS_PER_FIRE_CRYSTAL);
+    if (mapping.rfcColumn)
+      basePoints.construction += Math.round(parseNumber(row[mapping.rfcColumn]) * POINTS_PER_REFINED_FIRE_CRYSTAL);
+    if (mapping.shardColumn)
+      basePoints.research += Math.round(parseNumber(row[mapping.shardColumn]) * POINTS_PER_FIRE_CRYSTAL_SHARD);
+    const generalPoints = mapping.generalColumn
+      ? resourceValueToPoints(row[mapping.generalColumn], mapping.generalColumn) : 0;
+
+    const availableSlots = {};
+    for (const day of DAY_SPECS)
+      availableSlots[day.key] = parseAvailability(row[mapping.dayAvail[day.key]], slotMinutes);
+
+    let selectedDays;
+    if (mapping.selectedColumn) selectedDays = parseSelectedDays(row[mapping.selectedColumn]);
+    else {
+      selectedDays = new Set();
+      for (const day of DAY_SPECS)
+        if (availableSlots[day.key].size && (basePoints[day.key] > 0 || generalPoints > 0))
+          selectedDays.add(day.key);
+    }
+    const comment = mapping.commentColumn && !isBlank(row[mapping.commentColumn])
+      ? String(row[mapping.commentColumn]).trim() : "";
+    return {
+      playerId: entry.pid,
+      tag: mapping.tagColumn ? canonicalTag(row[mapping.tagColumn]) : "",
+      name: mapping.nameColumn && !isBlank(row[mapping.nameColumn]) ? String(row[mapping.nameColumn]).trim() : "",
+      sourceOrder: entry.order,   // original row order, mirrors Python
+      selectedDays, availableSlots, basePoints, generalPoints, comment,
+      wishRanges: comment ? parseTimeRanges(comment) : [],
+    };
+  });
+  return { players, duplicates: [...new Set(duplicates)] };
+}
+
+/* ----- exact max-profit min-cost flow (BigInt costs) ----- */
+class MinCostFlow {
+  constructor(n){ this.n=n; this.head=Array.from({length:n},()=>[]); this.to=[]; this.cap=[]; this.cost=[]; }
+  addEdge(u,v,cap,cost){ // cost: BigInt
+    const id=this.to.length;
+    this.head[u].push(id); this.to.push(v); this.cap.push(cap); this.cost.push(cost);
+    this.head[v].push(id+1); this.to.push(u); this.cap.push(0); this.cost.push(-cost);
+    return id;
+  }
+  maxProfitFlow(s,t){
+    for(;;){
+      const dist=new Array(this.n).fill(null), inq=new Array(this.n).fill(false), pre=new Array(this.n).fill(-1);
+      dist[s]=0n; const q=[s]; let qi=0; inq[s]=true;
+      while(qi<q.length){
+        const u=q[qi++]; inq[u]=false;
+        for(const e of this.head[u]){
+          if(this.cap[e]<=0) continue;
+          const v=this.to[e], nd=dist[u]+this.cost[e];
+          if(dist[v]===null || nd<dist[v]){
+            dist[v]=nd; pre[v]=e;
+            if(!inq[v]){ inq[v]=true; q.push(v); }
+          }
+        }
+      }
+      if(dist[t]===null || dist[t]>=0n) return;
+      let bottleneck=Infinity;
+      for(let v=t; v!==s;){ const e=pre[v]; bottleneck=Math.min(bottleneck,this.cap[e]); v=this.to[e^1]; }
+      for(let v=t; v!==s;){ const e=pre[v]; this.cap[e]-=bottleneck; this.cap[e^1]+=bottleneck; v=this.to[e^1]; }
+    }
+  }
+  flowOn(id){ return this.cap[id^1]; }
+}
+
+function solveSchedule(players, options){
+  const { slotMinutes=30, maxTotalPerPlayer=3, dayWindow=[0,1440], honorWishes=true } = options || {};
+  const slotStarts = [];
+  for (let s=dayWindow[0]; s+slotMinutes<=dayWindow[1]; s+=slotMinutes) slotStarts.push(s);
+  const openSet = new Set(slotStarts);
+
+  const candidates = [];
+  for (const p of players)
+    for (const day of DAY_SPECS){
+      if (!p.selectedDays.has(day.key)) continue;
+      if (p.basePoints[day.key] <= 0 && p.generalPoints <= 0) continue;
+      for (const s of [...p.availableSlots[day.key]].sort((a,b)=>a-b))
+        if (openSet.has(s)) candidates.push([p, day.key, s]);
+    }
+
+  const totalSlots = slotStarts.length * DAY_SPECS.length;
+  const maxOrder = players.reduce((m,p)=>Math.max(m,p.sourceOrder), 0);
+  const wishOn = honorWishes ? 1 : 0;
+  const tieBoundNum = 1_000_000 + 47*10_000 + maxOrder + 1;   // wish + scarcity + order
+  const TIE_BOUND = BigInt(tieBoundNum);
+  const FILL = BigInt(totalSlots) * TIE_BOUND + 1n;
+  const SCALE = BigInt(totalSlots) * (FILL + TIE_BOUND) + 1n;
+
+  const wishBonus = (p, start) => {
+    if (!wishOn || !p.wishRanges.length) return 0n;
+    const end = start + slotMinutes;
+    for (const [a,b,was24] of p.wishRanges){
+      const hi = was24 ? 1440 : b;
+      const overlaps = hi > a
+        ? (start < hi && end > a)
+        : (start < hi || end > a);   // overnight wish
+      if (overlaps) return 1_000_000n;
+    }
+    return 0n;
+  };
+  const tieWeight = (p, dayKey, start) => {
+    const avail = Math.max(1, p.availableSlots[dayKey].size);
+    const scarcity = Math.max(0, 48 - avail);
+    return wishBonus(p, start) + BigInt(scarcity*10_000 + (maxOrder - p.sourceOrder));
+  };
+
+  // node layout
+  const SRC=0, SNK=1;
+  let next=2;
+  const pNode=new Map(), zNode=new Map(), pdNode=new Map(), slotNode=new Map();
+  for (const [p] of candidates) if(!pNode.has(p.playerId)) pNode.set(p.playerId, next++);
+  for (const [p,dk] of candidates){
+    const k=p.playerId+"|"+dk;
+    if(!pdNode.has(k)) pdNode.set(k,next++);
+    if(p.basePoints[dk]<=0 && !zNode.has(p.playerId)) zNode.set(p.playerId,next++);
+  }
+  for (const [,dk,s] of candidates){
+    const k=dk+"|"+s;
+    if(!slotNode.has(k)) slotNode.set(k,next++);
+  }
+  const net=new MinCostFlow(next);
+  const byId=new Map(players.map(p=>[p.playerId,p]));
+  for (const [pid,node] of pNode){
+    const p=byId.get(pid);
+    if (p.generalPoints>0){
+      net.addEdge(SRC,node,1, -(BigInt(p.generalPoints)*SCALE));
+      if (maxTotalPerPlayer>1) net.addEdge(SRC,node,maxTotalPerPlayer-1,0n);
+    } else net.addEdge(SRC,node,maxTotalPerPlayer,0n);
+  }
+  for (const [k,node] of pdNode){
+    const [pid,dk]=k.split("|"); const p=byId.get(pid);
+    if (p.basePoints[dk]<=0) net.addEdge(zNode.get(pid),node,1,0n);
+    else net.addEdge(pNode.get(pid),node,1,0n);
+  }
+  for (const [pid,znode] of zNode) net.addEdge(pNode.get(pid),znode,1,0n);
+  const candEdges=[];
+  for (const [p,dk,s] of candidates){
+    const profit = BigInt(p.basePoints[dk])*SCALE + FILL + tieWeight(p,dk,s);
+    const id=net.addEdge(pdNode.get(p.playerId+"|"+dk), slotNode.get(dk+"|"+s), 1, -profit);
+    candEdges.push([id,p,dk,s]);
+  }
+  for (const node of slotNode.values()) net.addEdge(node,SNK,1,0n);
+  net.maxProfitFlow(SRC,SNK);
+
+  const assignments=[];
+  const perPlayer=new Map();
+  for (const [id,p,dk,s] of candEdges)
+    if (net.flowOn(id)===1){
+      assignments.push({ playerId:p.playerId, dayKey:dk, start:s });
+      if(!perPlayer.has(p.playerId)) perPlayer.set(p.playerId,[]);
+      perPlayer.get(p.playerId).push([dk,s]);
+    }
+  const dayOrder=Object.fromEntries(DAY_SPECS.map((d,i)=>[d.key,i]));
+  assignments.sort((a,b)=> dayOrder[a.dayKey]-dayOrder[b.dayKey] || a.start-b.start || a.playerId.localeCompare(b.playerId));
+
+  let totalPoints=0;
+  for (const a of assignments) totalPoints += byId.get(a.playerId).basePoints[a.dayKey];
+  for (const pid of perPlayer.keys()) totalPoints += byId.get(pid).generalPoints;
+
+  // ---- self-audit: every hard rule re-checked from scratch ----
+  const seenSlot=new Set(), seenPD=new Set();
+  for (const a of assignments){
+    const p=byId.get(a.playerId);
+    const slotKey=a.dayKey+"|"+a.start, pdKey=a.playerId+"|"+a.dayKey;
+    if (seenSlot.has(slotKey)) throw new SchedulerError("Internal check failed: a slot was double-booked.");
+    if (seenPD.has(pdKey)) throw new SchedulerError("Internal check failed: a player was booked twice on one day.");
+    if (!p.selectedDays.has(a.dayKey)) throw new SchedulerError("Internal check failed: assignment on an unselected day.");
+    if (!p.availableSlots[a.dayKey].has(a.start)) throw new SchedulerError("Internal check failed: assignment outside availability.");
+    seenSlot.add(slotKey); seenPD.add(pdKey);
+  }
+  for (const [pid,list] of perPlayer)
+    if (list.length > maxTotalPerPlayer) throw new SchedulerError("Internal check failed: event-wide limit exceeded.");
+
+  return { assignments, totalPoints, perPlayer, slotStarts };
+}
+
+function analyzeUnplaced(players, solve, options){
+  const placed=new Set(solve.assignments.map(a=>a.playerId));
+  const notes=[];
+  for (const p of players){
+    if (placed.has(p.playerId)) continue;
+    let reason;
+    const anyAvail = DAY_SPECS.some(d=>p.availableSlots[d.key].size);
+    const anyValue = p.generalPoints>0 || DAY_SPECS.some(d=>p.basePoints[d.key]>0);
+    if (!p.selectedDays.size) reason = "didn't pick any buff day on the form";
+    else if (!anyAvail) reason = "didn't tick any time ranges, so there's no window to place them in";
+    else if (!anyValue) reason = "listed no speedups or crystals, so an appointment wouldn't add points";
+    else reason = "all of their free time slots were needed by players bringing more points";
+    notes.push({ player:p, reason });
+  }
+  return notes;
+}
+/* ================================ CORE-END ================================ */
+
+/* ------------------------------- UI layer ------------------------------- */
+if (typeof document !== "undefined") (function(){
+  const $ = id => document.getElementById(id);
+  const drop=$("drop"), fileInput=$("fileInput"), statusEl=$("status"), results=$("results");
+  let state=null;
+
+  // day window selects
+  for (let h=0; h<=24; h++){
+    for (const sel of [$("optStart"),$("optEnd")]){
+      if (h===24 && sel.id==="optStart") continue;
+      const o=document.createElement("option");
+      o.value=h*60; o.textContent = h===24 ? "24:00 (midnight)" : String(h).padStart(2,"0")+":00";
+      sel.appendChild(o);
+    }
+  }
+  $("optStart").value="0"; $("optEnd").value="1440";
+
+  function setStatus(msg, kind){
+    statusEl.className="status show "+(kind||"");
+    statusEl.innerHTML=msg;
+  }
+  function clearStatus(){ statusEl.className="status"; statusEl.innerHTML=""; }
+
+  $("pickBtn").addEventListener("click", e=>{ e.stopPropagation(); fileInput.click(); });
+  drop.addEventListener("click", ()=> fileInput.click());
+  drop.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); fileInput.click(); }});
+  ["dragenter","dragover"].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add("dragover"); }));
+  ["dragleave","drop"].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove("dragover"); }));
+  drop.addEventListener("drop", e=>{ const f=e.dataTransfer.files?.[0]; if(f) handleFile(f); });
+  fileInput.addEventListener("change", ()=>{ const f=fileInput.files?.[0]; if(f) handleFile(f); fileInput.value=""; });
+  ["optMax","optSlot","optStart","optEnd","optNames","optWishes"].forEach(id =>
+    $(id).addEventListener("change", ()=>{ if(state?.file) handleFile(state.file); }));
+
+  function options(){
+    let start=+$("optStart").value, end=+$("optEnd").value;
+    if (end<=start){ end=1440; $("optEnd").value="1440"; }
+    return {
+      slotMinutes:+$("optSlot").value,
+      maxTotalPerPlayer:+$("optMax").value,
+      dayWindow:[start,end],
+      includeNames:$("optNames").checked,
+      honorWishes:$("optWishes").checked,
+    };
+  }
+
+  async function handleFile(file){
+    clearStatus(); results.classList.remove("show"); drop.classList.remove("lit");
+    try{
+      if (typeof XLSX === "undefined")
+        throw new SchedulerError("The spreadsheet reader couldn't load — please check your internet connection once, then reload this page.");
+      setStatus("Reading <b>"+escapeHtml(file.name)+"</b>…","ok");
+      const data=await file.arrayBuffer();
+      const wb=XLSX.read(data,{type:"array"});
+      // choose the sheet whose header row looks most like form responses
+      let best=null;
+      for (const name of wb.SheetNames){
+        const grid=XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,defval:null,blankrows:false});
+        for (let r=0; r<Math.min(grid.length,40); r++){
+          const cells=(grid[r]||[]).filter(c=>!isBlank(c));
+          if (!cells.length) continue;
+          let score=0;
+          if (cells.some(c=>headerMatchScore(String(c),ID_ALIASES)>=500)) score+=1000;
+          if (cells.some(c=>/time|availability/i.test(String(c)))) score+=200;
+          score+=Math.min(100,cells.length);
+          if (!best || score>best.score) best={score,name,grid,headerRow:r};
+        }
+      }
+      if (!best || best.score<1000)
+        throw new SchedulerError("This doesn't look like the survey responses file — I couldn't find a Player ID question in it. Make sure you opened the file downloaded from Microsoft Forms (“Open in Excel”).");
+      const headers=best.grid[best.headerRow].map(h=>String(h??"").replace(/\u00a0/g," ").trim());
+      const rows=[];
+      for (let r=best.headerRow+1; r<best.grid.length; r++){
+        const line=best.grid[r]; if(!line||line.every(c=>isBlank(c))) continue;
+        const obj={}; headers.forEach((h,i)=>obj[h]=line[i]??null); rows.push(obj);
+      }
+      const opts=options();
+      const mapping=buildMapping(headers);
+      const { players, duplicates }=buildPlayers(rows, mapping, opts.slotMinutes);
+      const solve=solveSchedule(players, opts);
+      const unplaced=analyzeUnplaced(players, solve, opts);
+      const weekdays=extractWeekdayLabels(rows.map(r=>mapping.selectedColumn?r[mapping.selectedColumn]:null));
+      state={ file, mapping, players, solve, unplaced, duplicates, opts, weekdays,
+              responses: rows.length, stateName: guessStateName(file.name) };
+      render();
+      drop.classList.add("lit");
+      setStatus("Done! <b>"+solve.assignments.length+" appointments</b> created for <b>"+
+        new Set(solve.assignments.map(a=>a.playerId)).size+" players</b>. Scroll down to review, then download.","ok");
+    }catch(err){
+      console.error(err);
+      const msg = err instanceof SchedulerError ? err.message
+        : "Something unexpected went wrong reading that file. If it keeps happening, re-download the responses from Microsoft Forms and try again.";
+      setStatus("⚠️ "+escapeHtml(msg),"err");
+    }
+  }
+
+  function guessStateName(filename){
+    const m=String(filename).match(/state[\s_-]*(\d+)/i);
+    return m ? "State "+m[1] : "";
+  }
+  const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+  function playerLabel(p){
+    return p.name ? p.name : "ID "+p.playerId;
+  }
+
+  function render(){
+    const { players, solve, unplaced, duplicates, opts, weekdays }=state;
+    const byId=new Map(players.map(p=>[p.playerId,p]));
+    $("cPlayers").textContent=new Set(solve.assignments.map(a=>a.playerId)).size+" / "+players.length;
+    $("cAppointments").textContent=solve.assignments.length;
+    $("cPoints").textContent=abbreviate(solve.totalPoints);
+    $("cResponses").textContent=state.responses;
+
+    // attention list
+    const attention=[];
+    for (const pid of duplicates){
+      const p=byId.get(pid);
+      if (p) attention.push(`<span class="who">${escapeHtml(playerLabel(p))}</span> sent the form more than once — I kept their most recent answers.`);
+    }
+    for (const p of players)
+      if (!/^\d{6,12}$/.test(p.playerId))
+        attention.push(`<span class="who">${escapeHtml(playerLabel(p))}</span> gave an unusual player ID (<span class="mono">${escapeHtml(p.playerId)}</span>) — worth double-checking in game.`);
+    for (const { player, reason } of unplaced)
+      attention.push(`<span class="who">${escapeHtml(playerLabel(player))}</span> couldn't be scheduled: ${reason}.`);
+    for (const p of players){
+      const missing=[...p.selectedDays].filter(dk=>p.basePoints[dk]<=0 && p.generalPoints<=0);
+      if (missing.length)
+        attention.push(`<span class="who">${escapeHtml(playerLabel(p))}</span> asked for ${missing.map(dk=>DAY_SPECS.find(d=>d.key===dk).label).join(" and ")} but listed no matching speedups, so that day was skipped for them.`);
+    }
+    $("attentionPanel").hidden=!attention.length;
+    $("attentionList").innerHTML=attention.map(a=>`<li>${a}</li>`).join("");
+
+    // comments
+    const comments=players.filter(p=>p.comment);
+    $("commentsPanel").hidden=!comments.length;
+    $("commentsList").innerHTML=comments.map(p=>
+      `<li><span class="who">${escapeHtml(playerLabel(p))}</span> <span class="muted">(${escapeHtml(p.tag||"no alliance")})</span>: “${escapeHtml(p.comment)}”</li>`).join("");
+
+    // tabs
+    const tabs=$("dayTabs"); tabs.innerHTML="";
+    DAY_SPECS.forEach((day,i)=>{
+      const b=document.createElement("button");
+      b.className="tab"; b.role="tab"; b.textContent=dayDisplay(day,weekdays);
+      b.setAttribute("aria-selected", i===0 ? "true":"false");
+      b.addEventListener("click",()=>{ tabs.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected","false")); b.setAttribute("aria-selected","true"); renderDay(day.key); });
+      tabs.appendChild(b);
+    });
+    renderDay(DAY_SPECS[0].key);
+    results.classList.add("show");
+  }
+
+  function dayDisplay(day, weekdays){
+    const wd=weekdays[day.key]||day.defaultWeekday;
+    return day.label+(wd ? " ("+wd+")" : "");
+  }
+
+  function renderDay(dayKey){
+    const { players, solve, opts }=state;
+    const byId=new Map(players.map(p=>[p.playerId,p]));
+    const bySlot=new Map(solve.assignments.filter(a=>a.dayKey===dayKey).map(a=>[a.start,a]));
+    const tbody=$("dayTable").querySelector("tbody"); tbody.innerHTML="";
+    for (const s of solve.slotStarts){
+      const tr=document.createElement("tr");
+      const a=bySlot.get(s);
+      const p=a?byId.get(a.playerId):null;
+      const wish=p && p.comment ? `<span class="note">✎ ${escapeHtml(p.comment.length>90?p.comment.slice(0,90)+"…":p.comment)}</span>`:"";
+      tr.innerHTML=`<td class="time">${slotLabel(s,opts.slotMinutes)}</td>`+
+        (p?`<td>${escapeHtml(p.name||"—")}${wish}</td><td>${escapeHtml(p.tag||"—")}</td><td class="mono">${escapeHtml(p.playerId)}</td>`
+          :`<td class="empty-slot">open</td><td class="empty-slot">—</td><td class="empty-slot">—</td>`);
+      tbody.appendChild(tr);
+    }
+  }
+
+  function abbreviate(n){
+    if (n>=1e9) return (n/1e9).toFixed(1).replace(/\.0$/,"")+"B";
+    if (n>=1e6) return (n/1e6).toFixed(1).replace(/\.0$/,"")+"M";
+    if (n>=1e3) return (n/1e3).toFixed(0)+"k";
+    return String(n);
+  }
+
+  $("downloadBtn").addEventListener("click", ()=>{
+    if (!state) return;
+    const { players, solve, unplaced, opts, weekdays, stateName }=state;
+    const byId=new Map(players.map(p=>[p.playerId,p]));
+    const wb=XLSX.utils.book_new();
+
+    for (const day of DAY_SPECS){
+      const rows=[["Time (UTC)","Player ID","Alliance"].concat(opts.includeNames?["Player Name"]:[])];
+      const bySlot=new Map(solve.assignments.filter(a=>a.dayKey===day.key).map(a=>[a.start,a]));
+      for (const s of solve.slotStarts){
+        const a=bySlot.get(s); const p=a?byId.get(a.playerId):null;
+        rows.push([slotLabel(s,opts.slotMinutes), p?p.playerId:"", p?p.tag:""].concat(opts.includeNames?[p?p.name:""]:[]));
+      }
+      const ws=XLSX.utils.aoa_to_sheet(rows);
+      ws["!cols"]=[{wch:15},{wch:16},{wch:14}].concat(opts.includeNames?[{wch:20}]:[]);
+      // keep IDs as text
+      for (let r=2;r<=rows.length;r++){ const c=ws["B"+r]; if(c&&c.v!=="" ){ c.t="s"; c.v=String(c.v);} }
+      XLSX.utils.book_append_sheet(wb, ws, sheetSafe(dayDisplay(day,weekdays)));
+    }
+
+    // Summary sheet
+    const sum=[["Player"+(opts.includeNames?"":" ID"),"Alliance","Player ID","Construction","Research","Troop Training","Est. points if all kept"]];
+    const perPlayerDay=new Map();
+    for (const a of solve.assignments) perPlayerDay.set(a.playerId+"|"+a.dayKey, slotLabel(a.start,opts.slotMinutes));
+    for (const p of players){
+      const cells=DAY_SPECS.map(d=>perPlayerDay.get(p.playerId+"|"+d.key)||"");
+      const scheduledDays=DAY_SPECS.filter(d=>perPlayerDay.has(p.playerId+"|"+d.key));
+      const pts=scheduledDays.reduce((t,d)=>t+p.basePoints[d.key],0)+(scheduledDays.length?p.generalPoints:0);
+      sum.push([opts.includeNames?(p.name||""):p.playerId, p.tag, p.playerId, ...cells, pts]);
+    }
+    const wsSum=XLSX.utils.aoa_to_sheet(sum);
+    wsSum["!cols"]=[{wch:20},{wch:12},{wch:16},{wch:14},{wch:14},{wch:14},{wch:20}];
+    XLSX.utils.book_append_sheet(wb, wsSum, "Summary");
+
+    // Scheduler notes
+    const notes=[["Scheduler notes — not for public posting"],[""],
+      ["All times are UTC. Availability answers were treated as hard rules."]];
+    if (unplaced.length){
+      notes.push([""],["Could not be scheduled:"]);
+      for (const {player,reason} of unplaced)
+        notes.push([`${player.name||player.playerId} (${player.tag||"no alliance"}) — ${reason}`]);
+    }
+    const commenters=players.filter(p=>p.comment);
+    if (commenters.length){
+      notes.push([""],["Comments people wrote on the form:"]);
+      for (const p of commenters)
+        notes.push([`${p.name||p.playerId} (${p.tag||"no alliance"}): ${p.comment}`]);
+    }
+    const wsNotes=XLSX.utils.aoa_to_sheet(notes);
+    wsNotes["!cols"]=[{wch:110}];
+    XLSX.utils.book_append_sheet(wb, wsNotes, "Scheduler notes");
+
+    const fname=(stateName?stateName+" - ":"")+"Optimised Buff Schedule.xlsx";
+    XLSX.writeFile(wb, fname);
+  });
+
+  function sheetSafe(name){ return name.replace(/[\\\/\?\*\[\]:]/g,"-").slice(0,31); }
+})();
+</script>
+</body>
+</html>

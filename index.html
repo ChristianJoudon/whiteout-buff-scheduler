@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Whiteout Buff Scheduler — SvS boost appointment optimizer</title>
+<meta name="description" content="A free, browser-based optimizer for Whiteout Survival SvS buff days. Drop in your Microsoft Forms sign-ups and get a provably optimal Construction / Research / Troop Training schedule that maximizes prep points. Runs entirely on your computer — nothing is uploaded.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#0a1420; --panel:#101f30; --panel-2:#152a40; --line:#23405c;
+  --ice:#e7f2fa; --steel:#8aa3b8; --ember:#f59a48; --ember-hot:#ffb56b;
+  --aurora:#63e2b7; --danger:#ff8896; --shadow:0 18px 44px rgba(2,8,16,.5);
+  --r:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1200px 500px at 78% -140px, rgba(99,226,183,.10), transparent 60%),
+    radial-gradient(900px 420px at 12% -160px, rgba(90,140,220,.14), transparent 60%),
+    var(--night);
+  color:var(--ice);
+  font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:17px; line-height:1.6;
+  min-height:100vh;
+}
+.wrap{max-width:980px;margin:0 auto;padding:28px 20px 80px}
+a{color:var(--ember-hot);text-decoration:none}
+a:hover{text-decoration:underline}
+
+header.site{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.brand{
+  font-family:"Bricolage Grotesque",system-ui,sans-serif;
+  font-weight:800;font-size:clamp(26px,4.4vw,40px);letter-spacing:.2px;line-height:1.08;
+}
+.brand .flake{color:var(--ember)}
+.tagline{color:var(--steel);font-size:15px}
+.aurora-rule{
+  height:3px;border-radius:3px;margin:14px 0 26px;
+  background:linear-gradient(90deg,#3d6ea8, var(--aurora) 34%, var(--ember) 78%, #3d6ea8);
+  background-size:220% 100%;
+}
+@media (prefers-reduced-motion: no-preference){
+  .aurora-rule{animation:aurora 14s linear infinite}
+  @keyframes aurora{0%{background-position:0% 0}100%{background-position:220% 0}}
+}
+
+.hero{
+  background:linear-gradient(180deg, rgba(21,42,64,.75), rgba(16,31,48,.9));
+  border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);
+  padding:30px 26px;margin-bottom:26px;
+}
+.hero h1{
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:800;
+  font-size:clamp(24px,4vw,34px);line-height:1.12;margin:0 0 10px;
+}
+.hero .lede{color:var(--ice);font-size:clamp(16px,2.4vw,19px);max-width:66ch;margin:0 0 8px}
+.hero .sub{color:var(--steel);font-size:15.5px;max-width:66ch;margin:8px 0 22px}
+.cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.btn{
+  display:inline-block;border:0;border-radius:12px;cursor:pointer;
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:16.5px;
+  padding:12px 22px;color:#1c1206;background:linear-gradient(180deg,var(--ember-hot),var(--ember));
+  box-shadow:0 6px 18px rgba(245,154,72,.28);
+}
+.btn:hover{filter:brightness(1.06);text-decoration:none}
+.btn:focus-visible{outline:3px solid rgba(255,181,107,.6);outline-offset:2px}
+.btn.big{font-size:18px;padding:14px 28px}
+.ghost{
+  background:transparent;color:var(--ice);border:1px solid var(--line);box-shadow:none;
+  font-weight:700;
+}
+.ghost:hover{border-color:var(--aurora);filter:none}
+
+.steps{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 26px;padding:0;list-style:none}
+.steps li{
+  flex:1 1 240px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  padding:14px 16px;display:flex;gap:12px;align-items:flex-start;
+}
+.steps .n{
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:800;color:var(--ember);
+  font-size:22px;line-height:1;padding-top:2px;
+}
+.steps b{display:block;font-size:15.5px}
+.steps span{color:var(--steel);font-size:14px}
+
+section.block{margin:0 0 30px}
+h2{
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:700;
+  font-size:clamp(20px,3vw,26px);margin:0 0 12px;
+}
+h2 .flake{color:var(--ember)}
+p.body{max-width:70ch;margin:0 0 14px}
+.muted{color:var(--steel)}
+
+.oneliner{
+  border-left:3px solid var(--ember);background:var(--panel);border-radius:0 var(--r) var(--r) 0;
+  padding:16px 20px;margin:0 0 22px;font-size:clamp(17px,2.6vw,20px);
+}
+.oneliner b{color:var(--aurora)}
+
+pre.diagram{
+  font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  font-size:13px;line-height:1.5;color:var(--ice);
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  padding:18px 16px;overflow-x:auto;margin:0 0 8px;
+}
+.diagram .pipe{color:var(--ember)}
+.caption{color:var(--steel);font-size:14px;margin:0 0 22px}
+
+.goals{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:0 0 8px}
+.goal{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.goal .rank{
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:13px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ember);margin-bottom:6px;
+}
+.goal b{display:block;font-size:16.5px;margin-bottom:4px}
+.goal span{color:var(--steel);font-size:14.5px}
+
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin:6px 0 8px}
+.fact{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 16px;text-align:center}
+.fact .num{
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:800;color:var(--aurora);
+  font-size:clamp(22px,3.4vw,28px);line-height:1.05;
+}
+.fact .lbl{color:var(--steel);font-size:13.5px;margin-top:6px}
+
+.callout{
+  background:rgba(99,226,183,.06);border:1px solid rgba(99,226,183,.35);
+  border-radius:var(--r);padding:16px 18px;margin:0 0 8px;
+}
+.callout b{color:var(--aurora)}
+
+footer.site{border-top:1px solid var(--line);margin-top:34px;padding-top:22px;color:var(--steel);font-size:14.5px}
+footer.site p{max-width:74ch;margin:0 0 12px}
+footer.site a{font-weight:700}
+.links{display:flex;gap:18px;flex-wrap:wrap;margin:0 0 14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="site">
+    <div class="brand"><span class="flake">❄</span> Whiteout Buff Scheduler</div>
+    <div class="tagline">SvS ministry appointment optimizer — Construction · Research · Troop Training</div>
+  </header>
+  <div class="aurora-rule" aria-hidden="true"></div>
+
+  <div class="hero">
+    <h1>Turn a pile of sign-ups into the highest-scoring buff schedule — automatically.</h1>
+    <p class="lede">Every SvS cycle your state runs three buff days and everyone wants a slot. Drop in the
+      responses your members submit through Microsoft Forms and this tool builds the arrangement that earns
+      the <b>most total prep points</b> — while never placing anyone outside a time they said they were free.</p>
+    <p class="sub">Free, no sign-up, no installs. The page runs entirely in your browser — the survey file
+      never leaves your computer.</p>
+    <div class="cta">
+      <a class="btn big" href="./Whiteout%20Buff%20Scheduler.html">Launch the scheduler →</a>
+      <a class="btn ghost" href="#how">See how it works</a>
+    </div>
+  </div>
+
+  <ol class="steps" aria-label="How to use it">
+    <li><span class="n">1</span><div><b>Collect sign-ups</b><span>Members fill your Microsoft Forms survey: which buff days, when they're free, what speedups &amp; crystals they'll bring.</span></div></li>
+    <li><span class="n">2</span><div><b>Drop in the export</b><span>Download the Forms responses spreadsheet and drag it onto the scheduler. Everything is parsed locally.</span></div></li>
+    <li><span class="n">3</span><div><b>Download the schedule</b><span>Get an .xlsx with one sheet per buff day, a summary, and a notes page flagging anything to check by hand.</span></div></li>
+  </ol>
+
+  <section class="block" id="how">
+    <h2><span class="flake">❄</span> How it decides — in one line</h2>
+    <div class="oneliner">
+      It's a plumbing puzzle. One drop of water equals one booked appointment, the shape of the pipes
+      encodes all the rules, the value stamped on each pipe encodes our priorities, and the water
+      automatically finds the <b>highest-scoring way through</b>.
+    </div>
+    <p class="body">The tempting approach — hand the best slot to the biggest spender, then the next, and so
+      on — looks reasonable but gets stuck. If two whales are both only free at 08:00, giving it to the
+      slightly bigger one leaves the other scoring nothing, when a smarter swap would have scored both.
+      Simple sorting can't see trades like that. So the whole board is modeled as one flow network:</p>
+
+    <pre class="diagram" aria-label="Diagram of the flow network"><span class="pipe">                     pipe carries the
+                     appointment's points
+                            │</span>
+   ┌─────┐   ┌──────────────▼──────────┐   ┌───────────┐   ┌───────┐
+   │ TAP │──►│         PLAYER          │──►│ TIME SLOT │──►│ DRAIN │
+   └─────┘   │   (at most 3 drops)     │   │ (1 drop)  │   └───────┘
+             └─────────────────────────┘   └───────────┘
+
+        one drop that reaches the drain  =  one booked appointment</pre>
+    <p class="caption muted">Pipes only exist between a player and the slots they actually said they're free
+      for — so an illegal appointment isn't penalized, it's simply impossible. Availability, chosen days,
+      one-player-per-slot, and the per-player cap are all built into the plumbing.</p>
+  </section>
+
+  <section class="block">
+    <h2>Three goals, in strict priority order</h2>
+    <div class="goals">
+      <div class="goal"><div class="rank">Priority 1</div><b>Most total points</b><span>Speedups score 30 pts/minute; Fire Crystals 2,000; Refined 30,000; Shards 1,000. A player's shared general speedups are counted once across the whole event.</span></div>
+      <div class="goal"><div class="rank">Priority 2</div><b>Fill the most slots</b><span>Among arrangements that tie on points, prefer the one that seats more people.</span></div>
+      <div class="goal"><div class="rank">Priority 3</div><b>Be fair</b><span>Favor players with barely any free time, and among equals, whoever signed up earlier. The web app can also honor specific times people request in the comments — when it costs nothing.</span></div>
+    </div>
+    <p class="body muted" style="margin-top:14px">All three are baked into a single number stamped on each
+      pipe — like place-value columns in one multi-digit total — so the optimizer settles points first,
+      then fills, then fairness, in one solve.</p>
+  </section>
+
+  <section class="block">
+    <h2>Why it's provably the best, not just good</h2>
+    <p class="body">Every pipe has a hidden reverse pipe, so when a new drop reveals an earlier choice was a
+      mistake, water re-routes backward — that backtracking is exactly what lets it discover the whale-swap
+      on its own. And networks shaped like this carry a mathematical guarantee (total unimodularity): the
+      best possible flow always lands on whole drops, never "half a player" in a slot. So the best water
+      routing <em>is</em> the best real schedule — an exact optimum, not an approximation.</p>
+    <div class="callout">
+      <b>Verified.</b> The solver was checked against exhaustive brute-force enumeration on 400 randomized
+      instances and matched the true optimum every time. On a real state's July sign-ups, the in-browser
+      engine and the Python pipeline produced identical column mapping, identical per-player records, and
+      the identical optimum. Every generated workbook is re-opened and each assignment re-checked before a
+      run reports success.
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>Two ways to run it</h2>
+    <div class="goals">
+      <div class="goal"><div class="rank">Easiest</div><b>In your browser</b><span>Launch the scheduler above (or download the single HTML file and double-click it). No Python, no terminal, nothing to install. Ideal for whoever runs your ministry.</span></div>
+      <div class="goal"><div class="rank">Power user</div><b>Python pipeline</b><span>SortingAlgorithm_v3.py runs the same exact solver from the command line, can fill an existing shared workbook in place, and exposes every option. See the README.</span></div>
+    </div>
+    <div class="cta" style="margin-top:18px">
+      <a class="btn" href="./Whiteout%20Buff%20Scheduler.html">Launch the scheduler →</a>
+    </div>
+  </section>
+
+  <footer class="site">
+    <p><b>Privacy.</b> Everything runs on your computer — the survey file is never uploaded. The downloaded
+      schedule contains time, Player ID, alliance, and (optionally) in-game name — never emails.</p>
+    <div class="links">
+      <a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler">Source on GitHub</a>
+      <a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler/blob/main/ALGORITHM.md">Full explainer</a>
+      <a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler/blob/main/README.md">Readme &amp; setup</a>
+    </div>
+    <p class="muted">Community tool for Whiteout Survival players. Not affiliated with or endorsed by the game's developers.</p>
+  </footer>
+
+</div>
+</body>
+</html>

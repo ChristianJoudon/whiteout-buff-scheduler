@@ -1,0 +1,9 @@
+# Whiteout Buff Scheduler — Python pipeline dependencies
+# The browser tool (Whiteout Buff Scheduler.html) needs none of this; it runs standalone.
+
+pandas>=1.5
+openpyxl>=3.1
+
+# Optional. Only needed if you force the OR-Tools solver with `--solver cpsat`.
+# The built-in network solver is exact on its own, so this is not required.
+# ortools>=9.7

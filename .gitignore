@@ -1,0 +1,19 @@
+# Real member sign-ups / generated schedules contain players' names and game IDs.
+# Never commit them to a public repo.
+*.xlsx
+*.xls
+*.csv
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
