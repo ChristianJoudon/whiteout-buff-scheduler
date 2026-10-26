@@ -1,0 +1,189 @@
+ADVANCED APPOINTMENT PLAN OPTIMIZER — JSON CONTRACT, VERSION 1
+
+Purpose
+
+Choose exactly one declared plan for each member, including a no-title baseline.
+A plan is the complete alternative for that member across this event, not an
+individual speedup transaction. Shared general speedups and other resource use
+are budgeted within that whole plan. No inventory-to-benefit conversion, game
+timer simulation, or inference of honesty is performed here.
+
+Files
+
+optimizer.py       CLI and importable solve(document, engine='cp-sat').
+example.json       Complete, runnable synthetic example.
+example-result.json  Its CP-SAT result, generated in the task's local environment.
+fixtures.json      Twelve synthetic semantic scenarios used by the tests.
+fixtures.py        Source of those synthetic fixtures.
+test_optimizer.py  Semantic tests and an independent raw-JSON exhaustive oracle.
+
+Run
+
+  /path/to/python-with-ortools optimizer.py --input example.json --output result.json
+
+CP-SAT is the production engine. It requires OR-Tools in the selected Python
+environment. This program never installs packages. An absent dependency returns
+DEPENDENCY_MISSING, not a fallback schedule. For explicitly small examples:
+
+  python3 optimizer.py --input example.json --engine exhaustive
+  python3 test_optimizer.py
+
+The exhaustive reference engine is an exact alternative only for at most 100,000
+candidate plan combinations by default. A larger instance fails clearly. Its
+deadline and combination limit are explicit, and incomplete enumeration never
+claims optimality. CP-SAT is additionally checked against the independent oracle
+when OR-Tools is available; otherwise that test is visibly skipped.
+
+Top-level fields
+
+objective_unit (required string): one common unit for all incremental benefits,
+  e.g. saved_timer_seconds or incremental_event_points. Choose integer units
+  fine enough for the required precision. Do not mix unlike quantities.
+policy: 'balanced' (default), 'benefit-first', or 'team-first'.
+deadline_seconds: total deadline across model construction and all solve stages;
+  positive, at most 86400, default 30. Solver and reporting overhead can add a
+  small amount of wall time. No fresh deadline is granted for a later stage.
+settings (optional object):
+  min_slot_minutes: at least 30; default 30.
+  max_event_appointments_per_player: positive integer; default 3.
+  max_day_appointments_per_player: positive integer; default 1. Set to 2 or
+    another explicit value to allow a combined plan using multiple offices on
+    the same requested day. Same-player overlap and cooldown still apply.
+  cross_position_cooldown_minutes: nonnegative, default 0. Fractional minutes
+    are supported to microsecond precision. The interval is a gap between the
+    earlier appointment's end and the later appointment's start, and applies
+    only when the offices differ. Supply the state's applicable policy;
+    this configurable default does not assert a game rule.
+slots (required nonempty list): each object has a unique id, day, office, start,
+  end. All are strings. Times must be absolute ISO UTC timestamps ending in Z
+  or an explicit zero offset; naive/local times are rejected. Every slot must
+  last at least 30 minutes. Midnight is handled by actual dates, not wrapping
+  clock arithmetic. Endpoints are half-open: 08:00–08:30 and 08:30–09:00 fit.
+  office identifies the physical office/seat, not the task category. For the
+  current ministry setup, construction and research use the same vice-president
+  key; education-minister is a separate office. Distinct activity labels must
+  not create fictitious parallel seats for the same physical office.
+blocked_slot_ids (optional list): unavailable office intervals. An overlapping
+  slot is blocked even if it has a different id.
+locks (optional list): objects with slot_id and member_id. A member absent from
+  the members list is an external fixed appointment. All fixed intervals are
+  preserved. Conflicting locks, and a slot both blocked and locked, are explicit
+  input blockers; no lock is silently moved. Known members must have a valid
+  selectable plan that contains every one of their fixed slots. Existing locks
+  are still returned when a deadline prevents finding a new complete schedule.
+members (required nonempty list): described below.
+
+Member fields
+
+id: required unique string.
+requested_days: list of exact day keys; no day is inferred from inventory.
+budgets: optional object mapping resource names to nonnegative finite amounts.
+  Units are specified by the resource key, e.g. general_minutes, fire_crystals.
+  Decimal quantities are accepted. Each plan's total resource use is checked
+  against these per-member budgets. No resource can be borrowed from another
+  member. A declared cost with a missing budget is an explicit data gap, never
+  a reliability penalty. Undeclared costs or game prerequisites are not guessed.
+availability: optional list of absolute UTC {start,end} windows. If supplied,
+  each complete appointment must fit inside the union of these windows. An
+  explicit empty list means no available appointment. If omitted, declared
+  plan feasibility is assumed and that assumption appears in result notes.
+  This contract uses full-seat availability. A different operational rule for
+  short login/action windows requires an explicit model extension.
+max_event_appointments / max_day_appointments: optional nonnegative member caps.
+  These may tighten the corresponding global setting, not loosen it.
+completed_tasks: optional list of task ids already completed before this plan.
+history_count: optional nonnegative integer; prior event access count for
+  rotation. If ANY member omits it, history ranking is disabled for ALL members
+  and this is disclosed in notes. Explicit 0 means genuinely no previous access;
+  unknown history is never silently ranked as zero. No inferred reliability,
+  alliance preference, or wealth penalty is applied.
+previous_slot_ids: optional list of existing slot ids, default empty. These are
+  soft preferences for stability. Use locks for commitments that may not move.
+plans: required list of mutually exclusive complete event plans.
+
+Plan fields
+
+id: required unique string within the member.
+baseline: optional boolean; exactly one plan per member must set it true.
+  This required no-title baseline has no appointments, zero incremental_benefit,
+  and zero preference_score. It may still consume resources or perform tasks:
+  members can contribute without receiving a title. For members with fixed
+  appointments the baseline remains documented but is not selectable.
+incremental_benefit: required signed integer, measured over this member's
+  no-title baseline. This is supplied by the planner or a separate validated
+  game-benefit calculation. Gross stock, gross prep points and claimed title
+  uplift are different quantities. They cannot be substituted silently.
+  Negative deltas are permitted and never clamped: the same fixed work may
+  consume fewer point-bearing speedups with a title, or a coupled alternative
+  may lose value against the no-title baseline. Benefit-first may prefer the
+  baseline in that case; a people-first policy may explicitly choose access
+  despite a negative delta. Fixed negative-value appointments remain fixed.
+objective_unit: optional string; if present must exactly match the top-level unit.
+appointments: list of exact slot ids. A nonbaseline plan needs at least one.
+consumption: optional object of total resource use for the entire plan, not only
+  the amount attributed to the title. Every declared amount must fit its budget.
+preference_score: optional nonnegative integer, default 0. This is an explicit
+  plan preference. Free-text comments, names, negation and day-scoped requests
+  are never interpreted automatically. Unknown preferences receive no penalty.
+tasks: optional ordered list of {id,prerequisites:[task_ids]}. Each prerequisite
+  must be in completed_tasks or earlier in this task list. Duplicate tasks and
+  cycles/unmet requirements are rejected. This validates declared dependency
+  order only; it does not infer completion times, title eligibility, or timer
+  feasibility from a task name. Supply game-feasible plans before solving.
+
+Invalid resource, prerequisite, time or request assumptions fail the input with
+a concrete reason. Plans blocked by locks/blocked intervals are instead marked
+unselectable, with the reason in notes. They are not interpreted as cheating.
+No per-plan budget violations are silently truncated or repaired.
+
+Policies and metric definitions
+
+balanced (default):
+  people, benefit, requested_days, preferences, history, stability.
+benefit-first:
+  benefit, people, requested_days, preferences, history, stability.
+team-first:
+  people, requested_days, preferences, history, benefit, stability.
+
+Each preceding stage is proved optimal and fixed before the next is attempted.
+No hidden percentage of benefit is sacrificed. Balanced first finds the widest
+member access, then the greatest incremental benefit achievable at that access.
+Benefit-first shows the unconstrained benefit benchmark and its access cost.
+Team-first can deliberately
+prefer access/preference/history over incremental benefit; its tradeoff is
+visible in the chosen policy and reported metrics.
+
+benefit: sum of selected plans' declared incremental_benefit.
+people: number of members receiving at least one appointment.
+requested_days: number of distinct (member, requested-day) pairs served.
+preferences: sum of selected plans' explicit preference_score.
+history: negative prior-access counts for members served this event. Maximizing
+  favors members with less previous access after earlier goals are fixed.
+stability: negative number of changed (member,slot) relationships, counting both
+  additions and removals against previous_slot_ids.
+
+A zero-benefit explicitly declared requested plan can receive access through
+coverage policy. Missing inventory never automatically creates such a plan or
+forfeits eligibility. A member's multiple appointments must never overlap,
+including across offices. One office cannot hold overlapping appointments for
+different members, including overlapping slots with different ids.
+
+Results
+
+status is OPTIMAL only when all six stages are proved optimal, or complete
+reference enumeration has finished. FEASIBLE is a valid incumbent with an
+unproved stage; later CP-SAT stages are not attempted. UNKNOWN means no complete
+incumbent was found within the deadline. INFEASIBLE is a proved absence of a
+complete schedule. INPUT_ERROR and DEPENDENCY_MISSING are explicit failures.
+
+stages records each metric's status and value; CP-SAT includes its bound and
+stage wall time. Exact integer reported values are independently recalculated
+from the selected plans; the solver's best_bound is a floating-point diagnostic.
+selected_plans records the chosen alternative and resource consumption for each
+member. assignments records office/day/absolute UTC time, member, plan and lock
+status. External fixed appointments earn no invented benefit or coverage.
+metrics, objective_order, notes, model_scope and elapsed_seconds make the scope
+and assumptions visible. A mathematical optimum is an optimum of these supplied
+plans and policy, not proof that omitted plans or unmodeled game mechanics do
+not matter. No output should be published automatically when status is UNKNOWN,
+INFEASIBLE, INPUT_ERROR or DEPENDENCY_MISSING.

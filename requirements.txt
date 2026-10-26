@@ -1,0 +1,2 @@
+# Production advanced-plan solver; used and tested in this edition.
+ortools==9.15.6755

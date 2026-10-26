@@ -1,0 +1,97 @@
+{
+  "date": "2026-10-26",
+  "edition": "Whiteout scheduler v4 local development",
+  "browser": {
+    "command": "node tests/browser-core.test.cjs",
+    "status": "PASS",
+    "targeted_regressions": 23,
+    "independent_exhaustive_instances": 300,
+    "policies": [
+      "balanced",
+      "team",
+      "benefit"
+    ],
+    "scale_case": {
+      "members": 120,
+      "available_appointments": 144,
+      "placed_appointments": 144,
+      "covered_members": 120,
+      "observed_solve_ms": 190
+    },
+    "actual_ui": {
+      "survey_import": "PASS",
+      "unknown_benefit_disables_ranking_for_all": "PASS",
+      "UTC_window_change": "PASS",
+      "external_fixed_appointment_import": "PASS",
+      "result_tabs": "PASS",
+      "xlsx_download": "PASS",
+      "download_event_note": "The browser event waiter timed out, but the actual saved XLSX file was found and inspected; export succeeded.",
+      "downloaded_artifact": "sample-export.xlsx",
+      "sheets": 6,
+      "fixed_external_id_in_day_sheet": "PASS",
+      "draft_status_and_source_comments_in_notes": "PASS"
+    },
+    "screenshot": "browser-preview.jpg"
+  },
+  "advanced": {
+    "command": ".venv/bin/python -m unittest discover -s advanced -p test_*.py -q",
+    "engine": "OR-Tools CP-SAT 9.15.6755",
+    "tests_run": 38,
+    "passed": 37,
+    "skipped": 1,
+    "skip_reason": "Absent-dependency-only test not applicable in installed-OR-Tools environment.",
+    "status": "PASS",
+    "oracle": "Independent raw-JSON complete enumeration compared with exhaustive engine and production CP-SAT; semantic fixtures plus randomized cases; see test_optimizer.py.",
+    "example_status": "OPTIMAL",
+    "stages_proved": 6,
+    "regressions_include": [
+      "no-appointment baseline still contributes",
+      "shared resource plan budget",
+      "physical office overlap across distinct slot IDs",
+      "external accepted locks",
+      "blocked interval vs differently named fixed slot",
+      "signed negative incremental benefit",
+      "missing history disables ranking globally",
+      "UTC midnight and fractional cooldown",
+      "truthful timeout / dependency handling"
+    ]
+  },
+  "mechanics": {
+    "command": "python3 -m unittest discover -s mechanics -p test_*.py -q",
+    "tests_run": 25,
+    "passed": 25,
+    "status": "PASS",
+    "scope": "Explicit supplied same-work timer arithmetic and bounded fixed-budget training; no live game simulator."
+  },
+  "integration": {
+    "command": ".venv/bin/python examples/from_tasks.py",
+    "status": "PASS",
+    "result": "OPTIMAL",
+    "members_served": 2,
+    "incremental_saved_seconds": 1600,
+    "general_speedup_minutes_consumed": 0,
+    "flexible_member_rerouted_to_0830": "PASS",
+    "files": [
+      "examples/task-derived-input.json",
+      "examples/task-derived-result.json"
+    ]
+  },
+  "research": {
+    "record": "research.json",
+    "sources": 17,
+    "findings": 17,
+    "original_research_chat_recovered": false,
+    "new_public_research_performed": true
+  },
+  "publication": {
+    "public_site_modified": false,
+    "local_files_only": true,
+    "real_game_actions": false,
+    "real_player_data_used": false
+  },
+  "limits": [
+    "Browser survey model is additive by requested day; coupled tasks/resources need whole-event alternatives in advanced mode.",
+    "Advanced plan optimizer validates declared budgets and dependency order, not omitted game timers or complete game-feasibility.",
+    "Mechanics calculator uses supplied inputs and explicit assumptions; current buff strengths, active event table and live resource readiness are not inferred."
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "mode": "same-work",
+  "task_id": "synthetic-long-build",
+  "base_work_seconds": "46200",
+  "existing_speed_percent": "100",
+  "title_speed_percent": "10",
+  "fixed_reduction_seconds": "600",
+  "fixed_reduction_stage": "after_speed",
+  "action_state": "new",
+  "started_at": "2026-10-26T08:05:00Z",
+  "office": "VP",
+  "appointments": [
+    {"id": "vp-0800", "office": "VP", "start": "2026-10-26T08:00:00Z", "end": "2026-10-26T08:30:00Z"}
+  ],
+  "evidence": {"source": "Synthetic demonstration. Fixed-reduction order is an explicit scenario choice, not an Agnes claim."},
+  "assumptions": ["All other effects are already reflected in supplied inputs; no resource or task-chain feasibility is asserted."]
+}

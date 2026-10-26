@@ -1,0 +1,157 @@
+{
+  "objective_unit": "saved_timer_minutes",
+  "policy": "balanced",
+  "deadline_seconds": 60,
+  "slots": [
+    {
+      "id": "c1",
+      "day": "construction-day",
+      "office": "vice-president",
+      "start": "2026-10-26T08:00:00Z",
+      "end": "2026-10-26T08:30:00Z"
+    },
+    {
+      "id": "r1",
+      "day": "research-day",
+      "office": "vice-president",
+      "start": "2026-10-27T08:00:00Z",
+      "end": "2026-10-27T08:30:00Z"
+    },
+    {
+      "id": "c2",
+      "day": "construction-day",
+      "office": "vice-president",
+      "start": "2026-10-26T08:30:00Z",
+      "end": "2026-10-26T09:00:00Z"
+    },
+    {
+      "id": "t1",
+      "day": "troop-day",
+      "office": "education-minister",
+      "start": "2026-10-29T08:00:00Z",
+      "end": "2026-10-29T08:30:00Z"
+    }
+  ],
+  "members": [
+    {
+      "id": "alpha",
+      "requested_days": [
+        "construction-day",
+        "research-day"
+      ],
+      "plans": [
+        {
+          "id": "no-title",
+          "incremental_benefit": 0,
+          "appointments": [],
+          "baseline": true,
+          "consumption": {
+            "general_minutes": 100
+          }
+        },
+        {
+          "id": "construction",
+          "incremental_benefit": 4,
+          "appointments": [
+            "c1"
+          ],
+          "consumption": {
+            "general_minutes": 60
+          }
+        },
+        {
+          "id": "research",
+          "incremental_benefit": 6,
+          "appointments": [
+            "r1"
+          ],
+          "consumption": {
+            "general_minutes": 70
+          }
+        },
+        {
+          "id": "split",
+          "incremental_benefit": 9,
+          "appointments": [
+            "c1",
+            "r1"
+          ],
+          "consumption": {
+            "general_minutes": 100
+          },
+          "tasks": [
+            {
+              "id": "planned-research",
+              "prerequisites": [
+                "research-prerequisite-ready"
+              ]
+            }
+          ],
+          "preference_score": 2
+        }
+      ],
+      "budgets": {
+        "general_minutes": 100
+      },
+      "history_count": 1,
+      "previous_slot_ids": [
+        "c1"
+      ],
+      "completed_tasks": [
+        "research-prerequisite-ready"
+      ],
+      "availability": [
+        {
+          "start": "2026-10-26T08:00:00Z",
+          "end": "2026-10-26T09:00:00Z"
+        },
+        {
+          "start": "2026-10-27T08:00:00Z",
+          "end": "2026-10-27T09:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "bravo",
+      "requested_days": [
+        "construction-day"
+      ],
+      "plans": [
+        {
+          "id": "no-title",
+          "incremental_benefit": 0,
+          "appointments": [],
+          "baseline": true
+        },
+        {
+          "id": "construction-request",
+          "incremental_benefit": 3,
+          "appointments": [
+            "c2"
+          ],
+          "preference_score": 1
+        }
+      ],
+      "history_count": 0,
+      "availability": [
+        {
+          "start": "2026-10-26T08:30:00Z",
+          "end": "2026-10-26T09:00:00Z"
+        }
+      ]
+    }
+  ],
+  "description": "Synthetic illustration: incremental benefits are supplied scenario assumptions, not game-mechanic estimates.",
+  "settings": {
+    "min_slot_minutes": 30,
+    "max_event_appointments_per_player": 3,
+    "max_day_appointments_per_player": 1,
+    "cross_position_cooldown_minutes": 7.5
+  },
+  "locks": [
+    {
+      "slot_id": "t1",
+      "member_id": "external-fixed-member"
+    }
+  ]
+}

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Whiteout Buff Scheduler | Project case study</title>
-<meta name="description" content="How Christian Joudon built a survey intake, constrained optimization and review workflow for Whiteout Survival buff appointments.">
+<meta name="description" content="How Christian Joudon built v4 around broad access, incremental benefit and transparent review.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -139,50 +139,142 @@ footer.site p{max-width:74ch;margin:0 0 12px}
 footer.site a{font-weight:700}
 .links{display:flex;gap:18px;flex-wrap:wrap;margin:0 0 14px}
 </style>
-</head>
 
-<body><div class="wrap"><header class="site"><div class="brand"><span class="flake">❄</span> Whiteout Buff Scheduler</div><div class="tagline">SvS ministry appointments · Construction · Research · Troop Training</div></header><div class="aurora-rule" aria-hidden="true"></div>
-<div class="hero"><h1>Turn community signups into a clear, reviewable schedule.</h1><p class="lede">A community tool connecting survey intake, exact scheduling and an Excel workbook organizers can review.</p><p class="sub">Designed and developed by Christian Joudon. This case study explains the problem, the engineering choices and the evidence behind the result.</p><div class="cta"><a class="btn big" href="./Whiteout%20Buff%20Scheduler.html">Launch the scheduler</a><a class="btn ghost" href="./walkthrough.html">Read the illustrated walkthrough</a><a class="btn ghost" href="#how">How the optimizer works</a></div></div>
-<ol class="steps" aria-label="Project overview"><li><span class="n">1</span><div><b>Prepare the input</b><span>Translate survey answers into usable player records.</span></div></li><li><span class="n">2</span><div><b>Respect the constraints</b><span>Keep assignments inside selected days, availability and appointment limits.</span></div></li><li><span class="n">3</span><div><b>Make the result reviewable</b><span>Show the schedule, attention messages and an Excel export.</span></div></li></ol>
-<section class="block" id="context">
-<h2>A community schedule needs more than a ranked list.</h2><div class="oneliner">The task combines player availability, shared resources and limited appointments across three event days.</div>
-<p class="body">Whiteout Survival communities arrange appointments for Construction, Research and Troop Training during an SvS preparation event. Players submit their available times, chosen days and resources through Microsoft Forms. An organizer then needs a schedule that uses those resources well without booking anyone outside their availability. A promising total is only useful if the resulting appointments can actually be kept.</p>
-<p class="body">I developed the scheduler, its browser interface, the Python workflow and the explanation of how its decisions work. The project connects data preparation, mathematical optimization and practical output for community organizers. I wanted someone to start with the survey they already collect, understand what the tool produced and see which answers still need attention. This case study follows those connections from an incoming response to a schedule someone can review.</p>
-<figure style="margin:22px 0"><div style="position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);aspect-ratio:3.3315043824476986"><img src="assets/03-results.jpg" alt="Actual browser output using synthetic responses. The rounded display shows 209k estimated points; the downloaded summary totals 208,800." loading="lazy" style="position:absolute;max-width:none;width:125.0%;left:-12.5%;top:-220.93023255813952%;height:auto"></div><figcaption class="caption" style="margin-top:10px">Actual browser output using synthetic responses. The rounded display shows 209k estimated points; the downloaded summary totals 208,800.</figcaption></figure>
-</section>
-<section class="block" id="input">
-<h2>Reliable assignments begin with readable input.</h2><div class="oneliner">The scheduler translates varied survey answers into consistent player records before it assigns a time.</div>
-<p class="body">A survey workbook is not a clean scheduling model. Column headings vary, resources arrive as numbers or written durations, and a player may submit more than once. The intake stage locates the relevant sheet and columns, recognizes Player IDs and builds one retained record per player. Completion timestamps guide duplicate handling when they are available, including timestamps stored as Excel serial values. Missing or unreadable availability does not become permission to schedule someone.</p>
-<p class="body">Resource parsing recognizes days, hours and minutes, then converts supported inputs into estimated points. Explicit units matter because a bare number defaults to days unless its header identifies another unit. Ambiguous amounts need clarification before use. Availability becomes a set of eligible appointment starts, with the full appointment required to fit inside the stated window. Selected days, resource values and comments remain distinct. This separation lets the organizer review an unusual answer without confusing a preference with a hard availability rule.</p>
-<div class="facts" aria-label="Processing stages"><div class="fact"><div class="num">Survey</div><div class="lbl">Read responses</div></div><div class="fact"><div class="num">Records</div><div class="lbl">Normalize players</div></div><div class="fact"><div class="num">Slots</div><div class="lbl">Apply constraints</div></div><div class="fact"><div class="num">Schedule</div><div class="lbl">Optimize and review</div></div></div>
-</section>
-<section class="block" id="constraints">
-<h2>A flexible player can protect a scarce appointment.</h2><div class="oneliner">Choosing the largest contribution first can prevent a better arrangement for the whole event.</div>
-<div class="goals">
-<div class="goal"><div class="rank">The rules</div><span>An appointment must fall on a selected day and within submitted availability. A slot holds at most one player. A player can receive at most one appointment on a day, with an additional limit across the event. These are constraints, not preferences the optimizer may trade away for more points.</span></div>
-<div class="goal"><div class="rank">A small example</div><span>Player A can attend at 08:00 or 08:30. Player B can attend only at 08:00. If A has the larger contribution, a simple ranking might give A the first slot and leave B out. Putting B at 08:00 and A at 08:30 includes both. The important information is how their options overlap, not just which player brings more.</span></div>
-<div class="goal"><div class="rank">The design decision</div><span>I model the connected problem across all three days. The solver can reconsider an earlier assignment when another arrangement improves the result. That ability to revise a choice is what the simple ranked approach lacks.</span></div>
-</div>
-</section>
-<section class="block" id="how">
+<style>
+.doc-nav{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px 24px;margin:0 0 34px}
+.doc-nav h2{font-size:20px}.doc-nav ol{columns:2;column-gap:36px;margin:0;padding-left:22px}
+.doc-nav li{break-inside:avoid;margin:0 0 9px;line-height:1.4;padding-right:14px}
+.topic{padding-top:8px;scroll-margin-top:24px}.topic h2{font-size:clamp(23px,3vw,29px);max-width:33ch}
+.topic h3{font-family:"Bricolage Grotesque",sans-serif;font-size:19px;margin:24px 0 7px}
+.topic .intro{font-size:19px;color:var(--steel);max-width:70ch;margin:0 0 18px}
+.topic .body{max-width:75ch}.topic p{overflow-wrap:anywhere}.topic{margin-bottom:46px!important}
+.topic figure{margin:26px 0 30px}.topic figure img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:var(--r)}
+.topic figcaption{margin-top:10px;line-height:1.55}.figure-no{color:var(--ember-hot);font-weight:bold;margin-right:7px}
+.table-scroll{overflow-x:auto;margin:24px 0;border:1px solid var(--line);border-radius:var(--r)}
+.reference-table{width:100%;border-collapse:collapse;font-size:16px;line-height:1.5}
+.reference-table th,.reference-table td{padding:14px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+.reference-table th{color:var(--aurora);background:var(--panel-2)}.reference-table td{background:var(--panel)}
+.reference-table tr:last-child td{border-bottom:0}.topic .links{margin-top:18px}
+.edition{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--steel);margin:0 0 12px}
+.read-routes{display:flex;flex-wrap:wrap;gap:8px 20px;margin:22px 0 0;line-height:1.4}
+.skip-link{position:absolute;left:16px;top:-80px;background:var(--panel);padding:12px;z-index:2}.skip-link:focus{top:12px}
+@media(max-width:650px){.doc-nav ol{columns:1}.doc-nav{padding:18px}.reference-table th,.reference-table td{padding:10px}.topic .intro{font-size:18px}}
+@media print{.wrap{max-width:none}.hero,.doc-nav,.topic figure,.callout{break-inside:avoid}.aurora-rule{animation:none}.topic a{text-decoration:underline}}
+</style></head><body><a class="skip-link" href="#contents">Skip to contents</a><main class="wrap">
+<header class="site"><div class="brand"><span class="flake">❄</span> Whiteout Buff Scheduler</div><div class="tagline">Community appointments · Construction · Research · Troop Training</div></header><div class="aurora-rule" aria-hidden="true"></div>
+<div class="hero"><p class="edition">VERSION 4 / 26 OCTOBER 2026 / PROJECT CASE STUDY</p><h1>Make appointment value and uncertainty visible</h1>
+<p class="lede">Whiteout Buff Scheduler v4 is a community planning tool for allocating temporary game offices. I developed its browser workflow, optimization tools and documentation around a distinction that changes the problem: resources a member owns are not the additional benefit an appointment creates.</p>
+<p class="sub">By Christian Joudon. All illustrated players, times and estimates are synthetic.</p><div class="cta">
+<a class="btn big" href="./Whiteout%20Buff%20Scheduler.html">Launch the scheduler</a>
+<a class="btn ghost" href="./walkthrough.html">Read the illustrated walkthrough</a>
+<a class="btn ghost" href="./docs/Whiteout%20Buff%20Scheduler%20Case%20Study.pdf">Download the PDF</a></div>
+<div class="read-routes"><a href="#policy">Understand the optimizer</a><a href="#evidence">Inspect the evidence</a><a href="./walkthrough.html#start">Learn with the sample</a></div></div>
+<nav class="doc-nav" id="contents" aria-label="Contents"><h2>In this case study</h2><ol>
+<li><a href="#context">A useful plan must respect both members and commitments.</a></li>
+<li><a href="#baseline">Inventory is context, while benefit needs a baseline.</a></li>
+<li><a href="#unknown">Unknown estimates change the ranking for everyone.</a></li>
+<li><a href="#constraints">A commitment is a constraint, not a tie preference.</a></li>
+<li><a href="#policy">Exact optimization makes the chosen priorities explicit.</a></li>
+<li><a href="#review">Review status remains visible through the export.</a></li>
+<li><a href="#advanced">Separate models handle interactions the survey cannot represent.</a></li>
+<li><a href="#writing">The guide follows the organizer&#x27;s questions, not the source file layout.</a></li>
+<li><a href="#evidence">The evidence supports tested behavior, not invented impact.</a></li>
+</ol></nav>
+<section class="block topic" id="context">
+<h2>A useful plan must respect both members and commitments.</h2>
+<p class="intro">The audience includes the community organizer using the tool and the technical reviewer who needs to understand its decisions without knowing the game.</p>
+<h3>The operating problem</h3>
+<p class="body">Whiteout Survival communities coordinate temporary office titles during State versus State, or SvS, preparation. A buff is a temporary benefit relevant to an action such as starting construction, research or troop training. Members submit requested days and available times. An organizer needs to allocate scarce appointments, preserve promises already made and identify questions that still need human judgment.</p>
+<h3>My contribution</h3>
+<p class="body">I developed the browser planner, the separate Python optimization and task calculation routes, synthetic examples and the explanations around them. The work connects input modeling, exact optimization, interface states, exported records and technical writing. The documentation is part of that system: it explains which decision belongs to the model and which remains with the organizer. It does not present a generated workbook as a game booking or claim observed community outcomes that the available evidence cannot establish.</p>
+<figure><a href="assets/v4/results.jpg" aria-label="Open figure 1 at full size"><img src="assets/v4/results.jpg" alt="V4 synthetic browser result showing separate coverage, appointment and measured benefit quantities." loading="lazy" width="950" height="203"></a><figcaption class="caption"><span class="figure-no">Figure 1.</span>The result cards distinguish survey coverage, all assignments, measured benefit and source responses.</figcaption></figure>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="baseline">
+<span id="input"></span>
+<h2>Inventory is context, while benefit needs a baseline.</h2>
+<p class="intro">A member can contribute without holding a title. Treating all of that contribution as a title gain would answer the wrong question.</p>
+<h3>The conceptual correction</h3>
+<p class="body">An inventory describes resources owned or intended for use. An appointment&#x27;s incremental benefit is the difference between a declared plan with that title and the same plan without it. These are different quantities. A long new action may benefit even when the member uses no general speedups. Conversely, a large stock does not prove that an appointment produces a large extra gain.</p>
+<h3>The model boundary</h3>
+<p class="body">The browser accepts explicit nonnegative whole minutes of additional saving for each requested day. It does not calculate these values from stock or allocate one general speedup pool across several days. Coupled work belongs in complete alternative plans in the advanced route. There, signed benefit values and an explicit baseline preserve cases in which a plan contributes without an appointment or loses value against the baseline. The unit and counterfactual remain visible rather than being hidden inside a score.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Inventory is context, while benefit needs a baseline. reference table"><table class="reference-table"><thead><tr><th scope="col">Quantity</th><th scope="col">What it describes</th></tr></thead><tbody>
+<tr><td>Inventory</td><td>Resources owned or declared for use</td></tr>
+<tr><td>No title baseline</td><td>What the same plan contributes without the requested title</td></tr>
+<tr><td>Incremental benefit</td><td>The additional result compared with that baseline</td></tr>
+<tr><td>Browser benefit minutes</td><td>Supplied nonnegative whole minutes of additional saving</td></tr>
+<tr><td>Game event points</td><td>A separate quantity requiring the applicable scoring conditions</td></tr>
+</tbody></table></div>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="unknown">
+<h2>Unknown estimates change the ranking for everyone.</h2>
+<p class="intro">Missing information should not become an invented zero, a wealth preference or a judgment about the member.</p>
+<h3>A visible fallback</h3>
+<p class="body">The supplied survey deliberately leaves Elm&#x27;s Research benefit blank. Under the default policy, incomplete eligible estimates disable benefit ranking globally. The planner still considers broad first access, requested day coverage, structured preferences and complete history. Members who supplied numbers do not gain a hidden advantage over members whose benefit remains unknown. Selecting the explicit benefit first policy instead produces a concrete missing estimate error.</p>
+<h3>Separate uncertainty from identity</h3>
+<p class="body">Prior access history has its own completeness test. Unknown history disables rotation for everyone; a genuine zero is not the same as missing history. Resource stock is retained as context, not a reliability score or honesty penalty. These choices keep the system&#x27;s treatment of uncertainty inspectable. They also change the writing: the interface explains the effective policy, while the guide explains why a measured subtotal can remain visible even though comparative benefit ranking is disabled.</p>
+<figure><a href="assets/v4/fallback.jpg" aria-label="Open figure 2 at full size"><img src="assets/v4/fallback.jpg" alt="Model status disclosing global benefit ranking fallback for the sample&#x27;s unknown Research estimate." loading="lazy" width="948" height="324"></a><figcaption class="caption"><span class="figure-no">Figure 2.</span>The original sample demonstrates uncertainty without excluding the member whose estimate is missing.</figcaption></figure>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="constraints">
+<h2>A commitment is a constraint, not a tie preference.</h2>
+<p class="intro">The model distinguishes availability, preferred windows, accepted appointments and comments before optimizing anything.</p>
+<h3>Preserve the real boundary</h3>
+<p class="body">The sample accepted file fixes Construction at 08:30 for a member absent from the survey. That external commitment occupies a seat and remains in the day sheet without earning invented benefit or survey coverage. A conflicting accepted seat or contradiction with a known member&#x27;s availability stops the calculation with a specific reason. The solver does not quietly move a promise to improve its objective.</p>
+<h3>Make flexible choices where flexibility exists</h3>
+<p class="body">Aster&#x27;s short Construction exclusion removes the whole overlapping 30 minute seat. Structured preferred windows can influence ties but cannot overrule availability. Free text is retained for review rather than converted into a positive wish. A separate integration example demonstrates global reassignment: a flexible member can use 08:00 or 08:30, while a constrained member can use only 08:00. Giving the constrained member the early seat and moving the flexible one later serves both.</p>
+<figure><a href="assets/v4/accepted.jpg" aria-label="Open figure 3 at full size"><img src="assets/v4/accepted.jpg" alt="Imported synthetic external appointment marked accepted and fixed." loading="lazy" width="950" height="350"></a><figcaption class="caption"><span class="figure-no">Figure 3.</span>A preserved external member has a real seat but no fabricated survey record.</figcaption></figure>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="policy">
+<span id="how"></span>
 <span id="algorithm"></span>
-<h2>The objective order is built into the solver.</h2><div class="oneliner">Estimated points come first, filled appointments second and preference rules only after those priorities.</div>
-<p class="body">The implementation represents appointments as flow through a network. A route passes through a player, a selected day and an available slot. Capacity limits control how many appointments can pass through each part. Missing connections rule out unavailable times. The minimum cost flow solver uses reverse connections to revise earlier choices as it finds a better arrangement. Integer capacities keep assignments whole, so the result does not depend on rounding a fraction of an appointment.</p>
-<p class="body">Integer weights preserve the priority order: maximize estimated points, then fill more slots, then apply the tie rules. The lower layer considers limited availability and signup order; the browser can also consider time requests in comments when that option is enabled. None of those preferences overrides availability or the first two objectives. Python integers and JavaScript BigInt retain the large weights exactly. A separate capacity limited connection credits each player&#x27;s general speedup pool once across the event, rather than adding the same shared resources to every appointment.</p>
-</section>
-<section class="block" id="output">
-<h2>Two routes make the result available for review.</h2><div class="oneliner">The browser serves a straightforward file workflow, while Python supports inspection and existing schedule templates.</div>
-<p class="body">In the browser, an organizer loads the Forms export, reviews the results and notes, then downloads an Excel workbook. Before displaying results, the solver checks assignments against the hard rules. The download separates the three buff days, summarizes each player&#x27;s appointments and includes Scheduler notes for unplaced players and comments. Spreadsheet data is processed locally, although the initial page load needs network access for its external libraries and fonts. Turning off player names does not anonymize Scheduler notes, so that sheet still needs review before sharing.</p>
-<p class="body">The Python route supports command line inspection and can fill an existing schedule template while preserving locked entries. Its output verifier reopens the written workbook and checks the assignments. The browser does not perform that same reopening step after download. Keeping the routes explicit makes the documentation more useful: organizers can choose a workflow, understand its checks and review the actual output without assuming both versions do everything identically.</p>
-<figure style="margin:22px 0"><div style="position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);aspect-ratio:4.775156281508368"><img src="assets/03-results.jpg" alt="Attention messages stay visible before download. Review these separately because not every warning is copied into Scheduler notes." loading="lazy" style="position:absolute;max-width:none;width:125.0%;left:-12.5%;top:-461.111111111111%;height:auto"></div><figcaption class="caption" style="margin-top:10px">Attention messages stay visible before download. Review these separately because not every warning is copied into Scheduler notes.</figcaption></figure>
-</section>
-<section class="block" id="evidence">
-<h2>Checks support the result and define its limits.</h2><div class="oneliner">Observed behavior and recorded verification reports provide different kinds of evidence.</div>
-<div class="goals">
-<div class="goal"><div class="rank">Demonstrated</div><span>The synthetic walkthrough used nine responses representing eight unique players. The browser placed six players in twelve appointments and displayed 209k estimated points. Those figures describe this example. They do not measure community adoption, time saved, real event scores or improvement over a previous schedule.</span></div>
-<div class="goal"><div class="rank">Previously reported</div><span>The repository documentation reports comparisons with exhaustive enumeration on 400 Python cases and 150 JavaScript cases. Those are historical verification claims, not tests rerun for this publication. The reviewed public snapshot does not include the test files needed to reproduce those counts directly.</span></div>
-<div class="goal"><div class="rank">Still limited</div><span>The optimum applies to the parsed records, configured constraints and implemented point model. It cannot establish what a player will actually spend or whether an appointment will be kept. Unclear survey answers still need organizer judgment, and current game scoring rules need to agree with the constants used by the tool.</span></div>
-</div>
-</section>
-<section class="block" id="documentation"><h2>Follow the workflow or inspect the source.</h2><div class="cta"><a class="btn" href="./walkthrough.html">Read the walkthrough</a><a class="btn ghost" href="./docs/Whiteout%20Buff%20Scheduler%20Case%20Study.pdf">Download the case study PDF</a><a class="btn ghost" href="./docs/Whiteout%20Buff%20Scheduler%20Walkthrough.pdf">Download the walkthrough PDF</a></div><p class="caption" style="margin-top:16px">Documentation edition: 26 October 2026. The illustrated example uses synthetic responses. Original project and explainer URLs remain available.</p></section>
-<footer class="site"><p>Survey data is processed locally. The initial page loads external libraries and fonts. Scheduler notes can retain names and original comments even when names are hidden elsewhere, so review that sheet before sharing.</p><div class="links"><a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler">Source on GitHub</a><a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler/blob/main/ALGORITHM.md">Walkthrough and explainer</a><a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler/blob/main/README.md">Readme and setup</a><a href="https://christianjoudon.github.io/">Christian Joudon’s portfolio</a></div><p class="muted">Community tool for Whiteout Survival players. Not affiliated with or endorsed by the game’s developers.</p></footer></div></body></html>
+<h2>Exact optimization makes the chosen priorities explicit.</h2>
+<p class="intro">The browser solves the submitted three day model exactly. That does not mean one policy is the right choice for every community.</p>
+<h3>Encode the priority order</h3>
+<p class="body">The browser uses a minimum cost flow network. Capacity limits encode appointment caps and one assignment per member and day. Eligible connections represent available seats, while fixed commitments remove occupied choices. Integer weights give each objective enough weight to dominate every lower priority combined. JavaScript BigInt keeps these layered weights exact rather than relying on floating point approximations.</p>
+<h3>Expose the consequence of the policy</h3>
+<p class="body">Broad first access protects the number of members served before maximizing complete measured benefit. Benefit first reverses those two priorities. The team access route prioritizes coverage, requested days, preferences and complete history before any lower benefit layer. With complete estimates, the interface compares access and measured extra minutes so the organizer can see the consequence. Lower layers preserve draft stability and resolve remaining ties. The guarantee applies to the declared inputs and objective order, not unmodeled game behavior or the eventual score.</p>
+<h3>Show the actual comparison</h3>
+<p class="body">The separate complete estimate variation changes Elm’s unknown value to a stated synthetic 25 minutes and narrows the window to 08:00 to 09:00. With the same fixed commitment, broad first access serves five survey members for 300 extra minutes; benefit first serves three for 410. These figures demonstrate the policy difference under declared inputs. They are not an observed benefit to a community or a forecast that the members will perform the work.</p>
+<figure><a href="assets/v4/tradeoff.jpg" aria-label="Open figure 4 at full size"><img src="assets/v4/tradeoff.jpg" alt="Review panel comparing broad first access with benefit first under complete synthetic estimates." loading="lazy" width="950" height="500"></a><figcaption class="caption"><span class="figure-no">Figure 4.</span>A separate complete estimate variation makes the access and benefit comparison inspectable.</figcaption></figure>
+<figure><a href="assets/v4/benefit.jpg" aria-label="Open figure 5 at full size"><img src="assets/v4/benefit.jpg" alt="Benefit first view of the same synthetic comparison, showing three members served for 410 measured extra minutes." loading="lazy" width="950" height="500"></a><figcaption class="caption"><span class="figure-no">Figure 5.</span>The complete variation makes the cost of choosing benefit first visible instead of burying it in an aggregate score.</figcaption></figure>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="review">
+<span id="output"></span>
+<h2>Review status remains visible through the export.</h2>
+<p class="intro">A successful calculation can still contain an unresolved input or a comment that needs judgment.</p>
+<h3>Use states that say what happened</h3>
+<p class="body">The browser distinguishes input issues, unreviewed comments and reviewed inputs. A review checkbox cannot clear an input issue, and recalculation resets comment acknowledgment. Even the reviewed state remains a planning draft. This prevents one successful computational step from implying that a prerequisite has been verified or an appointment entered into the game.</p>
+<h3>Carry the distinction into the workbook</h3>
+<p class="body">The export contains three day sheets, Summary, Declared resources and Scheduler notes. Draft filenames and notes preserve the review state. The names option changes day sheets and Summary but does not anonymize private notes, source comments or every identifier. Documentation therefore explains sharing by sheet purpose instead of promising blanket anonymity. It also states that initial loading uses external fonts and SheetJS, while selected survey processing stays local.</p>
+<figure><a href="assets/v4/reviewed.jpg" aria-label="Open figure 6 at full size"><img src="assets/v4/reviewed.jpg" alt="Reviewed input planning draft status and comment acknowledgment in the synthetic browser example." loading="lazy" width="948" height="324"></a><figcaption class="caption"><span class="figure-no">Figure 6.</span>Review acknowledgment is a documented state with a clear limit, not a booking confirmation.</figcaption></figure>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="advanced">
+<h2>Separate models handle interactions the survey cannot represent.</h2>
+<p class="intro">The browser, advanced plan optimizer and mechanics calculator share concepts without pretending to be interchangeable interfaces.</p>
+<h3>Select complete event alternatives</h3>
+<p class="body">The advanced Python optimizer uses OR-Tools CP-SAT to select one complete plan per member. Its JSON contract requires a baseline, one common integer benefit unit, physical office intervals, declared resource budgets and feasible alternatives. It checks supplied dependency order, member overlap, office overlap and locks. Six sequential objective stages must each be proved before OPTIMAL is reported. A deadline can instead produce FEASIBLE or UNKNOWN, and a missing dependency is disclosed rather than replaced with a silent heuristic.</p>
+<h3>Calculate only what the inputs support</h3>
+<p class="body">The mechanics tool uses exact fractions for supplied same work timer comparisons and bounded fixed budget training. Timing context can gate a new start against an exact office interval. It does not infer live buff strengths, residual queues, repeated starts, collection windows or reinvestment. The integration example compiles supplied work comparisons into alternatives and records two synthetic members served with 1,600 additional timer seconds saved and zero general speedups consumed. The result illustrates the model connection, not a measured game outcome.</p>
+<div class="links"><a href="advanced/schema.txt">Inspect the advanced contract</a><a href="mechanics/README.md">Read the mechanics boundaries</a><a href="examples/from_tasks.py">Inspect the integration example</a></div>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="writing">
+<h2>The guide follows the organizer&#x27;s questions, not the source file layout.</h2>
+<p class="intro">The writing applies the complete technical communication study to reader purpose, conceptual precision, recovery and maintenance.</p>
+<h3>Keep one continuous example</h3>
+<p class="body">The walkthrough follows the supplied five member survey and fixed external appointment through options, import, review and export. A separately labeled complete estimate variation demonstrates policy comparison without overwriting the unknown value in the original. Screenshots show real synthetic browser states. Captions explain their role, and exact control labels sit beside the relevant actions rather than in a distant legend.</p>
+<h3>Separate doing from understanding</h3>
+<p class="body">The main route helps an organizer complete the task. Linked reference sections explain benefit, policies, ambiguous inputs and the separate Python tools. This case study preserves the reasoning behind the design instead of replacing it with a compressed presentation. Shared content is intended to produce companion web, Markdown and PDF editions consistently. The writing review checks conceptual accuracy, completeness, task focus, clarity, concreteness, tone, organization, retrieval and visual usefulness as separate questions.</p>
+<div class="links"><a href="walkthrough.html">Follow the complete browser walkthrough</a></div>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="evidence">
+<h2>The evidence supports tested behavior, not invented impact.</h2>
+<p class="intro">Documentation and independent release check date: 26 October 2026. Saved development records, current release checks and synthetic browser demonstrations are identified separately.</p>
+<h3>Distinguish the record from the rerun</h3>
+<p class="body">The saved v4 development verification reports 23 targeted browser regressions, 300 independent exhaustive instances across three policies and a 120 member synthetic scale case. Independent release checks on 26 October 2026 reran the current suites: browser checks passed, the advanced suite ran 38 tests with 37 passes and one expected dependency specific skip, and all 25 mechanics tests passed. The integration rerun returned OPTIMAL for two synthetic members and 1,600 additional timer seconds with zero general speedups consumed.</p>
+<h3>Demonstrate the real interface with invented data</h3>
+<p class="body">The documentation run loaded the actual five row sample, imported the external fixed appointment, reviewed the three days and comments, and downloaded a six sheet workbook. That workbook was reopened and inspected. The main result covered five survey members across ten requested days, preserved the external member and displayed a 595 minute measured subtotal with an unknown benefit still disclosed. The complete estimate comparison is a different, explicitly labeled variation.</p>
+<h3>Keep the remaining questions visible</h3>
+<p class="body">Those checks do not establish representative user testing, accessibility conformance, community adoption, time savings or real event performance. Browser exactness is bounded by its additive survey model. Advanced exactness is bounded by supplied alternatives and feasibility assumptions. A new reader&#x27;s navigation, interpretation and task performance still need direct observation. Future improvements should preserve the source, record the issue and update the interface explanation and companion documents together.</p>
+<div class="links"><a href="verification.json">Read the saved v4 verification evidence</a><a href="README.md">Read the edition and route overview</a><a href="release-checks.json">Read the independent release checks for this documentation edition</a></div>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="documentation"><h2>Use the guide or inspect the model.</h2><div class="cta"><a class="btn" href="./walkthrough.html">Read the illustrated walkthrough</a><a class="btn ghost" href="./research.html">Research and model record</a><a class="btn ghost" href="./docs/Whiteout%20Buff%20Scheduler%20Case%20Study.pdf">Case study PDF</a><a class="btn ghost" href="./docs/Whiteout%20Buff%20Scheduler%20Walkthrough.pdf">Walkthrough PDF</a></div></section>
+<footer class="site"><p>Version 4. The guide, case study, Markdown and PDF companions share one editable documentation source. These are planning tools; arrange game appointments separately.</p><div class="links"><a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler/blob/main/README.md">Source and setup</a><a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler/blob/main/ALGORITHM.md">Walkthrough on GitHub</a><a href="./release-checks.json">Release verification</a><a href="https://christianjoudon.github.io/">Christian Joudon’s portfolio</a></div><p>Survey processing stays local. Initial page loading uses external libraries and fonts. Scheduler notes retain names and comments, including when names are excluded from the day sheets. Review the workbook before sharing.</p><p>Community project. Not affiliated with or endorsed by the game’s developers.</p></footer></main></body></html>

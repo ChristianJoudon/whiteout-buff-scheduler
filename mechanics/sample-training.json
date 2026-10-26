@@ -1,0 +1,18 @@
+{
+  "mode": "fixed-budget-training",
+  "task_id": "synthetic-promotion-budget",
+  "base_minutes_per_troop": "2.5",
+  "existing_speed_percent": "150",
+  "title_speed_percent": "50",
+  "speedup_minutes": "60",
+  "elapsed_minutes": "30",
+  "trainable_units": 100,
+  "action_kind": "promote",
+  "target_tier_points": "60",
+  "source_tier_points": "45",
+  "points_unit": "callerEventPoints",
+  "batch_capacity": 1000,
+  "capacity_enhance_percent": "200",
+  "evidence": {"source": "Synthetic supplied stats and scoring values; verify the active game before real use."},
+  "assumptions": ["Budget allocated to this stream only. Relevant starts and collection must be feasible; this model does not establish them."]
+}

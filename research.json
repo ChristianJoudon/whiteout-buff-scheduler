@@ -1,0 +1,394 @@
+{
+  "schemaVersion": 1,
+  "researchedOn": "2026-10-26",
+  "scope": "Public web research of Whiteout Survival development appointments, SvS timing and scoring; no account access, cloud writes, game changes or original-chat recovery.",
+  "provenanceCaution": "Original research chat was not recovered. Code/current documents plus public sources were available. Publication, crawl and Last Updated ages are not patch-effective dates. Official-branded wiki pages are community-authored and can lag release notes.",
+  "conclusions": [
+    "Use good-faith stated plans. Inventory, intended spend, project readiness and marginal benefit are distinct; missing mechanics inputs mean unknown benefit, not zero benefit or dishonesty.",
+    "The current form cannot support numerical claims about exact extra SvS points created by an appointment. It can support a constrained team access schedule and transparent opportunity estimates.",
+    "Event variant, active scoring table, state age/progression, normal versus Supreme term, actual president-skill windows and appointment mode are configuration, not universal constants.",
+    "A formally exact optimizer can prove optimality only for its explicit job/value/constraint model. Do not describe that as proving maximum achievable game score."
+  ],
+  "sources": [
+    {
+      "id": "official_reservations_202603",
+      "title": "Whiteout Survival – New Content Update",
+      "url": "https://www.centurygames.com/whiteout-survival-new-content-update/",
+      "authority": "primary_official_publisher",
+      "published": "2026-03-04",
+      "dateCaution": "Describes March 2 release; page publication differs.",
+      "retrieval": "Opened full page."
+    },
+    {
+      "id": "official_app_history",
+      "title": "Whiteout Survival official App Store version history",
+      "url": "https://apps.apple.com/us/app/whiteout-survival/id6443575749",
+      "authority": "primary_official_developer_release_notes",
+      "dateCaution": "Use version-specific dates; current summary and history vary by locale/cache.",
+      "retrieval": "Opened full developer listing."
+    },
+    {
+      "id": "official_position_cooldown",
+      "title": "Position Cooldown — Whiteout Survival Help Center",
+      "url": "https://centurygames.helpshift.com/hc/en/64-whiteout-survival/faq/8596-position-cooldown/?p=ios&tr=1209",
+      "authority": "primary_official_support_indexed",
+      "retrieval": "Indexed article text retrieved in search; direct fetch returned 404. Corroborated by official App Store notes and firsthand players."
+    },
+    {
+      "id": "official_skill_invalidity",
+      "title": "Why did my President Skills become invalid not long after they were activated?",
+      "url": "https://centurygames.helpshift.com/hc/en/64-whiteout-survival/faq/8592-why-did-my-president-skills-become-invalid-not-long-after-they-were-activated/?l=tr&p=ios",
+      "authority": "primary_official_support_indexed",
+      "retrieval": "Indexed article text retrieved; direct fetch returned 404.",
+      "caution": "Wording says when State of Power begins; does not precisely identify which phase boundary."
+    },
+    {
+      "id": "official_supreme_scope",
+      "title": "Supreme President Perks — Whiteout Survival Help Center",
+      "url": "https://centurygames.helpshift.com/hc/en/64-whiteout-survival/faq/8594-supreme-president-perks/?l=de&p=all&s=game-tips",
+      "authority": "primary_official_support",
+      "retrieval": "Opened full article."
+    },
+    {
+      "id": "wiki_svs",
+      "title": "SVS – State Of Power",
+      "url": "https://www.whiteoutsurvival.wiki/events/svs-state-of-power/",
+      "authority": "official_branded_community_authored_wiki",
+      "dateCaution": "Multi-author edited page; no reliable effective patch date shown.",
+      "retrieval": "Opened full page, identified contributor credits and official-wiki footer."
+    },
+    {
+      "id": "wiki_capacity_item",
+      "title": "Training Capacity Enhance (2h)",
+      "url": "https://www.whiteoutsurvival.wiki/items/training-capacity-enhance-2h/",
+      "authority": "official_branded_game_item_reference",
+      "dateCaution": "Current description retrieved; effective change date unknown.",
+      "retrieval": "Indexed item description."
+    },
+    {
+      "id": "wiki_agnes",
+      "title": "Agnes — Project Management",
+      "url": "https://www.whiteoutsurvival.wiki/experts/agnes/",
+      "authority": "official_branded_community_authored_expert_data",
+      "retrieval": "Opened/indexed full expert skill data."
+    },
+    {
+      "id": "wiki_training_faq",
+      "title": "Frequently Asked Questions — Training speed and capacity",
+      "url": "https://www.whiteoutsurvival.wiki/faq/faq-2/",
+      "authority": "official_branded_community_authored_wiki",
+      "retrieval": "Retrieved FAQ text."
+    },
+    {
+      "id": "wiki_october_patch",
+      "title": "Chief Concierge: Sneak Peek October 18 2026",
+      "url": "https://www.whiteoutsurvival.wiki/sneak-peek/101898521en/",
+      "authority": "official_branded_team_update_republication",
+      "dateCaution": "Announcement date, release date and rollout eligibility can differ.",
+      "retrieval": "Retrieved patch text."
+    },
+    {
+      "id": "firsthand_chisgule",
+      "title": "Chisgule Gaming: SvS Preparations [how to gain points in State of Power]",
+      "url": "https://www.youtube.com/watch?v=hl2qwD-z6ug",
+      "transcriptUrl": "https://lilys.ai/en/notes/1082565",
+      "authority": "primary_firsthand_gameplay_sponsored_creator",
+      "retrieval": "Gameplay transcript retrieved; direct YouTube page fetch unavailable.",
+      "caution": "Player perspective from an earlier version; useful mechanics evidence, not a universal current schedule."
+    },
+    {
+      "id": "firsthand_snapshot",
+      "title": "Ministers — player before/after appointment discussion",
+      "url": "https://www.reddit.com/r/whiteoutsurvival/comments/1kb49j8/ministers/",
+      "authority": "primary_firsthand_player_observation_and_peer_explanation",
+      "published": "2025-04-30",
+      "caution": "Not official engine documentation."
+    },
+    {
+      "id": "firsthand_formula",
+      "title": "Question about Ministry of Education buffs — displayed count/time measurements",
+      "url": "https://www.reddit.com/r/whiteoutsurvival/comments/1lciwl4/question_about_ministry_of_education_buffs/",
+      "authority": "primary_firsthand_player_measurement_with_community_formula",
+      "published": "2025-06-16",
+      "caution": "Formula and datamined base values are community claims; do not hardcode every base time from one comment."
+    },
+    {
+      "id": "firsthand_collect",
+      "title": "Training troops for events — when points appear",
+      "url": "https://www.reddit.com/r/whiteoutsurvival/comments/1hgw3no/training_troops_for_events/",
+      "authority": "firsthand_player_question_and_multiple_player_reports",
+      "published": "2024-12-18",
+      "caution": "Collection trigger is consistently reported but not independently confirmed in current game UI."
+    },
+    {
+      "id": "firsthand_promotion",
+      "title": "Promoting during SVS — measured points per second",
+      "url": "https://www.reddit.com/r/whiteoutsurvival/comments/1ieubmj/promoting_during_svs/",
+      "authority": "primary_firsthand_player_timing_experiment",
+      "published": "2025-02-01",
+      "caution": "Account-specific times; ratios demonstrate variation, not a universal tier table."
+    },
+    {
+      "id": "firsthand_lock",
+      "title": "Ministry cancel and put the next in line member",
+      "url": "https://www.reddit.com/r/whiteoutsurvival/comments/1k2wui2/",
+      "authority": "firsthand_player_reports",
+      "published": "2025-04-19",
+      "caution": "Confirms minimum slot behavior; does not establish every current UI rule."
+    },
+    {
+      "id": "firsthand_president",
+      "title": "First Time President Guide (Actually Useful)",
+      "url": "https://www.reddit.com/r/whiteoutsurvival/comments/1jgoew2/first_time_president_guide_actually_useful/",
+      "authority": "primary_firsthand_president_walkthrough",
+      "published": "2025-03-22",
+      "caution": "Five-minute personal swap and 7d30m scheduling observations require current confirmation."
+    }
+  ],
+  "findings": [
+    {
+      "id": "slot_mode",
+      "status": "official_confirmed",
+      "sourceIds": [
+        "official_reservations_202603"
+      ],
+      "fact": "Queue and time-slot modes coexist. President/Supreme must activate time-slot mode; requests select within next 24 hours. Approved applications create a Task List reminder.",
+      "plannerImplication": "A multi-day planner is an external plan. Separate planned, submitted, approved and held appointments; do not imply all can be booked in game immediately."
+    },
+    {
+      "id": "min_turn",
+      "status": "official_confirmed_with_firsthand_operational_detail",
+      "sourceIds": [
+        "official_app_history",
+        "official_position_cooldown",
+        "firsthand_lock"
+      ],
+      "fact": "Developer version 1.21.20 changed state-wide/inter-state position cooldown to 30 minutes. Removing an incumbent early does not make another slot immediately usable.",
+      "plannerImplication": "Default occupied/locked seat intervals to 30 minutes. A player needing only seconds still consumes the seat's minimum interval. Old two-hour statements are stale. Do not infer additional personal cooldowns."
+    },
+    {
+      "id": "queue_admin",
+      "status": "official_confirmed",
+      "sourceIds": [
+        "official_app_history"
+      ],
+      "fact": "The same update permits moving reservations up the queue and lets Supreme Presidents autoapprove the winning state's positions only or both states.",
+      "plannerImplication": "Queue order and inter-state access are leadership configuration. Do not assume an enemy state's players consume capacity, or assume no access, without current settings."
+    },
+    {
+      "id": "start_snapshot",
+      "status": "strong_player_supported_not_current_engine_verified",
+      "sourceIds": [
+        "firsthand_snapshot"
+      ],
+      "fact": "Players report construction/research/training speed buffs must be held before starting the action; receiving a title does not shorten a queue already running.",
+      "plannerImplication": "Schedule useful starts/restarts. A player with no speedups can benefit by starting a long queue. Finishing an old queue alone does not demonstrate minister benefit. Keep preexisting-queue remainder separate."
+    },
+    {
+      "id": "snapshot_persistence",
+      "status": "strong_player_supported",
+      "sourceIds": [
+        "firsthand_snapshot"
+      ],
+      "fact": "The title is needed at the new action's start; its reduced timer continues after the appointment ends.",
+      "plannerImplication": "Thirty-minute occupancy is an opportunity to initiate work lasting days, not thirty minutes of accelerated production. Never prorate benefit to the appointment duration."
+    },
+    {
+      "id": "short_buffs",
+      "status": "primary_firsthand_observation",
+      "sourceIds": [
+        "firsthand_chisgule"
+      ],
+      "fact": "At 03:29–03:56 the creator contrasts a half-hour VP turn with roughly five-minute Double Time/pet windows and reports losing those short buffs during repeated building starts.",
+      "plannerImplication": "Show a start-action checklist and coordinate personal buff readiness with the chosen slot. Do not assume every start across thirty minutes has the same stack."
+    },
+    {
+      "id": "scoring_triggers",
+      "status": "published_reference_and_firsthand_supported",
+      "sourceIds": [
+        "wiki_svs",
+        "firsthand_collect"
+      ],
+      "fact": "SvS tasks differ: Days 1/2/5 list eligible speedup/material use; Day 4 lists train/promote troops. Players report training score appears on collection.",
+      "plannerImplication": "Use action-specific scoring triggers: material spend/start, speedup use, and troop collection. Do not price Training Day as a universal 30 points per speedup minute. Support pretraining and holding completed troops for collection."
+    },
+    {
+      "id": "day_and_event_variant",
+      "status": "configuration_required",
+      "sourceIds": [
+        "wiki_svs"
+      ],
+      "fact": "SvS's listed tasks recur on several days; construction, research and training are not exclusive point categories tied to three labels.",
+      "plannerImplication": "Monday VP/construction, Tuesday VP/research and Thursday Education are common team policies, not hard game prohibitions. King of Icefield, Hall of Chiefs and seasonal overlapping events require their own scoring tables."
+    },
+    {
+      "id": "state_contribution",
+      "status": "progression_dependent_reference",
+      "sourceIds": [
+        "wiki_svs"
+      ],
+      "fact": "Personal/alliance score and state contribution are distinct. The wiki's current example uses 100% at FC4+, 50% at FC2–3 and 0% below, explicitly subject to progression.",
+      "plannerImplication": "Expose current state conversion bands only when state-score optimization is requested. Never install those example thresholds as universal or silently deny lower-level members growth/fair-access slots."
+    },
+    {
+      "id": "capacity_not_speed",
+      "status": "item_description_confirmed",
+      "sourceIds": [
+        "wiki_capacity_item"
+      ],
+      "fact": "Training Capacity Enhance (2h) increases both capacity and training times by 200%.",
+      "plannerImplication": "Model three-times-sized queues, not three-times throughput. It primarily helps bank a long pretraining batch, reduce requeue actions, and avoid idle overnight camps. Its start window differs from job completion."
+    },
+    {
+      "id": "additive_speed",
+      "status": "player_measurement_supported_formula",
+      "sourceIds": [
+        "firsthand_formula"
+      ],
+      "fact": "Displayed +50% Education speed adds percentage points to existing speed bonuses; it is not a 50% timer cut. Larger capacity can make a full batch take longer despite higher troops per minute.",
+      "plannerImplication": "Use speed bonus fractions consistently and distinguish same troop count from full-capacity batch comparison. Prefer live displayed times when base data or exceptional effects are unknown."
+    },
+    {
+      "id": "three_camps",
+      "status": "published_faq",
+      "sourceIds": [
+        "wiki_training_faq"
+      ],
+      "fact": "Training speed/capacity combine bonuses from all three camps and research.",
+      "plannerImplication": "Treat Infantry/Lancer/Marksman as parallel queues, with eligible tier/promotion backlog tracked per camp. A single account-wide speedup pool is shared, not replicated three times."
+    },
+    {
+      "id": "promotion_nonuniform",
+      "status": "primary_firsthand_measurement",
+      "sourceIds": [
+        "firsthand_promotion"
+      ],
+      "fact": "One player's T1→T10 through T9→T10 trials produced different points per second; their T9 promotion outperformed fresh T10 training for that event.",
+      "plannerImplication": "Tier, promotion source, remaining lower-tier inventory and actual per-unit time matter. Never equate one hour of all troop actions or presume everyone has an unlimited near-top-tier backlog."
+    },
+    {
+      "id": "fixed_construction_reduction",
+      "status": "published_expert_data",
+      "sourceIds": [
+        "wiki_agnes"
+      ],
+      "fact": "Agnes Project Management removes a fixed 2–8 hours from each new construction, depending on level.",
+      "plannerImplication": "Fixed reductions create thresholds and potentially instant builds. A speed-percent-only formula is incomplete; collect displayed unbuffed/buffed job times rather than guessing fixed-reduction order."
+    },
+    {
+      "id": "modern_orders_and_experts",
+      "status": "official_feature_existence_current_values_configurable",
+      "sourceIds": [
+        "official_app_history",
+        "wiki_october_patch"
+      ],
+      "fact": "Fire Crystal Age replaces some orders and adds Advanced Training/Crunch Time; July notes add research speed to Agnes. October announcement changes Advanced Training's cooldown to 1 day 23 hours.",
+      "plannerImplication": "Do not use one timeless buff list. Ask optional active-stack availability; keep exact effects and player eligibility configurable. Never confuse Advanced Training Chief Order with alliance tech sharing that name."
+    },
+    {
+      "id": "president_exception",
+      "status": "firsthand_supported_special_case",
+      "sourceIds": [
+        "firsthand_president"
+      ],
+      "fact": "A president's walkthrough reports selecting ministry buffs personally with a five-minute swap cooldown.",
+      "plannerImplication": "Allow leadership to mark a president as self-served/exempt from ordinary seat demand. Do not silently consume scarce Education/VP slots for that player or assume an unverified normal-player swap mechanism."
+    },
+    {
+      "id": "state_skills_and_term_boundary",
+      "status": "official_supported_boundary_needs_live_detail",
+      "sourceIds": [
+        "official_supreme_scope",
+        "official_skill_invalidity"
+      ],
+      "fact": "Supreme skills can affect current/affiliated states except State Search. Official indexed support warns predecessor skills can end at State of Power's beginning.",
+      "plannerImplication": "Use actual announced skill intervals, term reset/closure and access settings. Do not hardcode an unverified phase-specific expiry or assume every advertised 24-hour window survives a term/event boundary."
+    }
+  ],
+  "commonValuesToVerifyInCurrentPanel": {
+    "note": "Frequently corroborated community/gameplay defaults; editable rather than guaranteed current engine constants.",
+    "normalVicePresidentSpeedBonusFraction": 0.1,
+    "supremeVicePresidentSpeedBonusFraction": 0.15,
+    "normalEducationTrainingSpeedBonusFraction": 0.5,
+    "supremeEducationTrainingSpeedBonusFraction": 0.75,
+    "normalEducationFlatTrainingCapacity": 200,
+    "supremeEducationFlatTrainingCapacity": 300,
+    "mobilizeTrainingSpeedBonusFraction": 0.3,
+    "researchAdvancementSpeedBonusFraction": 0.1,
+    "mercantilismConstructionSpeedBonusFraction": 0.1,
+    "stateSkillTypicalDurationHours": 24,
+    "stateSkillCooldownNote": "Commonly reported seven days; a firsthand president reports scheduling lag of another thirty minutes. Use actual available-at timestamps instead of choosing between them.",
+    "sourceIds": [
+      "firsthand_chisgule",
+      "firsthand_president",
+      "firsthand_formula"
+    ],
+    "additionalCorroborationOnly": [
+      "https://www.whiteoutsurvivalwiki.com/events/sunfire-castle/",
+      "https://wosnexus.com/troop-training-calculator",
+      "https://wosalpha.com/calculators/WarAcademyCalcTree"
+    ]
+  },
+  "formulas": [
+    {
+      "id": "additive_duration",
+      "status": "community_supported_standard_model",
+      "variables": {
+        "B": "raw base seconds for the SAME action/quantity",
+        "s": "existing speed bonus as a fraction; +150% means 1.50",
+        "b": "new additive title bonus fraction; +10% means 0.10"
+      },
+      "formula": "T_without = B / (1+s); T_with = B / (1+s+b)",
+      "units": "seconds",
+      "limits": "Only the additive-speed layer. Apply independently verified multiplicative/fixed effects separately; do not invent their order."
+    },
+    {
+      "id": "displayed_time_calibration",
+      "status": "algebra_from_additive_model",
+      "formula": "T_with = T_without * (1+s) / (1+s+b); saved_seconds = T_without * b / (1+s+b)",
+      "units": "seconds; T_without must be same quantity with s and without b",
+      "example": "With +150% existing speed (s=1.50), +50 percentage points produces a 16.67% time saving for the same troop count, not 50%.",
+      "limits": "Do not use when displayed time already includes the title, buff stack changes, or fixed reductions make simple rescaling invalid."
+    },
+    {
+      "id": "training_plan",
+      "status": "planner_accounting_model",
+      "formula": "new_troop_points = completed_collected_quantity * points_per_target_tier; promotion_points = collected_promoted_quantity * (points_target - points_source)",
+      "units": "points",
+      "limits": "Tier point values and promotion-difference rule must come from the current event panel/configuration. All three camps can run, but inventory, resources, speedups and deadlines remain shared constraints."
+    },
+    {
+      "id": "training_output",
+      "status": "conditional_continuous_upper_bound",
+      "formula": "output_for_fixed_speedup_seconds H approximately H / seconds_per_troop; implemented calculator floors bounded allocation output using supplied speeds, elapsed time and trainable-unit caps. Camp residuals, requeue actions, changing later-start buffs and collection windows are not simulated",
+      "units": "troops; H in seconds",
+      "limits": "This is not automatically achievable in a thirty-minute human session and is not a score forecast without tier, plan and capacity inputs. Don't multiply H by three for the three camps."
+    },
+    {
+      "id": "marginal_counterfactual",
+      "status": "model_definition_not_game_claim",
+      "formula": "marginal_plan_value = feasible_value_same_declared_plan_with_title - feasible_value_same_declared_plan_without_title",
+      "units": "Choose explicit comparable units: saved seconds, additional collected event points, or player-supplied value.",
+      "limits": "Keep freed speedups as savings unless player authorizes a feasible reinvestment plan. Do not treat all preexisting crystal or speedup points as caused by the title."
+    }
+  ],
+  "unknownsAndSafeguards": [
+    "No primary current source recovered for whether a chief may hold multiple future reservations across offices. Community sources say one active application/office at a time. Enforce no simultaneous holdings; flag in-game submission sequencing separately rather than inventing a cross-day cooldown.",
+    "No evidence that lower inventory, first-time participation, narrower availability, language, alliance or missing optional details justify a reliability/distrust discount.",
+    "Do not infer exact gross points or marginal points from speedup inventory, FC inventory and requested days alone.",
+    "A 30-minute minimum seat lock does not prove incumbent automatically loses all benefits at thirty minutes when nobody follows in queue.",
+    "Do not rely on community claims that reserved players already receive benefits while merely waiting; they conflict with firsthand start/appointment reports.",
+    "Do not treat every game-branded wiki paragraph as patched fact: stale two-hour cooldown text persists in unofficial copies despite official developer 30-minute notes.",
+    "The current event panel and player-disclosed plans resolve variants. Missing optional precision should generate honest unknown/range labels while preserving useful team scheduling.",
+    "Planned expenditure is a good-faith team commitment. Inventory is an upper bound, not a demand to spend everything; general speedup allocations must be agreed or optimized only within declared flexibility.",
+    "No source justifies forcing all account development into immediate event points. Research unlocks, troop composition, healing readiness, scarce steel/shards and personal growth goals can legitimately change priorities."
+  ],
+  "minimumInputsForAdvancedNumericalOptimization": [
+    "Explicit event/scoring version, scoring-trigger windows, chosen objective and normal/Supreme term.",
+    "Player's intended actions or declared per-day spend with optional flexible general-speedup budget.",
+    "Per job: current displayed duration without the requested title or validated base duration and exact speed stack; readiness/prerequisites; desired latest completion/collection.",
+    "For troops: target tier, train versus promotion source tier, eligible backlog, per-camp current queue residual and capacity, shared resources/speedup budget.",
+    "Actual announced president-buff windows and personal buff availability, plus appointment seat locks and confirmed reservations.",
+    "Optional player priorities, progress targets and fairness policy. Do not infer trustworthiness from missing precision."
+  ]
+}

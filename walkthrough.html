@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Whiteout Buff Scheduler | Illustrated walkthrough</title>
-<meta name="description" content="Prepare a survey export, set the event rules, review the schedule and download an Excel workbook.">
+<meta name="description" content="A detailed illustrated v4 guide to survey intake, fixed appointments, review and export.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -139,88 +139,283 @@ footer.site p{max-width:74ch;margin:0 0 12px}
 footer.site a{font-weight:700}
 .links{display:flex;gap:18px;flex-wrap:wrap;margin:0 0 14px}
 </style>
-</head>
 
-<body><div class="wrap"><header class="site"><div class="brand"><span class="flake">❄</span> Whiteout Buff Scheduler</div><div class="tagline">SvS ministry appointments · Construction · Research · Troop Training</div></header><div class="aurora-rule" aria-hidden="true"></div>
-<div class="hero"><h1>Create and review a buff schedule.</h1><p class="lede">An illustrated walkthrough for alliance organizers preparing Construction, Research and Troop Training appointments.</p><p class="sub">Follow the operating sequence, then use the input reference when an answer needs clarification. All screenshots use synthetic players.</p><div class="cta"><a class="btn big" href="./Whiteout%20Buff%20Scheduler.html">Launch the scheduler</a><a class="btn ghost" href="./index.html">Read the project case study</a><a class="btn ghost" href="./docs/Whiteout%20Buff%20Scheduler%20Walkthrough.pdf">Download the PDF</a></div></div>
-<nav class="block" aria-label="Walkthrough contents"><h2>Find a step.</h2><div class="links">
-<a href="#overview">1. Turn survey responses into a schedule</a>
-<a href="#prepare">2. Prepare clear survey answers</a>
-<a href="#options">3. Set the event rules</a>
-<a href="#load">4. Choose the response file</a>
-<a href="#result">5. Read the result before exporting</a>
-<a href="#attention">6. Review attention messages and comments</a>
-<a href="#days">7. Inspect each buff day</a>
-<a href="#download">8. Download and share the right sheets</a>
-<a href="#reference">9. Resolve common input problems</a>
-<a href="#input-examples">10. Read the input format examples</a>
-</div></nav>
-<section class="block" id="overview"><h2>Turn survey responses into a schedule</h2><div class="oneliner">Use the browser tool to prepare appointments, review exceptions and download an Excel workbook.</div>
-<p class="body">Open the project website and select Launch the scheduler. Start with the response file exported from Microsoft Forms, then follow the sequence below. The tool reads the answers and shows a schedule for review. You arrange the appointments in the game separately.</p>
-<ol><li><a href="#prepare">Prepare clear survey answers</a></li><li><a href="#options">Set the event rules</a></li><li><a href="#load">Choose the response file</a></li><li><a href="#result">Read the result</a></li><li><a href="#attention">Review attention messages and comments</a></li><li><a href="#days">Inspect each buff day</a></li><li><a href="#download">Download and share the right sheets</a></li><li><a href="#reference">Resolve common input problems</a></li></ol>
-<div class="callout">Before you begin: have a current response export, an agreed appointment length and a confirmed schedule window in UTC. The examples use invented players and a window from 08:00 to 13:00 UTC. These are demonstration settings, not event defaults.</div>
-</section>
-<section class="block" id="prepare"><h2>Prepare clear survey answers</h2><div class="oneliner">Keep the question headers and make units, player identity and availability unambiguous.</div>
-<h3>Use a supported response file</h3><p class="body">Export the responses as .xlsx or .csv. The file chooser also accepts .xlsm. Keep the survey header row. The tool needs a recognizable Player ID field, one speedups field for each buff day, and either shared availability or availability for each day.</p>
-<h3>Write explicit units and UTC ranges</h3><p class="body">Use a value such as 12h, or put hours in the resource header. A bare number otherwise defaults to days unless the header identifies hours, minutes or points. Write availability such as 08:00 to 10:00 UTC. The tool does not convert local time zones.</p>
-<h3>Keep optional answers useful</h3><p class="body">Alliance, player name, completion time, selected buffs, general speedups, crystals and comments add context. If a selected buffs column is present, each player needs recognizable day choices. A blank choice is not treated as permission to schedule every day.</p>
-<h3>Resolve ambiguous resource answers</h3><p class="body">Use one clear amount instead of a range or a value such as 300/250. Missing or unreadable resource values become zero. The optimizer can only work with the values the parser recognizes.</p>
-<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:10px;border-bottom:1px solid var(--line)">Field</th><th style="text-align:left;padding:10px;border-bottom:1px solid var(--line)">Clear example</th><th style="text-align:left;padding:10px;border-bottom:1px solid var(--line)">Meaning</th></tr></thead><tbody><tr><td style="padding:10px;border-bottom:1px solid var(--line)">Player ID</td><td style="padding:10px;border-bottom:1px solid var(--line)">900000001</td><td style="padding:10px;border-bottom:1px solid var(--line)">Synthetic identifier</td></tr><tr><td style="padding:10px;border-bottom:1px solid var(--line)">Construction speedups (hours)</td><td style="padding:10px;border-bottom:1px solid var(--line)">12</td><td style="padding:10px;border-bottom:1px solid var(--line)">Twelve hours</td></tr><tr><td style="padding:10px;border-bottom:1px solid var(--line)">Selected buffs</td><td style="padding:10px;border-bottom:1px solid var(--line)">Construction; Research</td><td style="padding:10px;border-bottom:1px solid var(--line)">Requested days</td></tr><tr><td style="padding:10px;border-bottom:1px solid var(--line)">General availability</td><td style="padding:10px;border-bottom:1px solid var(--line)">08:00 to 10:00</td><td style="padding:10px;border-bottom:1px solid var(--line)">UTC time window</td></tr></tbody></table></div>
-<div class="callout">For duplicate IDs, a recognized completion time takes priority and the latest recognized time wins. When timestamps tie or both are unavailable, the later source row wins. Review the duplicate notice after loading.</div>
-</section>
-<section class="block" id="options"><h2>Set the event rules</h2><div class="oneliner">Open Options when the default appointment rules do not match your event.</div>
-<figure style="margin:22px 0"><div style="position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);aspect-ratio:4.191892370331034"><img src="assets/02-options.jpg" alt="Options in the actual browser tool. This synthetic example uses 30 minute appointments and an 08:00 to 13:00 UTC window." loading="lazy" style="position:absolute;max-width:none;width:125.0%;left:-12.5%;top:-252.3809523809524%;height:auto"></div><figcaption class="caption" style="margin-top:10px">Options in the actual browser tool. This synthetic example uses 30 minute appointments and an 08:00 to 13:00 UTC window.</figcaption></figure>
-<h3>Cap and appointment length</h3><p class="body">The default allows one appointment per buff day, three total. Reduce the event cap to two or one when needed. Appointment lengths are 30, 20, 15 or 60 minutes.</p>
-<h3>UTC schedule window</h3><p class="body">Set Schedule day runs from and …until (UTC). Defaults cover 00:00 to 24:00. Every whole appointment must fit both this window and the player’s availability.</p>
-<h3>Names and time wishes</h3><p class="body">The names checkbox affects day sheets and Summary, but does not anonymize Scheduler notes. The wishes option recognizes comment time ranges within tied results. It cannot override availability or reduce points or appointment count.</p>
-<div class="callout">Changing an option after selecting a file recalculates that same file. Download again after making the final change.</div>
-</section>
-<section class="block" id="load"><h2>Choose the response file</h2><div class="oneliner">Selecting a file starts scheduling automatically.</div>
-<figure style="margin:22px 0"><div style="position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);aspect-ratio:2.8071007320036747"><img src="assets/01-choose-file.jpg" alt="Choose file… opens the file picker. You can also drop the response file into this area." loading="lazy" style="position:absolute;max-width:none;width:125.0%;left:-12.5%;top:-65.85365853658537%;height:auto"></div><figcaption class="caption" style="margin-top:10px">Choose file… opens the file picker. You can also drop the response file into this area.</figcaption></figure>
-<h3>Choose the current export</h3><p class="body">Select Choose file… and pick the current response export, or drag the file into the drop area. Keep the original export available if you need to correct an answer and run it again.</p>
-<h3>Wait for the result</h3><p class="body">The tool reads the file and creates the schedule. There is no separate Generate button. Continue when the Done status and result cards appear.</p>
-<h3>If a required column cannot be found</h3><p class="body">Read the message identifying the missing field. Correct the corresponding survey header or export, then choose the corrected file. Renaming an unrelated field to pass the check would give the scheduler the wrong data.</p>
-<div class="callout">The browser processes the selected file locally. An internet connection is needed initially to load the page and its spreadsheet library.</div>
-</section>
-<section class="block" id="result"><h2>Read the result before exporting</h2><div class="oneliner">The four cards describe different parts of the calculation.</div>
-<figure style="margin:22px 0"><div style="position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);aspect-ratio:5.056047827479449"><img src="assets/03-results.jpg" alt="Synthetic result: 9 responses, 8 unique players, 6 players placed and 12 appointments. The points display rounds 208,800 to 209k." loading="lazy" style="position:absolute;max-width:none;width:125.0%;left:-12.5%;top:-335.29411764705867%;height:auto"></div><figcaption class="caption" style="margin-top:10px">Synthetic result: 9 responses, 8 unique players, 6 players placed and 12 appointments. The points display rounds 208,800 to 209k.</figcaption></figure>
-<h3>Players placed is not appointments made</h3><p class="body">One player can receive appointments on several requested days. In this example, six players receive twelve appointments. The event cap limits the total for each player; it does not promise an appointment to everyone.</p>
-<h3>Responses read can include duplicates</h3><p class="body">Nine source responses become eight unique players because one ID appears twice. Compare the response count with the export and read any duplicate notice before accepting the result.</p>
-<h3>Points are an estimate</h3><p class="body">The score uses the recognized resource amounts and the implemented points model. It assumes those resources are used. The schedule maximizes that model within the configured rules; it does not guarantee the eventual game score.</p>
-<div class="callout">A successful calculation can still contain entries that need your attention. Continue to the messages and day tabs before downloading.</div>
-</section>
-<section class="block" id="attention"><h2>Review attention messages and comments</h2><div class="oneliner">Resolve the input issues that matter before sharing a schedule.</div>
-<figure style="margin:22px 0"><div style="position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);aspect-ratio:4.775156281508368"><img src="assets/03-results.jpg" alt="Needs a quick look from you flags the duplicate response and two unplaced synthetic players." loading="lazy" style="position:absolute;max-width:none;width:125.0%;left:-12.5%;top:-461.111111111111%;height:auto"></div><figcaption class="caption" style="margin-top:10px">Needs a quick look from you flags the duplicate response and two unplaced synthetic players.</figcaption></figure>
-<figure style="margin:22px 0"><div style="position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);aspect-ratio:4.939816842939694"><img src="assets/03-results.jpg" alt="What people wrote in the comments preserves requests for organizer review. A comment is not confirmation that a request was fulfilled." loading="lazy" style="position:absolute;max-width:none;width:125.0%;left:-12.5%;top:-586.2068965517244%;height:auto"></div><figcaption class="caption" style="margin-top:10px">What people wrote in the comments preserves requests for organizer review. A comment is not confirmation that a request was fulfilled.</figcaption></figure>
-<h3>Read the reason, then check the source</h3><p class="body">An unplaced player may have no selected day, no usable resources, no full slot inside the window, or stronger competing requests. A short availability range can produce no valid slot even though the player supplied a time. Correct the source only when the answer is wrong, then load it again.</p>
-<h3>Keep the on page messages</h3><p class="body">Read What people wrote in the comments separately from the attention warnings. Scheduler notes contains unplaced reasons and comments, but does not copy every warning. Review duplicate IDs and other on page issues before download. Retain any organizer follow up you still need to resolve.</p>
-</section>
-<section class="block" id="days"><h2>Inspect each buff day</h2><div class="oneliner">Use the three tabs to review who is placed, when and on which day.</div>
-<figure style="margin:22px 0"><div style="position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);aspect-ratio:3.551769135006225"><img src="assets/03-results.jpg" alt="Construction Day in the synthetic example. Bravo receives 08:00 and Alpha receives 08:30. Empty rows are allowed." loading="lazy" style="position:absolute;max-width:none;width:125.0%;left:-12.5%;top:-515.702479338843%;height:auto"></div><figcaption class="caption" style="margin-top:10px">Construction Day in the synthetic example. Bravo receives 08:00 and Alpha receives 08:30. Empty rows are allowed.</figcaption></figure>
-<h3>Use UTC and event dates</h3><p class="body">Select all three day tabs in turn. Times are UTC. The displayed weekday is a label, not a calendar date. Use the agreed event dates when arranging appointments in the game.</p>
-<h3>Understand an open row</h3><p class="body">Open means nobody was assigned to that slot. Empty slots are allowed. The tool cannot override availability, day selection or the appointment cap simply to fill a row.</p>
-<h3>Recalculate rule changes</h3><p class="body">Update Options if the event window or cap changes, then review the new result. A manual workbook swap is not checked by the browser solver and can break the original constraints.</p>
-</section>
-<section class="block" id="download"><h2>Download and share the right sheets</h2><div class="oneliner">Export only after the result and attention messages have been reviewed.</div>
-<figure style="margin:22px 0"><div style="position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);aspect-ratio:10.232477746089367"><img src="assets/03-results.jpg" alt="Download the schedule (.xlsx) creates the current result as an Excel workbook." loading="lazy" style="position:absolute;max-width:none;width:125.0%;left:-12.5%;top:-885.7142857142861%;height:auto"></div><figcaption class="caption" style="margin-top:10px">Download the schedule (.xlsx) creates the current result as an Excel workbook.</figcaption></figure>
-<h3>Open the downloaded workbook</h3><p class="body">Select Download the schedule (.xlsx). Open the workbook in Excel or Google Sheets. Check that the three day sheets, Summary and Scheduler notes are present and that you are using the version downloaded after your final options change.</p>
-<h3>Use each sheet for its purpose</h3><p class="body">The day sheets contain UTC slots, player IDs, alliances and optional names. Summary lists each player&#x27;s assignments and estimated points. Scheduler notes holds unplaced reasons and the original comments for organizer review.</p>
-<h3>Review the notes before sharing</h3><p class="body">The names checkbox does not remove names or comments from Scheduler notes. Free text may contain personal information. Share the appropriate day sheets with players and keep organizer notes restricted to the people who need them.</p>
-<h3>Arrange the appointments separately</h3><p class="body">The workbook is a schedule to use in the game. Downloading it does not create or change any in game appointment. If you edit the workbook manually, review the affected availability and appointment limits yourself.</p>
-</section>
-<section class="block" id="reference"><h2>Resolve common input problems</h2><div class="oneliner">Use the reported issue to correct the file or the event settings.</div>
-<h3>A required column is missing</h3><p class="body">Keep recognizable headers for Player ID, all three resource fields and shared or day specific availability. Check that the file is the response export rather than a previously generated schedule.</p>
-<h3>A player has no valid appointment</h3><p class="body">Check selected buffs, usable resources, the full appointment length and the UTC window. An aligned single start or a clear time range can be recognized. A ten minute window cannot hold a thirty minute appointment.</p>
-<h3>A resource total looks wrong</h3><p class="body">Use explicit units such as 12h or a header that says hours. Avoid ranges and mixed answers. Blank or unreadable values become zero. A resource field labeled points is interpreted as points rather than a duration.</p>
-<h3>A player appears twice</h3><p class="body">The tool keeps one entry per normalized ID. It prefers a recognized completion time and retains the latest one. When timestamps tie or both are unavailable, the later source row wins. Confirm that the retained answers are the intended ones.</p>
-<h3>The spreadsheet library did not load</h3><p class="body">Reload the page with an internet connection so its external spreadsheet library can load, then choose the file again. Keep the source export available because reloading clears the selected file.</p>
-<h3>A comment was not honored</h3><p class="body">Time wishes are preferences within tied objectives. They do not override submitted availability, day selection, the event cap or higher priority scoring. General prose in a comment may not be recognized as a time preference.</p>
-<div class="callout">Reference edition: public source reviewed on 26 October 2026, commit 457e36e1fd5633fde36bb1ab7a529c73b91abaf8. The walkthrough covers the browser route. The repository README documents the separate Python route.</div>
-</section>
-<section class="block" id="input-examples"><h2>Read the input format examples</h2><div class="oneliner">Use these synthetic examples to make survey answers clear.</div>
-<h3>Keep durations and points separate</h3><p class="body">A header that identifies points uses the amount as a final score. A speedups field uses a duration. In the implemented model, each speedup minute contributes 30 points; shared general speedups count once for a player across the event.</p>
-<h3>A whole slot must fit</h3><p class="body">With 30 minute appointments, 08:00 to 08:30 can contain one slot. A range from 08:00 to 08:10 cannot. The configured schedule window can narrow the set further. Comments do not create new availability.</p>
-<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:10px;border-bottom:1px solid var(--line)">Field</th><th style="text-align:left;padding:10px;border-bottom:1px solid var(--line)">Clear example</th><th style="text-align:left;padding:10px;border-bottom:1px solid var(--line)">Meaning</th></tr></thead><tbody><tr><td style="padding:10px;border-bottom:1px solid var(--line)">Player ID</td><td style="padding:10px;border-bottom:1px solid var(--line)">900000001</td><td style="padding:10px;border-bottom:1px solid var(--line)">Synthetic identifier</td></tr><tr><td style="padding:10px;border-bottom:1px solid var(--line)">Construction speedups (hours)</td><td style="padding:10px;border-bottom:1px solid var(--line)">12</td><td style="padding:10px;border-bottom:1px solid var(--line)">Twelve hours</td></tr><tr><td style="padding:10px;border-bottom:1px solid var(--line)">Selected buffs</td><td style="padding:10px;border-bottom:1px solid var(--line)">Construction; Research</td><td style="padding:10px;border-bottom:1px solid var(--line)">Requested days</td></tr><tr><td style="padding:10px;border-bottom:1px solid var(--line)">General availability</td><td style="padding:10px;border-bottom:1px solid var(--line)">08:00 to 10:00</td><td style="padding:10px;border-bottom:1px solid var(--line)">UTC time window</td></tr></tbody></table></div>
-<div class="callout">Input examples accompany the nine page walkthrough. They are reference material, not additional operating steps.</div>
-</section>
-<footer class="site"><p>Survey data is processed locally. The initial page loads external libraries and fonts. Scheduler notes can retain names and original comments even when names are hidden elsewhere, so review that sheet before sharing.</p><div class="links"><a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler">Source on GitHub</a><a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler/blob/main/ALGORITHM.md">Walkthrough and explainer</a><a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler/blob/main/README.md">Readme and setup</a><a href="https://christianjoudon.github.io/">Christian Joudon’s portfolio</a></div><p class="muted">Community tool for Whiteout Survival players. Not affiliated with or endorsed by the game’s developers.</p></footer></div></body></html>
+<style>
+.doc-nav{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px 24px;margin:0 0 34px}
+.doc-nav h2{font-size:20px}.doc-nav ol{columns:2;column-gap:36px;margin:0;padding-left:22px}
+.doc-nav li{break-inside:avoid;margin:0 0 9px;line-height:1.4;padding-right:14px}
+.topic{padding-top:8px;scroll-margin-top:24px}.topic h2{font-size:clamp(23px,3vw,29px);max-width:33ch}
+.topic h3{font-family:"Bricolage Grotesque",sans-serif;font-size:19px;margin:24px 0 7px}
+.topic .intro{font-size:19px;color:var(--steel);max-width:70ch;margin:0 0 18px}
+.topic .body{max-width:75ch}.topic p{overflow-wrap:anywhere}.topic{margin-bottom:46px!important}
+.topic figure{margin:26px 0 30px}.topic figure img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:var(--r)}
+.topic figcaption{margin-top:10px;line-height:1.55}.figure-no{color:var(--ember-hot);font-weight:bold;margin-right:7px}
+.table-scroll{overflow-x:auto;margin:24px 0;border:1px solid var(--line);border-radius:var(--r)}
+.reference-table{width:100%;border-collapse:collapse;font-size:16px;line-height:1.5}
+.reference-table th,.reference-table td{padding:14px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+.reference-table th{color:var(--aurora);background:var(--panel-2)}.reference-table td{background:var(--panel)}
+.reference-table tr:last-child td{border-bottom:0}.topic .links{margin-top:18px}
+.edition{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--steel);margin:0 0 12px}
+.read-routes{display:flex;flex-wrap:wrap;gap:8px 20px;margin:22px 0 0;line-height:1.4}
+.skip-link{position:absolute;left:16px;top:-80px;background:var(--panel);padding:12px;z-index:2}.skip-link:focus{top:12px}
+@media(max-width:650px){.doc-nav ol{columns:1}.doc-nav{padding:18px}.reference-table th,.reference-table td{padding:10px}.topic .intro{font-size:18px}}
+@media print{.wrap{max-width:none}.hero,.doc-nav,.topic figure,.callout{break-inside:avoid}.aurora-rule{animation:none}.topic a{text-decoration:underline}}
+</style></head><body><a class="skip-link" href="#contents">Skip to contents</a><main class="wrap">
+<header class="site"><div class="brand"><span class="flake">❄</span> Whiteout Buff Scheduler</div><div class="tagline">Community appointments · Construction · Research · Troop Training</div></header><div class="aurora-rule" aria-hidden="true"></div>
+<div class="hero"><p class="edition">VERSION 4 / 26 OCTOBER 2026 / ILLUSTRATED WALKTHROUGH</p><h1>Prepare and review a Whiteout appointment plan</h1>
+<p class="lede">Use the v4 browser planner to read a survey, preserve accepted appointments, review the policy and export a planning workbook. This guide follows five synthetic members from the supplied files. It does not book appointments in the game.</p>
+<p class="sub">By Christian Joudon. All illustrated players, times and estimates are synthetic.</p><div class="cta">
+<a class="btn big" href="./Whiteout%20Buff%20Scheduler.html">Launch the scheduler</a>
+<a class="btn ghost" href="./">Read the project case study</a>
+<a class="btn ghost" href="./docs/Whiteout%20Buff%20Scheduler%20Walkthrough.pdf">Download the PDF</a></div>
+<div class="read-routes"><a href="#options">Do: create a schedule</a><a href="#reference">Look up: input and recovery</a><a href="#benefit">Understand: benefit and policy</a></div></div>
+<nav class="doc-nav" id="contents" aria-label="Contents"><h2>In this walkthrough</h2><ol>
+<li><a href="#start">What will I make, and what do I need?</a></li>
+<li><a href="#options">Which rules should I set before importing?</a></li>
+<li><a href="#import">How do I load the response file?</a></li>
+<li><a href="#accepted">How do I preserve an appointment already accepted?</a></li>
+<li><a href="#results">What do the result cards actually count?</a></li>
+<li><a href="#fallback">Why is benefit ranking disabled for this sample?</a></li>
+<li><a href="#review">What must I do with the comments?</a></li>
+<li><a href="#days">How should I inspect the three days?</a></li>
+<li><a href="#download">Which sheets should I download and share?</a></li>
+<li><a href="#game">When does this become a game appointment?</a></li>
+<li><a href="#benefit">What does a benefit estimate mean?</a></li>
+<li><a href="#policies">How can I compare access with measured benefit?</a></li>
+<li><a href="#reference">How do I correct a blocked or ambiguous input?</a></li>
+<li><a href="#advanced">When do I need the advanced plan optimizer?</a></li>
+<li><a href="#mechanics">How do I calculate a supplied task comparison?</a></li>
+<li><a href="#edition">Which edition and evidence does this guide use?</a></li>
+</ol></nav>
+<section class="block topic" id="start">
+<span id="overview"></span>
+<span id="prepare"></span>
+<h2>What will I make, and what do I need?</h2>
+<p class="intro">This route is for the organizer preparing Construction, Research and Troop Training appointments from a response file. You do not need Python for the browser workflow.</p>
+<h3>Keep the result in scope</h3>
+<p class="body">Whiteout Survival gives temporary office titles that can help particular actions. This planner assigns requested appointments across the form&#x27;s three buff days. It treats a seat as occupied for 30 minutes and produces a draft for review. A result in the browser, including a reviewed result, is not a reservation in the game&#x27;s appointment interface.</p>
+<h3>Use the supplied example</h3>
+<p class="body">Download sample-survey.csv and sample-accepted.csv. The survey contains Aster, Birch, Cedar, Dawn and Elm, with five distinct Player IDs and ten requested member and day combinations. Elm&#x27;s Research benefit is deliberately unknown. The accepted file contains Preserved member, ID 999999, who is absent from the survey. These names, times and estimates are invented teaching data.</p>
+<h3>Follow one complete route</h3>
+<p class="body">Set Options before choosing the survey. Then import the optional accepted appointments, review the result and comments, inspect the days, and download the workbook. Keep the original files available for corrections. The page initially loads fonts and its spreadsheet library over the network; it processes the selected survey locally.</p>
+<figure><a href="assets/v4/start.jpg" aria-label="Open figure 1 at full size"><img src="assets/v4/start.jpg" alt="V4 opening steps, survey drop area and Choose file button." loading="lazy" width="950" height="570"></a><figcaption class="caption"><span class="figure-no">Figure 1.</span>The opening view introduces import, review and export, with the survey drop area ready for a file.</figcaption></figure>
+<div class="links"><a href="sample-survey.csv">Download the synthetic survey</a><a href="sample-accepted.csv">Download the synthetic accepted appointments</a><a href="Whiteout%20Buff%20Scheduler.html">Open the browser planner</a></div>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="options">
+<h2>Which rules should I set before importing?</h2>
+<p class="intro">Open Options and establish the event rules before the file starts an automatic calculation.</p>
+<h3>Keep the example settings consistent</h3>
+<p class="body">For this walkthrough, keep Appointments per player for the whole event at Up to one on each buff day (recommended). Keep Team policy at Broad first access, then measured extra benefit. Set Schedule day runs from to 08:00 and …until (UTC) to 10:00. This is the sample window, not a recommended window for every event. In actual work, use the times agreed for that event.</p>
+<h3>Understand the fixed seat length</h3>
+<p class="body">Office occupancy offers 30 minutes (minimum seat rotation). This edition does not offer shorter appointments. A whole seat must fit both the selected window and the member&#x27;s available time. An action that finishes quickly does not free the remainder of its seat in this model.</p>
+<h3>Set preferences and export names deliberately</h3>
+<p class="body">Leave Honor structured preferred UTC windows in the selected policy order enabled for the example. Those windows are preferences, while availability and unavailable windows are hard limits. The names option affects shared day sheets and Summary; it does not remove names from private notes. Changing an option after loading a survey recalculates that file and resets comment review, so review the new result before exporting again.</p>
+<figure><a href="assets/v4/options.jpg" aria-label="Open figure 2 at full size"><img src="assets/v4/options.jpg" alt="Options showing an event cap of three appointments, broad first access, 30 minute office occupancy and the synthetic UTC window." loading="lazy" width="950" height="294"></a><figcaption class="caption"><span class="figure-no">Figure 2.</span>The example uses the default access policy, a 30 minute seat and an 08:00 to 10:00 UTC window.</figcaption></figure>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="import">
+<span id="load"></span>
+<h2>How do I load the response file?</h2>
+<p class="intro">Selecting the file starts scheduling. There is no separate Generate button.</p>
+<h3>Choose the survey</h3>
+<p class="body">Select Choose file… and open sample-survey.csv, or drag that file into the survey drop area. Use the survey control rather than the separate accepted appointments control. A real Forms export can be .xlsx or .csv; the chooser also accepts .xlsm. Keep recognizable headers and the original response rows.</p>
+<h3>Wait for the saved result on screen</h3>
+<p class="body">Continue when the Done status and result cards appear. The file&#x27;s five rows identify five survey members. Inventory columns are optional in v4, and this example has none. A member with no declared speedups can still receive an appointment. Do not add stock figures merely to make a member eligible.</p>
+<h3>If loading stops</h3>
+<p class="body">Read the specific error instead of substituting another file. A missing Player ID or availability column needs a correct header or export. If the spreadsheet reader failed to load, reload with a network connection and choose the file again. Reloading clears the current browser selection. Keep any genuine accepted appointments available to reimport before using a replacement plan.</p>
+<figure><a href="assets/v4/import.jpg" aria-label="Open figure 3 at full size"><img src="assets/v4/import.jpg" alt="Survey drop area and Choose file button for importing the response export." loading="lazy" width="950" height="327"></a><figcaption class="caption"><span class="figure-no">Figure 3.</span>Choose the survey response file in the main drop area. Selecting it starts the calculation.</figcaption></figure>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="accepted">
+<h2>How do I preserve an appointment already accepted?</h2>
+<p class="intro">Import commitments before assessing the new draft. A commitment is a fixed constraint, not a preference.</p>
+<h3>Load the accepted file</h3>
+<p class="body">Under Keep accepted appointments, use Existing appointments CSV to choose sample-accepted.csv. The file supplies Day, Start UTC and Player ID, with optional Alliance and Player Name. Day must be construction, research or training; the start must be a valid half hour time in HH:MM form. This example preserves construction at 08:30 for ID 999999, alliance GUEST.</p>
+<h3>Check the preserved row</h3>
+<p class="body">The import recalculates the survey. On Construction Day, find Preserved member at 08:30 and the accepted · fixed label. The member is kept even though no survey row exists for that ID. This appointment occupies its seat. It contributes to the appointment total and day sheet, but not the survey coverage denominator, measured benefit or survey Summary rows.</p>
+<h3>Resolve a conflict explicitly</h3>
+<p class="body">If two accepted rows claim the same seat, or a known member&#x27;s commitment contradicts current availability, the planner stops with a concrete error. It does not move the commitment. Check the agreed record and correct the conflict. Clear imported appointments removes the imported constraints, so use it only when the import itself should be removed, not as a way around a genuine commitment. If an error appears, do not treat an earlier visible result as a successful new calculation.</p>
+<figure><a href="assets/v4/accepted-import.jpg" aria-label="Open figure 4 at full size"><img src="assets/v4/accepted-import.jpg" alt="Keep accepted appointments panel, Existing appointments CSV control and imported appointment count." loading="lazy" width="950" height="239"></a><figcaption class="caption"><span class="figure-no">Figure 4.</span>The separate accepted appointments control imports commitments after the survey has been selected.</figcaption></figure>
+<figure><a href="assets/v4/accepted.jpg" aria-label="Open figure 5 at full size"><img src="assets/v4/accepted.jpg" alt="Construction Day row for Preserved member, ID 999999, marked accepted and fixed." loading="lazy" width="950" height="350"></a><figcaption class="caption"><span class="figure-no">Figure 5.</span>An external accepted member remains fixed at 08:30 on Construction Day.</figcaption></figure>
+<figure><a href="assets/v4/conflict.jpg" aria-label="Open figure 6 at full size"><img src="assets/v4/conflict.jpg" alt="Error explaining that conflicting accepted appointments need resolution and were not moved." loading="lazy" width="950" height="70"></a><figcaption class="caption"><span class="figure-no">Figure 6.</span>A separate synthetic conflict demonstrates a blocker. It is not an alteration to the original sample.</figcaption></figure>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="results">
+<span id="result"></span>
+<h2>What do the result cards actually count?</h2>
+<p class="intro">Read the coverage, appointment count, measured subtotal and source response count as different quantities.</p>
+<h3>Separate members from appointments</h3>
+<p class="body">Players placed shows covered survey members out of the five unique survey members. Appointments made counts assignments, including the preserved external appointment. One member can appear on several requested days, so these cards need not match. The Done sentence can also include the external member, while the coverage card remains survey based.</p>
+<h3>Read the subtotal as a subtotal</h3>
+<p class="body">Measured subtotal · minutes saved adds supplied benefit estimates for scheduled survey requests that have an estimate. It is additional timer time saved against the same plan without the title. It is not inventory, total work completed, preparation points or a complete gain total when estimates are missing. A visible number can coexist with benefit ranking being disabled.</p>
+<h3>Read the explanation below the cards</h3>
+<p class="body">Model and review status lists the objective order, requested days covered, structured preferences honored and accepted appointments preserved. Check that explanation before interpreting the schedule. Survey responses read counts the file rows; duplicate IDs can make that count larger than the unique member total. The supplied sample has no duplicates.</p>
+<h3>Read this run without changing its meaning</h3>
+<p class="body">After the accepted import, the main example covers all five survey members and all ten requested days, with three structured preferences honored. It contains eleven appointments and six distinct assigned IDs because the external commitment is included. The measured subtotal is 595 minutes from known estimates, and five survey responses were read. Elm remains unknown; these counts are synthetic demonstration results, not measured community impact.</p>
+<figure><a href="assets/v4/results.jpg" aria-label="Open figure 7 at full size"><img src="assets/v4/results.jpg" alt="Result cards and model explanation from the five member sample after the external appointment import." loading="lazy" width="950" height="203"></a><figcaption class="caption"><span class="figure-no">Figure 7.</span>The cards count survey coverage, all assignments, measured benefit and input rows separately.</figcaption></figure>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="fallback">
+<h2>Why is benefit ranking disabled for this sample?</h2>
+<p class="intro">Elm&#x27;s missing Research estimate is intentional. Unknown benefit is not a zero benefit or a reason to exclude Elm.</p>
+<h3>Keep the unknown value unknown</h3>
+<p class="body">Open the original sample and find Elm, ID 100005. Research is requested and an 08:00 to 08:30 window is available, but Research buff benefit minutes is blank. Do not copy another member&#x27;s value, derive it from speedup stock or enter zero merely to complete the column. Zero would assert a measured absence of additional benefit.</p>
+<h3>Follow the safe policy fallback</h3>
+<p class="body">With incomplete estimates on eligible requests, the default policy disables benefit ranking for everyone. It uses broad access, requested day coverage, structured preferences and complete history instead. Members with estimates do not receive a ranking advantage over members whose benefit is unknown. The status explains this change; the measured subtotal remains only the known portion of the selected plan.</p>
+<h3>Do not force the benefit policy</h3>
+<p class="body">Selecting Measured extra benefit first (requires complete estimates) with an eligible estimate missing produces an error identifying the request. Supply a defensible estimate or return to broad team access. Missing history follows a separate rule: if any survey member&#x27;s history is unknown, rotation ranking is disabled for all. The original sample has explicit history values for all five members.</p>
+<figure><a href="assets/v4/fallback.jpg" aria-label="Open figure 8 at full size"><img src="assets/v4/fallback.jpg" alt="Model status explaining incomplete benefit estimates and the effective broad team access order." loading="lazy" width="948" height="324"></a><figcaption class="caption"><span class="figure-no">Figure 8.</span>The original sample keeps Elm&#x27;s benefit unknown and disables comparative benefit ranking for every member.</figcaption></figure>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="review">
+<span id="attention"></span>
+<h2>What must I do with the comments?</h2>
+<p class="intro">Read comments as source information. The solver does not convert free text into wishes or prove task readiness.</p>
+<h3>Review the two supplied comments</h3>
+<p class="body">Aster asks for Research after a lab prerequisite and requests a readiness check before booking. Elm says there are no speedups and a long research will be started. These comments explain context, but neither supplies a verified extra time window or a calculated title benefit. Do not invent either from the wording. Check readiness with the member before carrying the plan into the game.</p>
+<h3>Record confirmed time restrictions structurally</h3>
+<p class="body">If follow up establishes a hard time limit, put it in the applicable availability or unavailable column and reload the corrected file. Put a preferred time in the matching preferred UTC column. Review Needs a quick look from you separately from What people wrote in the comments. An input problem is not resolved simply because a comment was read.</p>
+<h3>Acknowledge review without upgrading the result</h3>
+<p class="body">When the statement is true, select I have reviewed all comments and recorded any hard limits in the structured availability / unavailable columns. The status can then become Planning draft — reviewed inputs. That acknowledgment does not validate a prerequisite, buy a title or make a game booking. DRAFT — input issues need resolution remains when structured input issues exist, even if the checkbox is selected. Any recalculation resets comment review.</p>
+<figure><a href="assets/v4/comments.jpg" aria-label="Open figure 9 at full size"><img src="assets/v4/comments.jpg" alt="Aster&#x27;s prerequisite comment and Elm&#x27;s long research comment in the comments panel." loading="lazy" width="948" height="162"></a><figcaption class="caption"><span class="figure-no">Figure 9.</span>The supplied comments remain visible for organizer judgment rather than becoming automatic scheduling wishes.</figcaption></figure>
+<figure><a href="assets/v4/reviewed.jpg" aria-label="Open figure 10 at full size"><img src="assets/v4/reviewed.jpg" alt="Comment review checkbox and Planning draft status after acknowledgment in a synthetic demonstration." loading="lazy" width="948" height="324"></a><figcaption class="caption"><span class="figure-no">Figure 10.</span>A reviewed input state records the organizer&#x27;s acknowledgment. It remains a planning draft.</figcaption></figure>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="days">
+<h2>How should I inspect the three days?</h2>
+<p class="intro">Read the actual rows after the imports and review. Do not infer a game calendar from a weekday label.</p>
+<h3>Inspect each tab</h3>
+<p class="body">Open Construction Day (Monday), Research Day (Tuesday) and Troop Training Day (Thursday) in turn for this sample. These are the default labels when the form provides no other recognized weekday. They are not dated event reservations. All displayed times are UTC. Use the actual event dates when organizing the final game actions.</p>
+<h3>Connect a row to its source</h3>
+<p class="body">Aster&#x27;s Construction unavailable window is 08:00 to 08:15. Because that overlaps the first 30 minute seat, the entire 08:00 Construction appointment is unavailable to Aster. Birch can use only the 08:00 Construction seat. Cedar has a structured Research preference for 08:30 to 09:00, while Dawn has a Training preference for 09:00 to 10:00. Preferences can lose to higher policy priorities; a hard exclusion cannot.</p>
+<h3>Keep manual edits outside the solver&#x27;s guarantee</h3>
+<p class="body">An open row means no assignment was selected there. Empty seats are allowed. If the event window or cap changes, change Options and review the recalculated result. A manual workbook swap is not automatically checked by the browser. Preserve the accepted external member unless the real commitment has been changed explicitly.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="How should I inspect the three days? reference table"><table class="reference-table"><thead><tr><th scope="col">UTC start</th><th scope="col">Construction</th><th scope="col">Research</th><th scope="col">Training</th></tr></thead><tbody>
+<tr><td>08:00</td><td>Birch</td><td>Elm</td><td>Cedar</td></tr>
+<tr><td>08:30</td><td>Preserved member, fixed</td><td>Cedar</td><td>Aster</td></tr>
+<tr><td>09:00</td><td>Aster</td><td>Aster</td><td>Dawn</td></tr>
+<tr><td>09:30</td><td>Dawn</td><td>Dawn</td><td>Open</td></tr>
+</tbody></table></div>
+<figure><a href="assets/v4/construction.jpg" aria-label="Open figure 11 at full size"><img src="assets/v4/construction.jpg" alt="Construction rows showing Birch at 08:00, Preserved member at 08:30, Aster at 09:00 and Dawn at 09:30." loading="lazy" width="950" height="350"></a><figcaption class="caption"><span class="figure-no">Figure 11.</span>Construction preserves the external 08:30 commitment and respects Aster’s overlapping exclusion.</figcaption></figure>
+<figure><a href="assets/v4/research.jpg" aria-label="Open figure 12 at full size"><img src="assets/v4/research.jpg" alt="Research Day schedule for the synthetic members within the 08:00 to 10:00 UTC window." loading="lazy" width="950" height="350"></a><figcaption class="caption"><span class="figure-no">Figure 12.</span>Research rows can be checked against requested days, full availability and structured preferences.</figcaption></figure>
+<figure><a href="assets/v4/training.jpg" aria-label="Open figure 13 at full size"><img src="assets/v4/training.jpg" alt="Troop Training Day schedule for the same synthetic members." loading="lazy" width="950" height="326"></a><figcaption class="caption"><span class="figure-no">Figure 13.</span>Training uses the same appointment rules but its own requested days and preferred windows.</figcaption></figure>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="download">
+<h2>Which sheets should I download and share?</h2>
+<p class="intro">Download only the version corresponding to the final options and imports you reviewed. Export is possible even while the plan is marked DRAFT.</p>
+<h3>Open the workbook</h3>
+<p class="body">Select Download the schedule (.xlsx) and open the saved file in Excel or Google Sheets. This edition exports six sheets: three buff day sheets, Summary, Declared resources and Scheduler notes. An unresolved draft has DRAFT in its filename. Download availability does not mean the organizer&#x27;s review is finished.</p>
+<h3>Use the appropriate sheet</h3>
+<p class="body">Day sheets list time, Player ID, alliance and optional name, including imported external commitments. Summary describes the survey members&#x27; assignments and measured extra minutes. Declared resources preserves recognized resource answers as context, not inferred title gains. Because the supplied sample has no inventory columns, that sheet can contain its headers without resource records. Scheduler notes records review status, policy, issues, unplaced reasons and source comments.</p>
+<h3>Review privacy before sharing</h3>
+<p class="body">Turning names off changes day sheets and Summary. It does not anonymize Scheduler notes, the on screen comments or every identity field. IDs and alliances remain identifiers, and free text may contain personal information or an email address even though no dedicated email column is exported. Keep private notes for the organizer and share only the intended sheets after inspecting their contents.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Which sheets should I download and share? reference table"><table class="reference-table"><thead><tr><th scope="col">Sheet</th><th scope="col">Use</th></tr></thead><tbody>
+<tr><td>Construction Day (Monday)</td><td>Construction appointments, including fixed imports</td></tr>
+<tr><td>Research Day (Tuesday)</td><td>Research appointments</td></tr>
+<tr><td>Troop Training Day (Thursday)</td><td>Training appointments</td></tr>
+<tr><td>Summary</td><td>Survey members and measured assigned benefit</td></tr>
+<tr><td>Declared resources</td><td>Original recognized inventory answers for context</td></tr>
+<tr><td>Scheduler notes</td><td>Private review status, issues and comments</td></tr>
+</tbody></table></div>
+<figure><a href="assets/v4/download.jpg" aria-label="Open figure 14 at full size"><img src="assets/v4/download.jpg" alt="Reviewed planning draft status beside Download the schedule, following comment review." loading="lazy" width="950" height="94"></a><figcaption class="caption"><span class="figure-no">Figure 14.</span>Select Download the schedule (.xlsx) to save the current draft. This synthetic run’s saved workbook was reopened and all six sheets were inspected.</figcaption></figure>
+<div class="callout"><p class="body">The browser does not reopen the downloaded file for verification. Opening and inspecting it is part of this organizer review.</p></div>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="game">
+<h2>When does this become a game appointment?</h2>
+<p class="intro">The documentation route ends with a reviewed plan. Booking in the game is a separate action.</p>
+<h3>Confirm the live conditions</h3>
+<p class="body">Before arranging real appointments, confirm current event dates, office rules, member readiness and the actual accepted schedule. The app models a 30 minute seat even if an action finishes early. A title relevant to a new start must be obtained before that action begins; a planning row does not establish that this happened.</p>
+<h3>Keep a clear completion boundary</h3>
+<p class="body">The walkthrough is complete when the applicable imports and issues have been reviewed and the intended workbook has been inspected. A reviewed draft can still need a prerequisite check or game booking. Record that remaining work as pending rather than calling the downloaded schedule a confirmed reservation.</p>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="benefit">
+<h2>What does a benefit estimate mean?</h2>
+<p class="intro">Compare the same declared plan with and without the requested title. Inventory and gross event contribution answer different questions.</p>
+<h3>Use one counterfactual</h3>
+<p class="body">Construction buff benefit minutes means additional whole minutes saved by the title over the same work without it. Research and Training use their equivalent headers. The comparison must keep its baseline clear. A member can contribute without an appointment, so the no title baseline is not automatically zero work or zero contribution.</p>
+<h3>Do not multiply shared resources</h3>
+<p class="body">Browser estimates must already account for any allocation of general speedups across days. The browser does not distribute that pool, simulate spending or derive gains from stock. It accepts nonnegative whole minute estimates for individual requests. If tasks or resources interact, use complete alternatives in the advanced route rather than adding incompatible day estimates.</p>
+<h3>Distinguish a known zero from a blank</h3>
+<p class="body">Enter zero only when the comparison supports no additional timer saving. Leave an unknown estimate blank and accept the disclosed fallback. The separate mechanics calculator can evaluate supplied task statistics, but its output is conditional on those inputs; it is not a browser control or a live game forecast.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="What does a benefit estimate mean? reference table"><table class="reference-table"><thead><tr><th scope="col">Quantity</th><th scope="col">What it describes</th></tr></thead><tbody>
+<tr><td>Inventory</td><td>Resources owned or declared for use</td></tr>
+<tr><td>No title baseline</td><td>What the same plan contributes without the requested title</td></tr>
+<tr><td>Incremental benefit</td><td>The additional result compared with that baseline</td></tr>
+<tr><td>Browser benefit minutes</td><td>Supplied nonnegative whole minutes of additional saving</td></tr>
+<tr><td>Game event points</td><td>A separate quantity requiring the applicable scoring conditions</td></tr>
+</tbody></table></div>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="policies">
+<h2>How can I compare access with measured benefit?</h2>
+<p class="intro">Use examples/comparison-survey.csv for this separate comparison. It changes only Elm’s Research benefit to a synthetic 25 minutes; the original sample remains unchanged.</p>
+<h3>Use the complete estimate variation</h3>
+<p class="body">Load examples/comparison-survey.csv, keep the same accepted appointment, and narrow the window to 08:00 to 09:00 UTC. Keep the event cap at three and the default broad first access policy. These are deliberate variation settings, not the main walkthrough settings. All eligible benefits are now supplied. The 25 minute value is a teaching assumption, not a calculation of a real member’s benefit or permission to fill a production blank arbitrarily.</p>
+<h3>Read both measured outcomes</h3>
+<p class="body">For this variation, broad first access serves five survey members for 300 measured extra minutes. Benefit first serves three for 410 minutes. The broad policy shows six appointments including the external commitment, five of ten requested days covered and no preferred windows honored. Select Measured extra benefit first (requires complete estimates) to inspect its alternative. The comparison exposes a real model tradeoff: two fewer survey members receive access in return for 110 more declared minutes, under these synthetic inputs.</p>
+<h3>Choose the policy openly</h3>
+<p class="body">Broad access, then requested days and preferences puts request coverage, preferences and complete history ahead of benefit. All policies keep hard constraints and accepted commitments. A lower priority can break a tie but cannot silently outweigh a higher one. Changing the policy recalculates the file and requires a fresh review before the replacement download.</p>
+<figure><a href="assets/v4/tradeoff.jpg" aria-label="Open figure 15 at full size"><img src="assets/v4/tradeoff.jpg" alt="Model comparison showing broad first access and benefit first outcomes from a complete synthetic estimate set." loading="lazy" width="950" height="500"></a><figcaption class="caption"><span class="figure-no">Figure 15.</span>The separately labeled complete estimate variation exposes access and measured benefit side by side. Values belong only to that synthetic variation.</figcaption></figure>
+<figure><a href="assets/v4/benefit.jpg" aria-label="Open figure 16 at full size"><img src="assets/v4/benefit.jpg" alt="Benefit first policy result from the separate complete synthetic estimate variation." loading="lazy" width="950" height="500"></a><figcaption class="caption"><span class="figure-no">Figure 16.</span>Switching to benefit first in the same complete variation serves three survey members for 410 declared extra minutes, while the broad access comparison remains visible.</figcaption></figure>
+<div class="links"><a href="examples/comparison-survey.csv">Download the separately labeled complete estimate variation</a></div>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="reference">
+<span id="input-examples"></span>
+<h2>How do I correct a blocked or ambiguous input?</h2>
+<p class="intro">Use the reported symptom to find the source field. Do not alter a genuine constraint merely to obtain a schedule.</p>
+<h3>Ambiguous time or no full seat</h3>
+<p class="body">Replace local time abbreviations and phrases such as only after with confirmed positive UTC ranges. Write 20:00 to 22:00 rather than 8 to 10pm, or put AM or PM on both endpoints. Equal endpoints are ambiguous; use All day if that is what the member meant. A ten minute window cannot contain a 30 minute seat. An unavailable interval that overlaps any part of a seat removes that seat.</p>
+<h3>Wrong or missing benefit and history</h3>
+<p class="body">Benefit entries must be nonnegative whole minutes. History must be a nonnegative whole appointment count. Do not turn malformed values into zero. Unknown benefit and unknown history disable their respective ranking layers globally, rather than penalizing the affected person. With no selected day column, v4 derives requested days from available day windows; with the column present, explicit choices govern, so a blank choice is not all days.</p>
+<h3>Duplicate or conflicting records</h3>
+<p class="body">Use one Player ID for one member. A recognized completion timestamp takes precedence for duplicate submissions; the latest recognized time wins, with the later row winning a tie or when both timestamps are absent. Review the retained answers. For accepted appointments, resolve a duplicate seat, conflicting member and day, event cap conflict or out of window start against the actual commitment before rescheduling.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="How do I correct a blocked or ambiguous input? reference table"><table class="reference-table"><thead><tr><th scope="col">Exact example header</th><th scope="col">Meaning</th></tr></thead><tbody>
+<tr><td>Player ID</td><td>Identity used to retain one survey record per member</td></tr>
+<tr><td>Desired buffs</td><td>Requested construction, research or training days</td></tr>
+<tr><td>General availability</td><td>Positive UTC windows shared across days</td></tr>
+<tr><td>Construction preferred UTC</td><td>A preference within policy priorities</td></tr>
+<tr><td>Construction unavailable UTC</td><td>An exclusion that removes overlapping seats</td></tr>
+<tr><td>Construction buff benefit minutes</td><td>Additional whole minutes saved; blank means unknown</td></tr>
+<tr><td>Prior appointments</td><td>Known prior access count; blank means unknown</td></tr>
+<tr><td>Comments</td><td>Source text for organizer review, not automatic wishes</td></tr>
+</tbody></table></div>
+<figure><a href="assets/v4/ambiguity.jpg" aria-label="Open figure 17 at full size"><img src="assets/v4/ambiguity.jpg" alt="Input issue identifying an ambiguous availability value and requesting explicit UTC ranges." loading="lazy" width="950" height="326"></a><figcaption class="caption"><span class="figure-no">Figure 17.</span>A separately labeled malformed time variation illustrates input recovery without changing the original sample.</figcaption></figure>
+<figure><a href="assets/v4/attention.jpg" aria-label="Open figure 18 at full size"><img src="assets/v4/attention.jpg" alt="Attention panel identifies Birch’s unreadable availability alongside unplaced requested days." loading="lazy" width="950" height="285"></a><figcaption class="caption"><span class="figure-no">Figure 18.</span>The separate malformed time variation reports why Birch has no full available seat. Correct the source availability rather than clearing a genuine limit.</figcaption></figure>
+<figure><a href="assets/v4/missing-benefit.jpg" aria-label="Open figure 19 at full size"><img src="assets/v4/missing-benefit.jpg" alt="Benefit first error identifying Elm’s missing Research estimate and requiring a measured value or broad team access." loading="lazy" width="950" height="94"></a><figcaption class="caption"><span class="figure-no">Figure 19.</span>The explicit benefit first policy rejects an eligible unknown estimate instead of treating it as zero.</figcaption></figure>
+<div class="callout"><p class="body">Research and Training use the corresponding preferred UTC, unavailable UTC and buff benefit minutes headers. Inventory columns remain optional.</p></div>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="advanced">
+<h2>When do I need the advanced plan optimizer?</h2>
+<p class="intro">Use this separate Python route for coupled tasks, shared budgets, absolute dates or multiple physical offices. A browser survey is not its input file.</p>
+<h3>Prepare the separate Python route</h3>
+<p class="body">Use a terminal from the v4 package folder on macOS or Linux with Python 3 available. Read advanced/schema.txt and keep the supplied advanced/example.json unchanged for the first run. Create a dedicated environment before installing requirements.txt into it, then run the synthetic example with that environment’s Python. The production engine is OR-Tools CP-SAT; the program does not install dependencies itself.</p>
+<h3>Describe complete alternatives</h3>
+<p class="body">Supply exactly one baseline plan per member, plus mutually exclusive complete event alternatives. Benefits are signed integer differences in one declared objective unit, not browser benefit minutes inferred from stock. Declare resource consumption once for each complete plan, the member&#x27;s budgets, requested days, physical offices, absolute UTC intervals, prerequisites and commitments. The baseline has no appointments and zero incremental benefit, but may still consume resources or do useful work.</p>
+<h3>Interpret the result status</h3>
+<p class="body">OPTIMAL requires proof at all six policy stages. FEASIBLE means an incumbent exists but a stage is unproved; UNKNOWN means no complete incumbent was found by the deadline. INPUT_ERROR, INFEASIBLE and DEPENDENCY_MISSING require their stated resolution. Do not publish them as a completed optimized plan. The exhaustive engine is a bounded reference for small inputs, not an automatic production fallback. Declared plans still need game feasibility outside the optimizer.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="When do I need the advanced plan optimizer? reference table"><table class="reference-table"><thead><tr><th scope="col">Step</th><th scope="col">Command</th><th scope="col">Expected result</th></tr></thead><tbody>
+<tr><td>Create the environment</td><td>python3 -m venv .venv</td><td>A dedicated local Python environment</td></tr>
+<tr><td>Install the declared dependency</td><td>.venv/bin/python -m pip install -r requirements.txt</td><td>OR-Tools available in that environment</td></tr>
+<tr><td>Run the synthetic plan</td><td>.venv/bin/python advanced/optimizer.py --input advanced/example.json --output advanced/result.json</td><td>A result file whose status and stages must be read</td></tr>
+</tbody></table></div>
+<div class="links"><a href="advanced/schema.txt">Read the advanced JSON contract</a><a href="advanced/example.json">Inspect the synthetic advanced input</a><a href="advanced/optimizer.py">Inspect the advanced optimizer source</a></div>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="mechanics">
+<h2>How do I calculate a supplied task comparison?</h2>
+<p class="intro">The mechanics calculator is a separate Python tool. It evaluates explicit statistics and assumptions, not the contents of the browser survey.</p>
+<h3>Compare the same work</h3>
+<p class="body">From the v4 package folder, run the same work command in the table below. This mode compares the same fixed work with and without a title using supplied speed percentages. A fixed time reduction needs an explicit before_speed or after_speed stage. A preexisting queue receives no new title benefit. New start checks use supplied absolute UTC appointments and an exact office identifier; omitted timing context is an assumption, not a verified reservation.</p>
+<h3>Keep training quantities separate</h3>
+<p class="body">The separate fixed budget training example calculates whole troop output from supplied speed, budget and base time, with an optional available unit cap. Promotion needs a supplied source tier and promotion time. Optional event points need explicit scoring inputs. Capacity Enhance changes batch size and batch time; it does not independently multiply per troop throughput.</p>
+<h3>Respect the arithmetic boundary</h3>
+<p class="body">The calculator uses exact fractions for arithmetic and flooring. It does not simulate camp residuals, repeated queue starts, item denominations, collection windows, resource reinvestment or changing buffs at later starts. The integration example requires the advanced environment above and compiles supplied same work calculations into complete alternatives. Its saved result serves two synthetic members for 1,600 additional timer seconds with no general speedups consumed. It is an example result, not a live outcome.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="How do I calculate a supplied task comparison? reference table"><table class="reference-table"><thead><tr><th scope="col">Route</th><th scope="col">Command</th><th scope="col">Output meaning</th></tr></thead><tbody>
+<tr><td>Same work</td><td>python3 mechanics/task_model.py --input mechanics/sample-same-work.json</td><td>Timer saving for supplied identical work</td></tr>
+<tr><td>Fixed budget training</td><td>python3 mechanics/task_model.py --input mechanics/sample-training.json</td><td>Bounded troop output for supplied statistics</td></tr>
+<tr><td>Complete integration</td><td>.venv/bin/python examples/from_tasks.py</td><td>Task calculations compiled into plans and optimized</td></tr>
+</tbody></table></div>
+<div class="links"><a href="mechanics/README.md">Read the supplied task calculator instructions</a><a href="examples/from_tasks.py">Inspect the complete integration example</a></div>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<section class="block topic" id="edition">
+<h2>Which edition and evidence does this guide use?</h2>
+<p class="intro">Documentation edition: 26 October 2026. It describes the Whiteout scheduler v4 source files and their supplied synthetic examples.</p>
+<h3>Use the current source for current behavior</h3>
+<p class="body">The browser HTML, README.md, advanced/schema.txt and mechanics/README.md define this edition&#x27;s separate routes. Older instructions describing stock as title created points, shorter browser seats or automatic free text wishes do not describe v4. Keep the guide and source edition together when sharing a local copy.</p>
+<h3>Know what has and has not been established</h3>
+<p class="body">The saved development verification and the independent release checks dated 26 October 2026 document automated model tests. This documentation also uses an actual synthetic browser import, fixed appointment import and six sheet download that was reopened and inspected. These checks establish the tested behaviors, not novice usability, accessibility conformance, adoption or improved game results. A new reader’s questions and performance require separate observation. Report a mismatch with the source file, setting and visible state so a correction can reach the walkthrough, case study and reference together.</p>
+<div class="links"><a href="index.html">Read the project case study</a><a href="verification.json">Read the saved v4 verification record</a><a href="README.md">Read the v4 route overview</a><a href="release-checks.json">Read the independent documentation release checks</a></div>
+<p class="caption"><a href="#contents">Back to contents</a></p></section>
+<footer class="site"><p>Version 4. The guide, case study, Markdown and PDF companions share one editable documentation source. These are planning tools; arrange game appointments separately.</p><div class="links"><a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler/blob/main/README.md">Source and setup</a><a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler/blob/main/ALGORITHM.md">Walkthrough on GitHub</a><a href="./release-checks.json">Release verification</a><a href="https://christianjoudon.github.io/">Christian Joudon’s portfolio</a></div><p>Survey processing stays local. Initial page loading uses external libraries and fonts. Scheduler notes retain names and comments, including when names are excluded from the day sheets. Review the workbook before sharing.</p><p>Community project. Not affiliated with or endorsed by the game’s developers.</p></footer></main></body></html>

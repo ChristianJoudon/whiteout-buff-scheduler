@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "status": "OPTIMAL",
+  "optimal": true,
+  "engine": "cp-sat",
+  "objective_unit": "secondsSaved",
+  "policy": "balanced",
+  "objective_order": [
+    "people",
+    "benefit",
+    "requested_days",
+    "preferences",
+    "history",
+    "stability"
+  ],
+  "metrics": {
+    "benefit": 1600,
+    "people": 2,
+    "requested_days": 2,
+    "preferences": 0,
+    "history": 0,
+    "stability": -2
+  },
+  "stages": [
+    {
+      "name": "people",
+      "status": "OPTIMAL",
+      "value": 2,
+      "best_bound": 2.0,
+      "wall_seconds": 0.000905
+    },
+    {
+      "name": "benefit",
+      "status": "OPTIMAL",
+      "value": 1600,
+      "best_bound": 1600.0000000000002,
+      "wall_seconds": 0.000123
+    },
+    {
+      "name": "requested_days",
+      "status": "OPTIMAL",
+      "value": 2,
+      "best_bound": 2.0,
+      "wall_seconds": 8.9e-05
+    },
+    {
+      "name": "preferences",
+      "status": "OPTIMAL",
+      "value": 0,
+      "best_bound": -0.0,
+      "wall_seconds": 7.7e-05
+    },
+    {
+      "name": "history",
+      "status": "OPTIMAL",
+      "value": 0,
+      "best_bound": -0.0,
+      "wall_seconds": 7.2e-05
+    },
+    {
+      "name": "stability",
+      "status": "OPTIMAL",
+      "value": -2,
+      "best_bound": -2.0,
+      "wall_seconds": 7e-05
+    }
+  ],
+  "selected_plans": [
+    {
+      "member_id": "flexible-long-start",
+      "plan_id": "start-0835",
+      "baseline": false,
+      "incremental_benefit": 1100,
+      "consumption": {
+        "general_minutes": "0"
+      }
+    },
+    {
+      "member_id": "short-window-long-start",
+      "plan_id": "start-0805",
+      "baseline": false,
+      "incremental_benefit": 500,
+      "consumption": {
+        "general_minutes": "0"
+      }
+    }
+  ],
+  "assignments": [
+    {
+      "member_id": "short-window-long-start",
+      "plan_id": "start-0805",
+      "slot_id": "vp-0800",
+      "day": "build-day",
+      "office": "VP",
+      "start": "2026-11-02T08:00:00Z",
+      "end": "2026-11-02T08:30:00Z",
+      "locked": false,
+      "external": false
+    },
+    {
+      "member_id": "flexible-long-start",
+      "plan_id": "start-0835",
+      "slot_id": "vp-0830",
+      "day": "build-day",
+      "office": "VP",
+      "start": "2026-11-02T08:30:00Z",
+      "end": "2026-11-02T09:00:00Z",
+      "locked": false,
+      "external": false
+    }
+  ],
+  "notes": [],
+  "model_scope": [
+    "Benefit is a caller-declared increment over that member's no-appointment baseline, in the single declared objective unit.",
+    "Resource inventories do not generate benefit or reliability penalties. Only declared plan consumption and budgets are checked.",
+    "Task prerequisites are checked in declared execution order; game timers, action timing and title effects are not simulated.",
+    "Availability, when supplied, means the entire appointment must fit inside its UTC windows.",
+    "History is prior event service count and is disabled globally if any member lacks it; stability counts changed member-slot relationships.",
+    "External fixed appointments are honored but excluded from member benefit and coverage metrics."
+  ],
+  "elapsed_seconds": 0.233005,
+  "office_conflict_pairs": 1
+}

@@ -1,0 +1,922 @@
+{
+  "walkthrough": {
+    "title": "Prepare and review a Whiteout appointment plan",
+    "lede": "Use the v4 browser planner to read a survey, preserve accepted appointments, review the policy and export a planning workbook. This guide follows five synthetic members from the supplied files. It does not book appointments in the game.",
+    "sections": [
+      {
+        "id": "start",
+        "title": "What will I make, and what do I need?",
+        "intro": "This route is for the organizer preparing Construction, Research and Troop Training appointments from a response file. You do not need Python for the browser workflow.",
+        "blocks": [
+          {
+            "title": "Keep the result in scope",
+            "body": "Whiteout Survival gives temporary office titles that can help particular actions. This planner assigns requested appointments across the form's three buff days. It treats a seat as occupied for 30 minutes and produces a draft for review. A result in the browser, including a reviewed result, is not a reservation in the game's appointment interface."
+          },
+          {
+            "title": "Use the supplied example",
+            "body": "Download sample-survey.csv and sample-accepted.csv. The survey contains Aster, Birch, Cedar, Dawn and Elm, with five distinct Player IDs and ten requested member and day combinations. Elm's Research benefit is deliberately unknown. The accepted file contains Preserved member, ID 999999, who is absent from the survey. These names, times and estimates are invented teaching data."
+          },
+          {
+            "title": "Follow one complete route",
+            "body": "Set Options before choosing the survey. Then import the optional accepted appointments, review the result and comments, inspect the days, and download the workbook. Keep the original files available for corrections. The page initially loads fonts and its spreadsheet library over the network; it processes the selected survey locally."
+          }
+        ],
+        "links": [
+          {
+            "label": "Download the synthetic survey",
+            "url": "sample-survey.csv"
+          },
+          {
+            "label": "Download the synthetic accepted appointments",
+            "url": "sample-accepted.csv"
+          },
+          {
+            "label": "Open the browser planner",
+            "url": "Whiteout%20Buff%20Scheduler.html"
+          }
+        ],
+        "figures": [
+          {
+            "key": "start",
+            "caption": "The opening view introduces import, review and export, with the survey drop area ready for a file.",
+            "alt": "V4 opening steps, survey drop area and Choose file button."
+          }
+        ]
+      },
+      {
+        "id": "options",
+        "title": "Which rules should I set before importing?",
+        "intro": "Open Options and establish the event rules before the file starts an automatic calculation.",
+        "blocks": [
+          {
+            "title": "Keep the example settings consistent",
+            "body": "For this walkthrough, keep Appointments per player for the whole event at Up to one on each buff day (recommended). Keep Team policy at Broad first access, then measured extra benefit. Set Schedule day runs from to 08:00 and …until (UTC) to 10:00. This is the sample window, not a recommended window for every event. In actual work, use the times agreed for that event."
+          },
+          {
+            "title": "Understand the fixed seat length",
+            "body": "Office occupancy offers 30 minutes (minimum seat rotation). This edition does not offer shorter appointments. A whole seat must fit both the selected window and the member's available time. An action that finishes quickly does not free the remainder of its seat in this model."
+          },
+          {
+            "title": "Set preferences and export names deliberately",
+            "body": "Leave Honor structured preferred UTC windows in the selected policy order enabled for the example. Those windows are preferences, while availability and unavailable windows are hard limits. The names option affects shared day sheets and Summary; it does not remove names from private notes. Changing an option after loading a survey recalculates that file and resets comment review, so review the new result before exporting again."
+          }
+        ],
+        "figures": [
+          {
+            "key": "options",
+            "caption": "The example uses the default access policy, a 30 minute seat and an 08:00 to 10:00 UTC window.",
+            "alt": "Options showing an event cap of three appointments, broad first access, 30 minute office occupancy and the synthetic UTC window."
+          }
+        ]
+      },
+      {
+        "id": "import",
+        "title": "How do I load the response file?",
+        "intro": "Selecting the file starts scheduling. There is no separate Generate button.",
+        "blocks": [
+          {
+            "title": "Choose the survey",
+            "body": "Select Choose file… and open sample-survey.csv, or drag that file into the survey drop area. Use the survey control rather than the separate accepted appointments control. A real Forms export can be .xlsx or .csv; the chooser also accepts .xlsm. Keep recognizable headers and the original response rows."
+          },
+          {
+            "title": "Wait for the saved result on screen",
+            "body": "Continue when the Done status and result cards appear. The file's five rows identify five survey members. Inventory columns are optional in v4, and this example has none. A member with no declared speedups can still receive an appointment. Do not add stock figures merely to make a member eligible."
+          },
+          {
+            "title": "If loading stops",
+            "body": "Read the specific error instead of substituting another file. A missing Player ID or availability column needs a correct header or export. If the spreadsheet reader failed to load, reload with a network connection and choose the file again. Reloading clears the current browser selection. Keep any genuine accepted appointments available to reimport before using a replacement plan."
+          }
+        ],
+        "figures": [
+          {
+            "key": "import",
+            "caption": "Choose the survey response file in the main drop area. Selecting it starts the calculation.",
+            "alt": "Survey drop area and Choose file button for importing the response export."
+          }
+        ]
+      },
+      {
+        "id": "accepted",
+        "title": "How do I preserve an appointment already accepted?",
+        "intro": "Import commitments before assessing the new draft. A commitment is a fixed constraint, not a preference.",
+        "blocks": [
+          {
+            "title": "Load the accepted file",
+            "body": "Under Keep accepted appointments, use Existing appointments CSV to choose sample-accepted.csv. The file supplies Day, Start UTC and Player ID, with optional Alliance and Player Name. Day must be construction, research or training; the start must be a valid half hour time in HH:MM form. This example preserves construction at 08:30 for ID 999999, alliance GUEST."
+          },
+          {
+            "title": "Check the preserved row",
+            "body": "The import recalculates the survey. On Construction Day, find Preserved member at 08:30 and the accepted · fixed label. The member is kept even though no survey row exists for that ID. This appointment occupies its seat. It contributes to the appointment total and day sheet, but not the survey coverage denominator, measured benefit or survey Summary rows."
+          },
+          {
+            "title": "Resolve a conflict explicitly",
+            "body": "If two accepted rows claim the same seat, or a known member's commitment contradicts current availability, the planner stops with a concrete error. It does not move the commitment. Check the agreed record and correct the conflict. Clear imported appointments removes the imported constraints, so use it only when the import itself should be removed, not as a way around a genuine commitment. If an error appears, do not treat an earlier visible result as a successful new calculation."
+          }
+        ],
+        "figures": [
+          {
+            "key": "accepted-import",
+            "caption": "The separate accepted appointments control imports commitments after the survey has been selected.",
+            "alt": "Keep accepted appointments panel, Existing appointments CSV control and imported appointment count."
+          },
+          {
+            "key": "accepted",
+            "caption": "An external accepted member remains fixed at 08:30 on Construction Day.",
+            "alt": "Construction Day row for Preserved member, ID 999999, marked accepted and fixed."
+          },
+          {
+            "key": "conflict",
+            "caption": "A separate synthetic conflict demonstrates a blocker. It is not an alteration to the original sample.",
+            "alt": "Error explaining that conflicting accepted appointments need resolution and were not moved."
+          }
+        ]
+      },
+      {
+        "id": "results",
+        "title": "What do the result cards actually count?",
+        "intro": "Read the coverage, appointment count, measured subtotal and source response count as different quantities.",
+        "blocks": [
+          {
+            "title": "Separate members from appointments",
+            "body": "Players placed shows covered survey members out of the five unique survey members. Appointments made counts assignments, including the preserved external appointment. One member can appear on several requested days, so these cards need not match. The Done sentence can also include the external member, while the coverage card remains survey based."
+          },
+          {
+            "title": "Read the subtotal as a subtotal",
+            "body": "Measured subtotal · minutes saved adds supplied benefit estimates for scheduled survey requests that have an estimate. It is additional timer time saved against the same plan without the title. It is not inventory, total work completed, preparation points or a complete gain total when estimates are missing. A visible number can coexist with benefit ranking being disabled."
+          },
+          {
+            "title": "Read the explanation below the cards",
+            "body": "Model and review status lists the objective order, requested days covered, structured preferences honored and accepted appointments preserved. Check that explanation before interpreting the schedule. Survey responses read counts the file rows; duplicate IDs can make that count larger than the unique member total. The supplied sample has no duplicates."
+          },
+          {
+            "title": "Read this run without changing its meaning",
+            "body": "After the accepted import, the main example covers all five survey members and all ten requested days, with three structured preferences honored. It contains eleven appointments and six distinct assigned IDs because the external commitment is included. The measured subtotal is 595 minutes from known estimates, and five survey responses were read. Elm remains unknown; these counts are synthetic demonstration results, not measured community impact."
+          }
+        ],
+        "figures": [
+          {
+            "key": "results",
+            "caption": "The cards count survey coverage, all assignments, measured benefit and input rows separately.",
+            "alt": "Result cards and model explanation from the five member sample after the external appointment import."
+          }
+        ]
+      },
+      {
+        "id": "fallback",
+        "title": "Why is benefit ranking disabled for this sample?",
+        "intro": "Elm's missing Research estimate is intentional. Unknown benefit is not a zero benefit or a reason to exclude Elm.",
+        "blocks": [
+          {
+            "title": "Keep the unknown value unknown",
+            "body": "Open the original sample and find Elm, ID 100005. Research is requested and an 08:00 to 08:30 window is available, but Research buff benefit minutes is blank. Do not copy another member's value, derive it from speedup stock or enter zero merely to complete the column. Zero would assert a measured absence of additional benefit."
+          },
+          {
+            "title": "Follow the safe policy fallback",
+            "body": "With incomplete estimates on eligible requests, the default policy disables benefit ranking for everyone. It uses broad access, requested day coverage, structured preferences and complete history instead. Members with estimates do not receive a ranking advantage over members whose benefit is unknown. The status explains this change; the measured subtotal remains only the known portion of the selected plan."
+          },
+          {
+            "title": "Do not force the benefit policy",
+            "body": "Selecting Measured extra benefit first (requires complete estimates) with an eligible estimate missing produces an error identifying the request. Supply a defensible estimate or return to broad team access. Missing history follows a separate rule: if any survey member's history is unknown, rotation ranking is disabled for all. The original sample has explicit history values for all five members."
+          }
+        ],
+        "figures": [
+          {
+            "key": "fallback",
+            "caption": "The original sample keeps Elm's benefit unknown and disables comparative benefit ranking for every member.",
+            "alt": "Model status explaining incomplete benefit estimates and the effective broad team access order."
+          }
+        ]
+      },
+      {
+        "id": "review",
+        "title": "What must I do with the comments?",
+        "intro": "Read comments as source information. The solver does not convert free text into wishes or prove task readiness.",
+        "blocks": [
+          {
+            "title": "Review the two supplied comments",
+            "body": "Aster asks for Research after a lab prerequisite and requests a readiness check before booking. Elm says there are no speedups and a long research will be started. These comments explain context, but neither supplies a verified extra time window or a calculated title benefit. Do not invent either from the wording. Check readiness with the member before carrying the plan into the game."
+          },
+          {
+            "title": "Record confirmed time restrictions structurally",
+            "body": "If follow up establishes a hard time limit, put it in the applicable availability or unavailable column and reload the corrected file. Put a preferred time in the matching preferred UTC column. Review Needs a quick look from you separately from What people wrote in the comments. An input problem is not resolved simply because a comment was read."
+          },
+          {
+            "title": "Acknowledge review without upgrading the result",
+            "body": "When the statement is true, select I have reviewed all comments and recorded any hard limits in the structured availability / unavailable columns. The status can then become Planning draft — reviewed inputs. That acknowledgment does not validate a prerequisite, buy a title or make a game booking. DRAFT — input issues need resolution remains when structured input issues exist, even if the checkbox is selected. Any recalculation resets comment review."
+          }
+        ],
+        "figures": [
+          {
+            "key": "comments",
+            "caption": "The supplied comments remain visible for organizer judgment rather than becoming automatic scheduling wishes.",
+            "alt": "Aster's prerequisite comment and Elm's long research comment in the comments panel."
+          },
+          {
+            "key": "reviewed",
+            "caption": "A reviewed input state records the organizer's acknowledgment. It remains a planning draft.",
+            "alt": "Comment review checkbox and Planning draft status after acknowledgment in a synthetic demonstration."
+          }
+        ]
+      },
+      {
+        "id": "days",
+        "title": "How should I inspect the three days?",
+        "intro": "Read the actual rows after the imports and review. Do not infer a game calendar from a weekday label.",
+        "blocks": [
+          {
+            "title": "Inspect each tab",
+            "body": "Open Construction Day (Monday), Research Day (Tuesday) and Troop Training Day (Thursday) in turn for this sample. These are the default labels when the form provides no other recognized weekday. They are not dated event reservations. All displayed times are UTC. Use the actual event dates when organizing the final game actions."
+          },
+          {
+            "title": "Connect a row to its source",
+            "body": "Aster's Construction unavailable window is 08:00 to 08:15. Because that overlaps the first 30 minute seat, the entire 08:00 Construction appointment is unavailable to Aster. Birch can use only the 08:00 Construction seat. Cedar has a structured Research preference for 08:30 to 09:00, while Dawn has a Training preference for 09:00 to 10:00. Preferences can lose to higher policy priorities; a hard exclusion cannot."
+          },
+          {
+            "title": "Keep manual edits outside the solver's guarantee",
+            "body": "An open row means no assignment was selected there. Empty seats are allowed. If the event window or cap changes, change Options and review the recalculated result. A manual workbook swap is not automatically checked by the browser. Preserve the accepted external member unless the real commitment has been changed explicitly."
+          }
+        ],
+        "figures": [
+          {
+            "key": "construction",
+            "caption": "Construction preserves the external 08:30 commitment and respects Aster’s overlapping exclusion.",
+            "alt": "Construction rows showing Birch at 08:00, Preserved member at 08:30, Aster at 09:00 and Dawn at 09:30."
+          },
+          {
+            "key": "research",
+            "caption": "Research rows can be checked against requested days, full availability and structured preferences.",
+            "alt": "Research Day schedule for the synthetic members within the 08:00 to 10:00 UTC window."
+          },
+          {
+            "key": "training",
+            "caption": "Training uses the same appointment rules but its own requested days and preferred windows.",
+            "alt": "Troop Training Day schedule for the same synthetic members."
+          }
+        ],
+        "table": {
+          "headers": [
+            "UTC start",
+            "Construction",
+            "Research",
+            "Training"
+          ],
+          "rows": [
+            [
+              "08:00",
+              "Birch",
+              "Elm",
+              "Cedar"
+            ],
+            [
+              "08:30",
+              "Preserved member, fixed",
+              "Cedar",
+              "Aster"
+            ],
+            [
+              "09:00",
+              "Aster",
+              "Aster",
+              "Dawn"
+            ],
+            [
+              "09:30",
+              "Dawn",
+              "Dawn",
+              "Open"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "download",
+        "title": "Which sheets should I download and share?",
+        "intro": "Download only the version corresponding to the final options and imports you reviewed. Export is possible even while the plan is marked DRAFT.",
+        "blocks": [
+          {
+            "title": "Open the workbook",
+            "body": "Select Download the schedule (.xlsx) and open the saved file in Excel or Google Sheets. This edition exports six sheets: three buff day sheets, Summary, Declared resources and Scheduler notes. An unresolved draft has DRAFT in its filename. Download availability does not mean the organizer's review is finished."
+          },
+          {
+            "title": "Use the appropriate sheet",
+            "body": "Day sheets list time, Player ID, alliance and optional name, including imported external commitments. Summary describes the survey members' assignments and measured extra minutes. Declared resources preserves recognized resource answers as context, not inferred title gains. Because the supplied sample has no inventory columns, that sheet can contain its headers without resource records. Scheduler notes records review status, policy, issues, unplaced reasons and source comments."
+          },
+          {
+            "title": "Review privacy before sharing",
+            "body": "Turning names off changes day sheets and Summary. It does not anonymize Scheduler notes, the on screen comments or every identity field. IDs and alliances remain identifiers, and free text may contain personal information or an email address even though no dedicated email column is exported. Keep private notes for the organizer and share only the intended sheets after inspecting their contents."
+          }
+        ],
+        "table": {
+          "headers": [
+            "Sheet",
+            "Use"
+          ],
+          "rows": [
+            [
+              "Construction Day (Monday)",
+              "Construction appointments, including fixed imports"
+            ],
+            [
+              "Research Day (Tuesday)",
+              "Research appointments"
+            ],
+            [
+              "Troop Training Day (Thursday)",
+              "Training appointments"
+            ],
+            [
+              "Summary",
+              "Survey members and measured assigned benefit"
+            ],
+            [
+              "Declared resources",
+              "Original recognized inventory answers for context"
+            ],
+            [
+              "Scheduler notes",
+              "Private review status, issues and comments"
+            ]
+          ]
+        },
+        "note": "The browser does not reopen the downloaded file for verification. Opening and inspecting it is part of this organizer review.",
+        "figures": [
+          {
+            "key": "download",
+            "caption": "Select Download the schedule (.xlsx) to save the current draft. This synthetic run’s saved workbook was reopened and all six sheets were inspected.",
+            "alt": "Reviewed planning draft status beside Download the schedule, following comment review."
+          }
+        ]
+      },
+      {
+        "id": "game",
+        "title": "When does this become a game appointment?",
+        "intro": "The documentation route ends with a reviewed plan. Booking in the game is a separate action.",
+        "blocks": [
+          {
+            "title": "Confirm the live conditions",
+            "body": "Before arranging real appointments, confirm current event dates, office rules, member readiness and the actual accepted schedule. The app models a 30 minute seat even if an action finishes early. A title relevant to a new start must be obtained before that action begins; a planning row does not establish that this happened."
+          },
+          {
+            "title": "Keep a clear completion boundary",
+            "body": "The walkthrough is complete when the applicable imports and issues have been reviewed and the intended workbook has been inspected. A reviewed draft can still need a prerequisite check or game booking. Record that remaining work as pending rather than calling the downloaded schedule a confirmed reservation."
+          }
+        ]
+      },
+      {
+        "id": "benefit",
+        "title": "What does a benefit estimate mean?",
+        "intro": "Compare the same declared plan with and without the requested title. Inventory and gross event contribution answer different questions.",
+        "blocks": [
+          {
+            "title": "Use one counterfactual",
+            "body": "Construction buff benefit minutes means additional whole minutes saved by the title over the same work without it. Research and Training use their equivalent headers. The comparison must keep its baseline clear. A member can contribute without an appointment, so the no title baseline is not automatically zero work or zero contribution."
+          },
+          {
+            "title": "Do not multiply shared resources",
+            "body": "Browser estimates must already account for any allocation of general speedups across days. The browser does not distribute that pool, simulate spending or derive gains from stock. It accepts nonnegative whole minute estimates for individual requests. If tasks or resources interact, use complete alternatives in the advanced route rather than adding incompatible day estimates."
+          },
+          {
+            "title": "Distinguish a known zero from a blank",
+            "body": "Enter zero only when the comparison supports no additional timer saving. Leave an unknown estimate blank and accept the disclosed fallback. The separate mechanics calculator can evaluate supplied task statistics, but its output is conditional on those inputs; it is not a browser control or a live game forecast."
+          }
+        ],
+        "table": {
+          "headers": [
+            "Quantity",
+            "What it describes"
+          ],
+          "rows": [
+            [
+              "Inventory",
+              "Resources owned or declared for use"
+            ],
+            [
+              "No title baseline",
+              "What the same plan contributes without the requested title"
+            ],
+            [
+              "Incremental benefit",
+              "The additional result compared with that baseline"
+            ],
+            [
+              "Browser benefit minutes",
+              "Supplied nonnegative whole minutes of additional saving"
+            ],
+            [
+              "Game event points",
+              "A separate quantity requiring the applicable scoring conditions"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "policies",
+        "title": "How can I compare access with measured benefit?",
+        "intro": "Use examples/comparison-survey.csv for this separate comparison. It changes only Elm’s Research benefit to a synthetic 25 minutes; the original sample remains unchanged.",
+        "blocks": [
+          {
+            "title": "Use the complete estimate variation",
+            "body": "Load examples/comparison-survey.csv, keep the same accepted appointment, and narrow the window to 08:00 to 09:00 UTC. Keep the event cap at three and the default broad first access policy. These are deliberate variation settings, not the main walkthrough settings. All eligible benefits are now supplied. The 25 minute value is a teaching assumption, not a calculation of a real member’s benefit or permission to fill a production blank arbitrarily."
+          },
+          {
+            "title": "Read both measured outcomes",
+            "body": "For this variation, broad first access serves five survey members for 300 measured extra minutes. Benefit first serves three for 410 minutes. The broad policy shows six appointments including the external commitment, five of ten requested days covered and no preferred windows honored. Select Measured extra benefit first (requires complete estimates) to inspect its alternative. The comparison exposes a real model tradeoff: two fewer survey members receive access in return for 110 more declared minutes, under these synthetic inputs."
+          },
+          {
+            "title": "Choose the policy openly",
+            "body": "Broad access, then requested days and preferences puts request coverage, preferences and complete history ahead of benefit. All policies keep hard constraints and accepted commitments. A lower priority can break a tie but cannot silently outweigh a higher one. Changing the policy recalculates the file and requires a fresh review before the replacement download."
+          }
+        ],
+        "figures": [
+          {
+            "key": "tradeoff",
+            "caption": "The separately labeled complete estimate variation exposes access and measured benefit side by side. Values belong only to that synthetic variation.",
+            "alt": "Model comparison showing broad first access and benefit first outcomes from a complete synthetic estimate set."
+          },
+          {
+            "key": "benefit",
+            "caption": "Switching to benefit first in the same complete variation serves three survey members for 410 declared extra minutes, while the broad access comparison remains visible.",
+            "alt": "Benefit first policy result from the separate complete synthetic estimate variation."
+          }
+        ],
+        "links": [
+          {
+            "label": "Download the separately labeled complete estimate variation",
+            "url": "examples/comparison-survey.csv"
+          }
+        ]
+      },
+      {
+        "id": "reference",
+        "title": "How do I correct a blocked or ambiguous input?",
+        "intro": "Use the reported symptom to find the source field. Do not alter a genuine constraint merely to obtain a schedule.",
+        "blocks": [
+          {
+            "title": "Ambiguous time or no full seat",
+            "body": "Replace local time abbreviations and phrases such as only after with confirmed positive UTC ranges. Write 20:00 to 22:00 rather than 8 to 10pm, or put AM or PM on both endpoints. Equal endpoints are ambiguous; use All day if that is what the member meant. A ten minute window cannot contain a 30 minute seat. An unavailable interval that overlaps any part of a seat removes that seat."
+          },
+          {
+            "title": "Wrong or missing benefit and history",
+            "body": "Benefit entries must be nonnegative whole minutes. History must be a nonnegative whole appointment count. Do not turn malformed values into zero. Unknown benefit and unknown history disable their respective ranking layers globally, rather than penalizing the affected person. With no selected day column, v4 derives requested days from available day windows; with the column present, explicit choices govern, so a blank choice is not all days."
+          },
+          {
+            "title": "Duplicate or conflicting records",
+            "body": "Use one Player ID for one member. A recognized completion timestamp takes precedence for duplicate submissions; the latest recognized time wins, with the later row winning a tie or when both timestamps are absent. Review the retained answers. For accepted appointments, resolve a duplicate seat, conflicting member and day, event cap conflict or out of window start against the actual commitment before rescheduling."
+          }
+        ],
+        "figures": [
+          {
+            "key": "ambiguity",
+            "caption": "A separately labeled malformed time variation illustrates input recovery without changing the original sample.",
+            "alt": "Input issue identifying an ambiguous availability value and requesting explicit UTC ranges."
+          },
+          {
+            "key": "attention",
+            "caption": "The separate malformed time variation reports why Birch has no full available seat. Correct the source availability rather than clearing a genuine limit.",
+            "alt": "Attention panel identifies Birch’s unreadable availability alongside unplaced requested days."
+          },
+          {
+            "key": "missing-benefit",
+            "caption": "The explicit benefit first policy rejects an eligible unknown estimate instead of treating it as zero.",
+            "alt": "Benefit first error identifying Elm’s missing Research estimate and requiring a measured value or broad team access."
+          }
+        ],
+        "table": {
+          "headers": [
+            "Exact example header",
+            "Meaning"
+          ],
+          "rows": [
+            [
+              "Player ID",
+              "Identity used to retain one survey record per member"
+            ],
+            [
+              "Desired buffs",
+              "Requested construction, research or training days"
+            ],
+            [
+              "General availability",
+              "Positive UTC windows shared across days"
+            ],
+            [
+              "Construction preferred UTC",
+              "A preference within policy priorities"
+            ],
+            [
+              "Construction unavailable UTC",
+              "An exclusion that removes overlapping seats"
+            ],
+            [
+              "Construction buff benefit minutes",
+              "Additional whole minutes saved; blank means unknown"
+            ],
+            [
+              "Prior appointments",
+              "Known prior access count; blank means unknown"
+            ],
+            [
+              "Comments",
+              "Source text for organizer review, not automatic wishes"
+            ]
+          ]
+        },
+        "note": "Research and Training use the corresponding preferred UTC, unavailable UTC and buff benefit minutes headers. Inventory columns remain optional."
+      },
+      {
+        "id": "advanced",
+        "title": "When do I need the advanced plan optimizer?",
+        "intro": "Use this separate Python route for coupled tasks, shared budgets, absolute dates or multiple physical offices. A browser survey is not its input file.",
+        "blocks": [
+          {
+            "title": "Prepare the separate Python route",
+            "body": "Use a terminal from the v4 package folder on macOS or Linux with Python 3 available. Read advanced/schema.txt and keep the supplied advanced/example.json unchanged for the first run. Create a dedicated environment before installing requirements.txt into it, then run the synthetic example with that environment’s Python. The production engine is OR-Tools CP-SAT; the program does not install dependencies itself."
+          },
+          {
+            "title": "Describe complete alternatives",
+            "body": "Supply exactly one baseline plan per member, plus mutually exclusive complete event alternatives. Benefits are signed integer differences in one declared objective unit, not browser benefit minutes inferred from stock. Declare resource consumption once for each complete plan, the member's budgets, requested days, physical offices, absolute UTC intervals, prerequisites and commitments. The baseline has no appointments and zero incremental benefit, but may still consume resources or do useful work."
+          },
+          {
+            "title": "Interpret the result status",
+            "body": "OPTIMAL requires proof at all six policy stages. FEASIBLE means an incumbent exists but a stage is unproved; UNKNOWN means no complete incumbent was found by the deadline. INPUT_ERROR, INFEASIBLE and DEPENDENCY_MISSING require their stated resolution. Do not publish them as a completed optimized plan. The exhaustive engine is a bounded reference for small inputs, not an automatic production fallback. Declared plans still need game feasibility outside the optimizer."
+          }
+        ],
+        "links": [
+          {
+            "label": "Read the advanced JSON contract",
+            "url": "advanced/schema.txt"
+          },
+          {
+            "label": "Inspect the synthetic advanced input",
+            "url": "advanced/example.json"
+          },
+          {
+            "label": "Inspect the advanced optimizer source",
+            "url": "advanced/optimizer.py"
+          }
+        ],
+        "table": {
+          "headers": [
+            "Step",
+            "Command",
+            "Expected result"
+          ],
+          "rows": [
+            [
+              "Create the environment",
+              "python3 -m venv .venv",
+              "A dedicated local Python environment"
+            ],
+            [
+              "Install the declared dependency",
+              ".venv/bin/python -m pip install -r requirements.txt",
+              "OR-Tools available in that environment"
+            ],
+            [
+              "Run the synthetic plan",
+              ".venv/bin/python advanced/optimizer.py --input advanced/example.json --output advanced/result.json",
+              "A result file whose status and stages must be read"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "mechanics",
+        "title": "How do I calculate a supplied task comparison?",
+        "intro": "The mechanics calculator is a separate Python tool. It evaluates explicit statistics and assumptions, not the contents of the browser survey.",
+        "blocks": [
+          {
+            "title": "Compare the same work",
+            "body": "From the v4 package folder, run the same work command in the table below. This mode compares the same fixed work with and without a title using supplied speed percentages. A fixed time reduction needs an explicit before_speed or after_speed stage. A preexisting queue receives no new title benefit. New start checks use supplied absolute UTC appointments and an exact office identifier; omitted timing context is an assumption, not a verified reservation."
+          },
+          {
+            "title": "Keep training quantities separate",
+            "body": "The separate fixed budget training example calculates whole troop output from supplied speed, budget and base time, with an optional available unit cap. Promotion needs a supplied source tier and promotion time. Optional event points need explicit scoring inputs. Capacity Enhance changes batch size and batch time; it does not independently multiply per troop throughput."
+          },
+          {
+            "title": "Respect the arithmetic boundary",
+            "body": "The calculator uses exact fractions for arithmetic and flooring. It does not simulate camp residuals, repeated queue starts, item denominations, collection windows, resource reinvestment or changing buffs at later starts. The integration example requires the advanced environment above and compiles supplied same work calculations into complete alternatives. Its saved result serves two synthetic members for 1,600 additional timer seconds with no general speedups consumed. It is an example result, not a live outcome."
+          }
+        ],
+        "links": [
+          {
+            "label": "Read the supplied task calculator instructions",
+            "url": "mechanics/README.md"
+          },
+          {
+            "label": "Inspect the complete integration example",
+            "url": "examples/from_tasks.py"
+          }
+        ],
+        "table": {
+          "headers": [
+            "Route",
+            "Command",
+            "Output meaning"
+          ],
+          "rows": [
+            [
+              "Same work",
+              "python3 mechanics/task_model.py --input mechanics/sample-same-work.json",
+              "Timer saving for supplied identical work"
+            ],
+            [
+              "Fixed budget training",
+              "python3 mechanics/task_model.py --input mechanics/sample-training.json",
+              "Bounded troop output for supplied statistics"
+            ],
+            [
+              "Complete integration",
+              ".venv/bin/python examples/from_tasks.py",
+              "Task calculations compiled into plans and optimized"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "edition",
+        "title": "Which edition and evidence does this guide use?",
+        "intro": "Documentation edition: 26 October 2026. It describes the Whiteout scheduler v4 source files and their supplied synthetic examples.",
+        "blocks": [
+          {
+            "title": "Use the current source for current behavior",
+            "body": "The browser HTML, README.md, advanced/schema.txt and mechanics/README.md define this edition's separate routes. Older instructions describing stock as title created points, shorter browser seats or automatic free text wishes do not describe v4. Keep the guide and source edition together when sharing a local copy."
+          },
+          {
+            "title": "Know what has and has not been established",
+            "body": "The saved development verification and the independent release checks dated 26 October 2026 document automated model tests. This documentation also uses an actual synthetic browser import, fixed appointment import and six sheet download that was reopened and inspected. These checks establish the tested behaviors, not novice usability, accessibility conformance, adoption or improved game results. A new reader’s questions and performance require separate observation. Report a mismatch with the source file, setting and visible state so a correction can reach the walkthrough, case study and reference together."
+          }
+        ],
+        "links": [
+          {
+            "label": "Read the project case study",
+            "url": "index.html"
+          },
+          {
+            "label": "Read the saved v4 verification record",
+            "url": "verification.json"
+          },
+          {
+            "label": "Read the v4 route overview",
+            "url": "README.md"
+          },
+          {
+            "label": "Read the independent documentation release checks",
+            "url": "release-checks.json"
+          }
+        ]
+      }
+    ]
+  },
+  "caseStudy": {
+    "title": "Make appointment value and uncertainty visible",
+    "lede": "Whiteout Buff Scheduler v4 is a community planning tool for allocating temporary game offices. I developed its browser workflow, optimization tools and documentation around a distinction that changes the problem: resources a member owns are not the additional benefit an appointment creates.",
+    "sections": [
+      {
+        "id": "context",
+        "title": "A useful plan must respect both members and commitments.",
+        "intro": "The audience includes the community organizer using the tool and the technical reviewer who needs to understand its decisions without knowing the game.",
+        "blocks": [
+          {
+            "title": "The operating problem",
+            "body": "Whiteout Survival communities coordinate temporary office titles during State versus State, or SvS, preparation. A buff is a temporary benefit relevant to an action such as starting construction, research or troop training. Members submit requested days and available times. An organizer needs to allocate scarce appointments, preserve promises already made and identify questions that still need human judgment."
+          },
+          {
+            "title": "My contribution",
+            "body": "I developed the browser planner, the separate Python optimization and task calculation routes, synthetic examples and the explanations around them. The work connects input modeling, exact optimization, interface states, exported records and technical writing. The documentation is part of that system: it explains which decision belongs to the model and which remains with the organizer. It does not present a generated workbook as a game booking or claim observed community outcomes that the available evidence cannot establish."
+          }
+        ],
+        "figures": [
+          {
+            "key": "results",
+            "caption": "The result cards distinguish survey coverage, all assignments, measured benefit and source responses.",
+            "alt": "V4 synthetic browser result showing separate coverage, appointment and measured benefit quantities."
+          }
+        ]
+      },
+      {
+        "id": "baseline",
+        "title": "Inventory is context, while benefit needs a baseline.",
+        "intro": "A member can contribute without holding a title. Treating all of that contribution as a title gain would answer the wrong question.",
+        "blocks": [
+          {
+            "title": "The conceptual correction",
+            "body": "An inventory describes resources owned or intended for use. An appointment's incremental benefit is the difference between a declared plan with that title and the same plan without it. These are different quantities. A long new action may benefit even when the member uses no general speedups. Conversely, a large stock does not prove that an appointment produces a large extra gain."
+          },
+          {
+            "title": "The model boundary",
+            "body": "The browser accepts explicit nonnegative whole minutes of additional saving for each requested day. It does not calculate these values from stock or allocate one general speedup pool across several days. Coupled work belongs in complete alternative plans in the advanced route. There, signed benefit values and an explicit baseline preserve cases in which a plan contributes without an appointment or loses value against the baseline. The unit and counterfactual remain visible rather than being hidden inside a score."
+          }
+        ],
+        "table": {
+          "headers": [
+            "Quantity",
+            "What it describes"
+          ],
+          "rows": [
+            [
+              "Inventory",
+              "Resources owned or declared for use"
+            ],
+            [
+              "No title baseline",
+              "What the same plan contributes without the requested title"
+            ],
+            [
+              "Incremental benefit",
+              "The additional result compared with that baseline"
+            ],
+            [
+              "Browser benefit minutes",
+              "Supplied nonnegative whole minutes of additional saving"
+            ],
+            [
+              "Game event points",
+              "A separate quantity requiring the applicable scoring conditions"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "unknown",
+        "title": "Unknown estimates change the ranking for everyone.",
+        "intro": "Missing information should not become an invented zero, a wealth preference or a judgment about the member.",
+        "blocks": [
+          {
+            "title": "A visible fallback",
+            "body": "The supplied survey deliberately leaves Elm's Research benefit blank. Under the default policy, incomplete eligible estimates disable benefit ranking globally. The planner still considers broad first access, requested day coverage, structured preferences and complete history. Members who supplied numbers do not gain a hidden advantage over members whose benefit remains unknown. Selecting the explicit benefit first policy instead produces a concrete missing estimate error."
+          },
+          {
+            "title": "Separate uncertainty from identity",
+            "body": "Prior access history has its own completeness test. Unknown history disables rotation for everyone; a genuine zero is not the same as missing history. Resource stock is retained as context, not a reliability score or honesty penalty. These choices keep the system's treatment of uncertainty inspectable. They also change the writing: the interface explains the effective policy, while the guide explains why a measured subtotal can remain visible even though comparative benefit ranking is disabled."
+          }
+        ],
+        "figures": [
+          {
+            "key": "fallback",
+            "caption": "The original sample demonstrates uncertainty without excluding the member whose estimate is missing.",
+            "alt": "Model status disclosing global benefit ranking fallback for the sample's unknown Research estimate."
+          }
+        ]
+      },
+      {
+        "id": "constraints",
+        "title": "A commitment is a constraint, not a tie preference.",
+        "intro": "The model distinguishes availability, preferred windows, accepted appointments and comments before optimizing anything.",
+        "blocks": [
+          {
+            "title": "Preserve the real boundary",
+            "body": "The sample accepted file fixes Construction at 08:30 for a member absent from the survey. That external commitment occupies a seat and remains in the day sheet without earning invented benefit or survey coverage. A conflicting accepted seat or contradiction with a known member's availability stops the calculation with a specific reason. The solver does not quietly move a promise to improve its objective."
+          },
+          {
+            "title": "Make flexible choices where flexibility exists",
+            "body": "Aster's short Construction exclusion removes the whole overlapping 30 minute seat. Structured preferred windows can influence ties but cannot overrule availability. Free text is retained for review rather than converted into a positive wish. A separate integration example demonstrates global reassignment: a flexible member can use 08:00 or 08:30, while a constrained member can use only 08:00. Giving the constrained member the early seat and moving the flexible one later serves both."
+          }
+        ],
+        "figures": [
+          {
+            "key": "accepted",
+            "caption": "A preserved external member has a real seat but no fabricated survey record.",
+            "alt": "Imported synthetic external appointment marked accepted and fixed."
+          }
+        ]
+      },
+      {
+        "id": "policy",
+        "title": "Exact optimization makes the chosen priorities explicit.",
+        "intro": "The browser solves the submitted three day model exactly. That does not mean one policy is the right choice for every community.",
+        "blocks": [
+          {
+            "title": "Encode the priority order",
+            "body": "The browser uses a minimum cost flow network. Capacity limits encode appointment caps and one assignment per member and day. Eligible connections represent available seats, while fixed commitments remove occupied choices. Integer weights give each objective enough weight to dominate every lower priority combined. JavaScript BigInt keeps these layered weights exact rather than relying on floating point approximations."
+          },
+          {
+            "title": "Expose the consequence of the policy",
+            "body": "Broad first access protects the number of members served before maximizing complete measured benefit. Benefit first reverses those two priorities. The team access route prioritizes coverage, requested days, preferences and complete history before any lower benefit layer. With complete estimates, the interface compares access and measured extra minutes so the organizer can see the consequence. Lower layers preserve draft stability and resolve remaining ties. The guarantee applies to the declared inputs and objective order, not unmodeled game behavior or the eventual score."
+          },
+          {
+            "title": "Show the actual comparison",
+            "body": "The separate complete estimate variation changes Elm’s unknown value to a stated synthetic 25 minutes and narrows the window to 08:00 to 09:00. With the same fixed commitment, broad first access serves five survey members for 300 extra minutes; benefit first serves three for 410. These figures demonstrate the policy difference under declared inputs. They are not an observed benefit to a community or a forecast that the members will perform the work."
+          }
+        ],
+        "figures": [
+          {
+            "key": "tradeoff",
+            "caption": "A separate complete estimate variation makes the access and benefit comparison inspectable.",
+            "alt": "Review panel comparing broad first access with benefit first under complete synthetic estimates."
+          },
+          {
+            "key": "benefit",
+            "caption": "The complete variation makes the cost of choosing benefit first visible instead of burying it in an aggregate score.",
+            "alt": "Benefit first view of the same synthetic comparison, showing three members served for 410 measured extra minutes."
+          }
+        ]
+      },
+      {
+        "id": "review",
+        "title": "Review status remains visible through the export.",
+        "intro": "A successful calculation can still contain an unresolved input or a comment that needs judgment.",
+        "blocks": [
+          {
+            "title": "Use states that say what happened",
+            "body": "The browser distinguishes input issues, unreviewed comments and reviewed inputs. A review checkbox cannot clear an input issue, and recalculation resets comment acknowledgment. Even the reviewed state remains a planning draft. This prevents one successful computational step from implying that a prerequisite has been verified or an appointment entered into the game."
+          },
+          {
+            "title": "Carry the distinction into the workbook",
+            "body": "The export contains three day sheets, Summary, Declared resources and Scheduler notes. Draft filenames and notes preserve the review state. The names option changes day sheets and Summary but does not anonymize private notes, source comments or every identifier. Documentation therefore explains sharing by sheet purpose instead of promising blanket anonymity. It also states that initial loading uses external fonts and SheetJS, while selected survey processing stays local."
+          }
+        ],
+        "figures": [
+          {
+            "key": "reviewed",
+            "caption": "Review acknowledgment is a documented state with a clear limit, not a booking confirmation.",
+            "alt": "Reviewed input planning draft status and comment acknowledgment in the synthetic browser example."
+          }
+        ]
+      },
+      {
+        "id": "advanced",
+        "title": "Separate models handle interactions the survey cannot represent.",
+        "intro": "The browser, advanced plan optimizer and mechanics calculator share concepts without pretending to be interchangeable interfaces.",
+        "blocks": [
+          {
+            "title": "Select complete event alternatives",
+            "body": "The advanced Python optimizer uses OR-Tools CP-SAT to select one complete plan per member. Its JSON contract requires a baseline, one common integer benefit unit, physical office intervals, declared resource budgets and feasible alternatives. It checks supplied dependency order, member overlap, office overlap and locks. Six sequential objective stages must each be proved before OPTIMAL is reported. A deadline can instead produce FEASIBLE or UNKNOWN, and a missing dependency is disclosed rather than replaced with a silent heuristic."
+          },
+          {
+            "title": "Calculate only what the inputs support",
+            "body": "The mechanics tool uses exact fractions for supplied same work timer comparisons and bounded fixed budget training. Timing context can gate a new start against an exact office interval. It does not infer live buff strengths, residual queues, repeated starts, collection windows or reinvestment. The integration example compiles supplied work comparisons into alternatives and records two synthetic members served with 1,600 additional timer seconds saved and zero general speedups consumed. The result illustrates the model connection, not a measured game outcome."
+          }
+        ],
+        "links": [
+          {
+            "label": "Inspect the advanced contract",
+            "url": "advanced/schema.txt"
+          },
+          {
+            "label": "Read the mechanics boundaries",
+            "url": "mechanics/README.md"
+          },
+          {
+            "label": "Inspect the integration example",
+            "url": "examples/from_tasks.py"
+          }
+        ]
+      },
+      {
+        "id": "writing",
+        "title": "The guide follows the organizer's questions, not the source file layout.",
+        "intro": "The writing applies the complete technical communication study to reader purpose, conceptual precision, recovery and maintenance.",
+        "blocks": [
+          {
+            "title": "Keep one continuous example",
+            "body": "The walkthrough follows the supplied five member survey and fixed external appointment through options, import, review and export. A separately labeled complete estimate variation demonstrates policy comparison without overwriting the unknown value in the original. Screenshots show real synthetic browser states. Captions explain their role, and exact control labels sit beside the relevant actions rather than in a distant legend."
+          },
+          {
+            "title": "Separate doing from understanding",
+            "body": "The main route helps an organizer complete the task. Linked reference sections explain benefit, policies, ambiguous inputs and the separate Python tools. This case study preserves the reasoning behind the design instead of replacing it with a compressed presentation. Shared content is intended to produce companion web, Markdown and PDF editions consistently. The writing review checks conceptual accuracy, completeness, task focus, clarity, concreteness, tone, organization, retrieval and visual usefulness as separate questions."
+          }
+        ],
+        "links": [
+          {
+            "label": "Follow the complete browser walkthrough",
+            "url": "walkthrough.html"
+          }
+        ]
+      },
+      {
+        "id": "evidence",
+        "title": "The evidence supports tested behavior, not invented impact.",
+        "intro": "Documentation and independent release check date: 26 October 2026. Saved development records, current release checks and synthetic browser demonstrations are identified separately.",
+        "blocks": [
+          {
+            "title": "Distinguish the record from the rerun",
+            "body": "The saved v4 development verification reports 23 targeted browser regressions, 300 independent exhaustive instances across three policies and a 120 member synthetic scale case. Independent release checks on 26 October 2026 reran the current suites: browser checks passed, the advanced suite ran 38 tests with 37 passes and one expected dependency specific skip, and all 25 mechanics tests passed. The integration rerun returned OPTIMAL for two synthetic members and 1,600 additional timer seconds with zero general speedups consumed."
+          },
+          {
+            "title": "Demonstrate the real interface with invented data",
+            "body": "The documentation run loaded the actual five row sample, imported the external fixed appointment, reviewed the three days and comments, and downloaded a six sheet workbook. That workbook was reopened and inspected. The main result covered five survey members across ten requested days, preserved the external member and displayed a 595 minute measured subtotal with an unknown benefit still disclosed. The complete estimate comparison is a different, explicitly labeled variation."
+          },
+          {
+            "title": "Keep the remaining questions visible",
+            "body": "Those checks do not establish representative user testing, accessibility conformance, community adoption, time savings or real event performance. Browser exactness is bounded by its additive survey model. Advanced exactness is bounded by supplied alternatives and feasibility assumptions. A new reader's navigation, interpretation and task performance still need direct observation. Future improvements should preserve the source, record the issue and update the interface explanation and companion documents together."
+          }
+        ],
+        "links": [
+          {
+            "label": "Read the saved v4 verification evidence",
+            "url": "verification.json"
+          },
+          {
+            "label": "Read the edition and route overview",
+            "url": "README.md"
+          },
+          {
+            "label": "Read the independent release checks for this documentation edition",
+            "url": "release-checks.json"
+          }
+        ]
+      }
+    ]
+  }
+}

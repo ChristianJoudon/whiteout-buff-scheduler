@@ -1,0 +1,706 @@
+{
+  "increment_over_stock": {
+    "objective_unit": "saved_timer_minutes",
+    "policy": "benefit-first",
+    "deadline_seconds": 10,
+    "slots": [
+      {
+        "id": "c1",
+        "day": "construction-day",
+        "office": "vice-president",
+        "start": "2026-10-26T08:00:00Z",
+        "end": "2026-10-26T08:30:00Z"
+      }
+    ],
+    "members": [
+      {
+        "id": "large-stock-small-title-increment",
+        "requested_days": [
+          "construction-day"
+        ],
+        "plans": [
+          {
+            "id": "no-title",
+            "incremental_benefit": 0,
+            "appointments": [],
+            "baseline": true
+          },
+          {
+            "id": "with-title",
+            "incremental_benefit": 10,
+            "appointments": [
+              "c1"
+            ]
+          }
+        ],
+        "reported_inventory": {
+          "general_minutes": 1000000
+        }
+      },
+      {
+        "id": "smaller-stock-larger-title-increment",
+        "requested_days": [
+          "construction-day"
+        ],
+        "plans": [
+          {
+            "id": "no-title",
+            "incremental_benefit": 0,
+            "appointments": [],
+            "baseline": true
+          },
+          {
+            "id": "with-title",
+            "incremental_benefit": 20,
+            "appointments": [
+              "c1"
+            ]
+          }
+        ],
+        "reported_inventory": {
+          "general_minutes": 1000
+        }
+      }
+    ]
+  },
+  "no_title_baseline": {
+    "objective_unit": "saved_timer_minutes",
+    "policy": "benefit-first",
+    "deadline_seconds": 10,
+    "slots": [
+      {
+        "id": "c1",
+        "day": "construction-day",
+        "office": "vice-president",
+        "start": "2026-10-26T08:00:00Z",
+        "end": "2026-10-26T08:30:00Z"
+      }
+    ],
+    "members": [
+      {
+        "id": "alpha",
+        "requested_days": [
+          "construction-day"
+        ],
+        "plans": [
+          {
+            "id": "no-title",
+            "incremental_benefit": 0,
+            "appointments": [],
+            "baseline": true,
+            "consumption": {
+              "general_minutes": 100
+            }
+          },
+          {
+            "id": "with-title",
+            "incremental_benefit": 5,
+            "appointments": [
+              "c1"
+            ],
+            "consumption": {
+              "general_minutes": 100
+            }
+          }
+        ],
+        "budgets": {
+          "general_minutes": 100
+        }
+      }
+    ]
+  },
+  "general_pool_split": {
+    "objective_unit": "saved_timer_minutes",
+    "policy": "benefit-first",
+    "deadline_seconds": 10,
+    "slots": [
+      {
+        "id": "c1",
+        "day": "construction-day",
+        "office": "vice-president",
+        "start": "2026-10-26T08:00:00Z",
+        "end": "2026-10-26T08:30:00Z"
+      },
+      {
+        "id": "r1",
+        "day": "research-day",
+        "office": "vice-president",
+        "start": "2026-10-27T08:00:00Z",
+        "end": "2026-10-27T08:30:00Z"
+      }
+    ],
+    "members": [
+      {
+        "id": "alpha",
+        "requested_days": [
+          "construction-day",
+          "research-day"
+        ],
+        "plans": [
+          {
+            "id": "no-title",
+            "incremental_benefit": 0,
+            "appointments": [],
+            "baseline": true
+          },
+          {
+            "id": "construction",
+            "incremental_benefit": 4,
+            "appointments": [
+              "c1"
+            ],
+            "consumption": {
+              "general_minutes": 60
+            }
+          },
+          {
+            "id": "research",
+            "incremental_benefit": 6,
+            "appointments": [
+              "r1"
+            ],
+            "consumption": {
+              "general_minutes": 70
+            }
+          },
+          {
+            "id": "split",
+            "incremental_benefit": 9,
+            "appointments": [
+              "c1",
+              "r1"
+            ],
+            "consumption": {
+              "general_minutes": 100
+            }
+          }
+        ],
+        "budgets": {
+          "general_minutes": 100
+        }
+      }
+    ]
+  },
+  "same_office_overlap": {
+    "objective_unit": "saved_timer_minutes",
+    "policy": "benefit-first",
+    "deadline_seconds": 10,
+    "slots": [
+      {
+        "id": "c1",
+        "day": "construction-day",
+        "office": "vice-president",
+        "start": "2026-10-26T08:00:00Z",
+        "end": "2026-10-26T08:30:00Z"
+      },
+      {
+        "id": "c2",
+        "day": "construction-day",
+        "office": "vice-president",
+        "start": "2026-10-26T08:15:00Z",
+        "end": "2026-10-26T08:45:00Z"
+      }
+    ],
+    "members": [
+      {
+        "id": "alpha",
+        "requested_days": [
+          "construction-day"
+        ],
+        "plans": [
+          {
+            "id": "no-title",
+            "incremental_benefit": 0,
+            "appointments": [],
+            "baseline": true
+          },
+          {
+            "id": "with-title",
+            "incremental_benefit": 10,
+            "appointments": [
+              "c1"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "bravo",
+        "requested_days": [
+          "construction-day"
+        ],
+        "plans": [
+          {
+            "id": "no-title",
+            "incremental_benefit": 0,
+            "appointments": [],
+            "baseline": true
+          },
+          {
+            "id": "with-title",
+            "incremental_benefit": 20,
+            "appointments": [
+              "c2"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "external_fixed_appointment": {
+    "objective_unit": "saved_timer_minutes",
+    "policy": "benefit-first",
+    "deadline_seconds": 10,
+    "slots": [
+      {
+        "id": "c1",
+        "day": "construction-day",
+        "office": "vice-president",
+        "start": "2026-10-26T08:00:00Z",
+        "end": "2026-10-26T08:30:00Z"
+      },
+      {
+        "id": "c2",
+        "day": "construction-day",
+        "office": "vice-president",
+        "start": "2026-10-26T08:15:00Z",
+        "end": "2026-10-26T08:45:00Z"
+      }
+    ],
+    "members": [
+      {
+        "id": "alpha",
+        "requested_days": [
+          "construction-day"
+        ],
+        "plans": [
+          {
+            "id": "no-title",
+            "incremental_benefit": 0,
+            "appointments": [],
+            "baseline": true
+          },
+          {
+            "id": "with-title",
+            "incremental_benefit": 999,
+            "appointments": [
+              "c2"
+            ]
+          }
+        ]
+      }
+    ],
+    "locks": [
+      {
+        "slot_id": "c1",
+        "member_id": "external-existing-member"
+      }
+    ]
+  },
+  "fractional_cooldown_midnight": {
+    "objective_unit": "saved_timer_minutes",
+    "policy": "benefit-first",
+    "deadline_seconds": 10,
+    "slots": [
+      {
+        "id": "c1",
+        "day": "construction-day",
+        "office": "vice-president",
+        "start": "2026-10-26T23:30:00Z",
+        "end": "2026-10-27T00:00:00Z"
+      },
+      {
+        "id": "r1",
+        "day": "research-day",
+        "office": "education-minister",
+        "start": "2026-10-27T00:07:30Z",
+        "end": "2026-10-27T00:37:30Z"
+      }
+    ],
+    "members": [
+      {
+        "id": "alpha",
+        "requested_days": [
+          "construction-day",
+          "research-day"
+        ],
+        "plans": [
+          {
+            "id": "no-title",
+            "incremental_benefit": 0,
+            "appointments": [],
+            "baseline": true
+          },
+          {
+            "id": "both",
+            "incremental_benefit": 30,
+            "appointments": [
+              "c1",
+              "r1"
+            ]
+          }
+        ],
+        "availability": [
+          {
+            "start": "2026-10-26T23:00:00Z",
+            "end": "2026-10-27T01:00:00Z"
+          }
+        ]
+      }
+    ],
+    "settings": {
+      "cross_position_cooldown_minutes": 7.5
+    }
+  },
+  "explicit_preference": {
+    "objective_unit": "saved_timer_minutes",
+    "policy": "benefit-first",
+    "deadline_seconds": 10,
+    "slots": [
+      {
+        "id": "c1",
+        "day": "construction-day",
+        "office": "vice-president",
+        "start": "2026-10-26T08:00:00Z",
+        "end": "2026-10-26T08:30:00Z"
+      },
+      {
+        "id": "c2",
+        "day": "construction-day",
+        "office": "vice-president",
+        "start": "2026-10-26T08:30:00Z",
+        "end": "2026-10-26T09:00:00Z"
+      }
+    ],
+    "members": [
+      {
+        "id": "alpha",
+        "requested_days": [
+          "construction-day"
+        ],
+        "plans": [
+          {
+            "id": "no-title",
+            "incremental_benefit": 0,
+            "appointments": [],
+            "baseline": true
+          },
+          {
+            "id": "earlier",
+            "incremental_benefit": 10,
+            "appointments": [
+              "c1"
+            ],
+            "preference_score": 0
+          },
+          {
+            "id": "preferred",
+            "incremental_benefit": 10,
+            "appointments": [
+              "c2"
+            ],
+            "preference_score": 2
+          }
+        ]
+      }
+    ]
+  },
+  "known_lock": {
+    "objective_unit": "saved_timer_minutes",
+    "policy": "benefit-first",
+    "deadline_seconds": 10,
+    "slots": [
+      {
+        "id": "c1",
+        "day": "construction-day",
+        "office": "vice-president",
+        "start": "2026-10-26T08:00:00Z",
+        "end": "2026-10-26T08:30:00Z"
+      },
+      {
+        "id": "c2",
+        "day": "construction-day",
+        "office": "vice-president",
+        "start": "2026-10-26T08:30:00Z",
+        "end": "2026-10-26T09:00:00Z"
+      }
+    ],
+    "members": [
+      {
+        "id": "alpha",
+        "requested_days": [
+          "construction-day"
+        ],
+        "plans": [
+          {
+            "id": "no-title",
+            "incremental_benefit": 0,
+            "appointments": [],
+            "baseline": true
+          },
+          {
+            "id": "locked",
+            "incremental_benefit": 1,
+            "appointments": [
+              "c1"
+            ]
+          },
+          {
+            "id": "otherwise-better",
+            "incremental_benefit": 100,
+            "appointments": [
+              "c2"
+            ]
+          }
+        ]
+      }
+    ],
+    "locks": [
+      {
+        "slot_id": "c1",
+        "member_id": "alpha"
+      }
+    ]
+  },
+  "policy_tradeoff": {
+    "objective_unit": "saved_timer_minutes",
+    "policy": "benefit-first",
+    "deadline_seconds": 10,
+    "slots": [
+      {
+        "id": "c1",
+        "day": "construction-day",
+        "office": "vice-president",
+        "start": "2026-10-26T08:00:00Z",
+        "end": "2026-10-26T08:30:00Z"
+      },
+      {
+        "id": "r1",
+        "day": "research-day",
+        "office": "vice-president",
+        "start": "2026-10-27T08:00:00Z",
+        "end": "2026-10-27T08:30:00Z"
+      }
+    ],
+    "members": [
+      {
+        "id": "alpha",
+        "requested_days": [
+          "construction-day",
+          "research-day"
+        ],
+        "plans": [
+          {
+            "id": "no-title",
+            "incremental_benefit": 0,
+            "appointments": [],
+            "baseline": true
+          },
+          {
+            "id": "both",
+            "incremental_benefit": 101,
+            "appointments": [
+              "c1",
+              "r1"
+            ]
+          },
+          {
+            "id": "construction",
+            "incremental_benefit": 50,
+            "appointments": [
+              "c1"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "bravo",
+        "requested_days": [
+          "research-day"
+        ],
+        "plans": [
+          {
+            "id": "no-title",
+            "incremental_benefit": 0,
+            "appointments": [],
+            "baseline": true
+          },
+          {
+            "id": "research",
+            "incremental_benefit": 50,
+            "appointments": [
+              "r1"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "previous_schedule_stability": {
+    "objective_unit": "saved_timer_minutes",
+    "policy": "benefit-first",
+    "deadline_seconds": 10,
+    "slots": [
+      {
+        "id": "c1",
+        "day": "construction-day",
+        "office": "vice-president",
+        "start": "2026-10-26T08:00:00Z",
+        "end": "2026-10-26T08:30:00Z"
+      },
+      {
+        "id": "c2",
+        "day": "construction-day",
+        "office": "vice-president",
+        "start": "2026-10-26T08:30:00Z",
+        "end": "2026-10-26T09:00:00Z"
+      }
+    ],
+    "members": [
+      {
+        "id": "alpha",
+        "requested_days": [
+          "construction-day"
+        ],
+        "plans": [
+          {
+            "id": "no-title",
+            "incremental_benefit": 0,
+            "appointments": [],
+            "baseline": true
+          },
+          {
+            "id": "first",
+            "incremental_benefit": 10,
+            "appointments": [
+              "c1"
+            ]
+          },
+          {
+            "id": "second",
+            "incremental_benefit": 10,
+            "appointments": [
+              "c2"
+            ]
+          }
+        ],
+        "previous_slot_ids": [
+          "c2"
+        ]
+      }
+    ]
+  },
+  "history_rotation": {
+    "objective_unit": "saved_timer_minutes",
+    "policy": "benefit-first",
+    "deadline_seconds": 10,
+    "slots": [
+      {
+        "id": "c1",
+        "day": "construction-day",
+        "office": "vice-president",
+        "start": "2026-10-26T08:00:00Z",
+        "end": "2026-10-26T08:30:00Z"
+      }
+    ],
+    "members": [
+      {
+        "id": "long-served",
+        "requested_days": [
+          "construction-day"
+        ],
+        "plans": [
+          {
+            "id": "no-title",
+            "incremental_benefit": 0,
+            "appointments": [],
+            "baseline": true
+          },
+          {
+            "id": "with-title",
+            "incremental_benefit": 10,
+            "appointments": [
+              "c1"
+            ]
+          }
+        ],
+        "history_count": 5
+      },
+      {
+        "id": "less-served",
+        "requested_days": [
+          "construction-day"
+        ],
+        "plans": [
+          {
+            "id": "no-title",
+            "incremental_benefit": 0,
+            "appointments": [],
+            "baseline": true
+          },
+          {
+            "id": "with-title",
+            "incremental_benefit": 10,
+            "appointments": [
+              "c1"
+            ]
+          }
+        ],
+        "history_count": 0
+      }
+    ]
+  },
+  "completed_prerequisite": {
+    "objective_unit": "saved_timer_minutes",
+    "policy": "benefit-first",
+    "deadline_seconds": 10,
+    "slots": [
+      {
+        "id": "c1",
+        "day": "construction-day",
+        "office": "vice-president",
+        "start": "2026-10-26T08:00:00Z",
+        "end": "2026-10-26T08:30:00Z"
+      }
+    ],
+    "members": [
+      {
+        "id": "alpha",
+        "requested_days": [
+          "construction-day"
+        ],
+        "plans": [
+          {
+            "id": "no-title",
+            "incremental_benefit": 0,
+            "appointments": [],
+            "baseline": true
+          },
+          {
+            "id": "with-title",
+            "incremental_benefit": 10,
+            "appointments": [
+              "c1"
+            ],
+            "tasks": [
+              {
+                "id": "furnace-upgrade",
+                "prerequisites": [
+                  "embassy-ready"
+                ]
+              },
+              {
+                "id": "next-building",
+                "prerequisites": [
+                  "furnace-upgrade"
+                ]
+              }
+            ]
+          }
+        ],
+        "completed_tasks": [
+          "embassy-ready"
+        ]
+      }
+    ]
+  }
+}

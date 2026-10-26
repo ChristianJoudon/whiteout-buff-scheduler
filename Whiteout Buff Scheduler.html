@@ -160,14 +160,14 @@ footer.site b{color:var(--ice)}
 
 <header class="site">
   <div class="brand"><span class="flake">❄</span> Whiteout Buff Scheduler</div>
-  <div class="tagline">SvS ministry appointments — Construction · Research · Troops</div>
+  <div class="tagline">v4 · Team appointments · Good-faith plans</div>
 </header>
 <div class="aurora-rule" role="presentation"></div>
 
 <ol class="steps">
   <li><span class="n">1</span><div><b>Drop your survey file</b><span>The Excel file you downloaded from your Microsoft Forms responses.</span></div></li>
-  <li><span class="n">2</span><div><b>Check the schedule</b><span>Everyone is placed inside the times they said they're free.</span></div></li>
-  <li><span class="n">3</span><div><b>Download for Excel</b><span>A finished workbook with one sheet per buff day, ready to share.</span></div></li>
+  <li><span class="n">2</span><div><b>Check the schedule</b><span>Review coverage, preferences, preserved appointments and unresolved comments.</span></div></li>
+  <li><span class="n">3</span><div><b>Download for Excel</b><span>A workbook with each buff day and the draft’s review status.</span></div></li>
 </ol>
 
 <div class="drop" id="drop" tabindex="0" role="button"
@@ -192,14 +192,10 @@ footer.site b{color:var(--ice)}
       </select>
     </div>
     <div class="opt">
-      <label for="optSlot">Length of each appointment</label>
-      <select id="optSlot">
-        <option value="30" selected>30 minutes (standard)</option>
-        <option value="20">20 minutes</option>
-        <option value="15">15 minutes</option>
-        <option value="60">60 minutes</option>
-      </select>
+      <label for="optPolicy">Team policy</label>
+      <select id="optPolicy"><option value="balanced" selected>Broad first access, then measured extra benefit</option><option value="team">Broad access, then requested days and preferences</option><option value="benefit">Measured extra benefit first (requires complete estimates)</option></select>
     </div>
+    <div class="opt"><label for="optSlot">Office occupancy</label><select id="optSlot"><option value="30">30 minutes (minimum seat rotation)</option></select></div>
     <div class="opt">
       <label for="optStart">Schedule day runs from</label>
       <select id="optStart"></select>
@@ -214,10 +210,17 @@ footer.site b{color:var(--ice)}
     </div>
     <div class="opt check">
       <input type="checkbox" id="optWishes" checked>
-      <label for="optWishes" style="margin:0">When it doesn't cost any points, honor time wishes written in the comments</label>
+      <label for="optWishes" style="margin:0">Honor structured preferred UTC windows in the selected policy order</label>
     </div>
   </div>
 </details>
+<div class="panel" style="margin-top:18px">
+<h3>Keep accepted appointments</h3>
+<p class="muted">Optionally load a CSV with <span class="mono">Day, Start UTC, Player ID</span>. Day is construction, research or training; start is HH:MM. These appointments stay fixed, including players absent from the survey.</p>
+<input id="lockInput" type="file" accept=".csv,.xlsx" style="position:static;width:auto;height:auto;opacity:1;pointer-events:auto" aria-label="Existing appointments CSV">
+<button class="btn ghost" id="clearLocks" type="button">Clear imported appointments</button><p id="lockStatus" class="muted">No existing appointments imported.</p>
+</div>
+<div class="panel"><h3>What this version optimizes</h3><p>Members’ declared plans are taken in good faith. Everyone can contribute without a buff. Inventory is context; it is not the points an appointment creates.</p><p>The default gives as many members as possible a first appointment, then maximizes measured extra benefit, then covers requested days and preferences, rotates access using supplied history and preserves prior draft times. If some eligible requests lack benefit estimates, all benefit ranking is disabled: the planner covers more requested days, preferences and history instead. Benefit-first requires complete estimates. With complete estimates, the result compares broad access with the greatest measured benefit. All policies use exact matching within this three-day model.</p><p class="muted">Optional columns: “Construction preferred UTC”, “Construction unavailable UTC”, “Construction buff benefit minutes” (and Research / Training equivalents), plus “Prior appointments”. Benefit minutes mean additional time saved by the title over the same plan without it, with shared general speedups already allocated once. Leave unknown benefits blank. This survey planner does not simulate task chains; use the advanced plan optimizer for coupled tasks, multiple offices and resource budgets.</p></div>
 
 <div class="status" id="status" role="status" aria-live="polite"></div>
 
@@ -225,10 +228,11 @@ footer.site b{color:var(--ice)}
   <div class="cards">
     <div class="card"><div class="k aurora" id="cPlayers">–</div><div class="l">players placed</div></div>
     <div class="card"><div class="k" id="cAppointments">–</div><div class="l">appointments made</div></div>
-    <div class="card"><div class="k ember" id="cPoints">–</div><div class="l">estimated prep points</div></div>
+    <div class="card"><div class="k ember" id="cPoints">–</div><div class="l">measured subtotal · minutes saved</div></div>
     <div class="card"><div class="k" id="cResponses">–</div><div class="l">survey responses read</div></div>
   </div>
 
+  <div class="panel" id="auditPanel"><h3>Model and review status</h3><div id="auditText"></div><label class="check"><input id="reviewComments" type="checkbox"> I have reviewed all comments and recorded any hard limits in the structured availability / unavailable columns.</label></div>
   <div class="dl">
     <button class="btn big" id="downloadBtn" type="button">Download the schedule (.xlsx)</button>
     <p>Opens in Excel or Google Sheets. One sheet per buff day, plus a summary and a notes page for you.</p>
@@ -254,20 +258,16 @@ footer.site b{color:var(--ice)}
 </section>
 
 <footer class="site">
-  <p><b>How the schedule is chosen.</b> Every submitted availability window is treated as a hard rule.
-  Within those rules, the tool finds the arrangement with the highest total estimated prep points
-  (speedups count 30 points per minute; Fire Crystals 2,000; Refined Fire Crystals 30,000; Fire Shards 1,000),
-  counting each player's general speedups once across the whole event — then fills as many remaining
-  slots as possible, favoring players with the fewest free times. The math behind it is an exact
-  optimizer, not a rough sort, so no shuffling of appointments could score higher.</p>
-  <p><b>Privacy.</b> The downloaded schedule contains time, player ID, alliance, and (optional) in-game name — never emails. The survey file never leaves this page.</p>
+  <p><b>Game mechanics.</b> VP is one office used for construction and research; Education is a second office used for training. A 30-minute seat is still occupied if a player finishes early. Obtain the title before starting the relevant action. Preparation-day rules and state-point eligibility vary; check the current in-game event. Training-day output is not 30 points per speedup minute. A shared general pool belongs to one player and cannot be spent in full on several days.</p>
+  <p><b>Scope.</b> This is a planning draft, not an in-game booking. The three day labels follow the existing form. The in-game time-slot interface only accepts reservations within the next 24 hours. The advanced Python model covers absolute dates, multiple offices, coupled plans, prerequisites and shared budgets.</p>
+  <p><b>Privacy.</b> Survey processing stays local; initial page loading uses external fonts and SheetJS. Names can be omitted from shared day and summary sheets. Private notes still retain comments and names and need review before sharing.</p>
 </footer>
 </div>
 
 <script>
 /* =============================== CORE-BEGIN ===============================
-   Pure logic, no DOM. Mirrors SortingAlgorithm_v3.py so the two can be
-   cross-verified. All solver weights use BigInt: layering is exact.        */
+   Pure logic, no DOM. v4 team matching. The advanced plan model is separate.
+   BigInt lexicographic weights are bounded dynamically.        */
 "use strict";
 
 const DAY_SPECS = [
@@ -275,10 +275,7 @@ const DAY_SPECS = [
   { key:"research",     label:"Research Day",     aliases:["research","tech","technology"],    defaultWeekday:"Tuesday" },
   { key:"training",     label:"Troop Training Day", aliases:["training","troop","troops","education"], defaultWeekday:"Thursday" },
 ];
-const POINTS_PER_SPEEDUP_MINUTE = 30;
-const POINTS_PER_FIRE_CRYSTAL = 2000;
-const POINTS_PER_REFINED_FIRE_CRYSTAL = 30000;
-const POINTS_PER_FIRE_CRYSTAL_SHARD = 1000;
+
 
 function normalizeText(v){
   if (v === null || v === undefined) return "";
@@ -466,12 +463,7 @@ function unitFromHeader(header){
   return "days";
 }
 const headerIsFinalPoints = h => { const n=normalizeText(h); return n.includes("score")||n.includes("point"); };
-function resourceValueToPoints(value, header){
-  if (headerIsFinalPoints(header)) return Math.max(0, Math.round(parseNumber(value)));
-  return Math.max(0, parseSpeedupMinutes(value, unitFromHeader(header)) * POINTS_PER_SPEEDUP_MINUTE);
-}
-
-/* ----- column aliases (mirrors v3) ----- */
+/* ----- survey mapping; resource answers remain raw context ----- */
 const ID_ALIASES = ["chief id","player id","governor id","user id","id from chief page"];
 const TAG_ALIASES = ["alliance name","alliance tag","player tag","chief tag","alliance","tag"];
 const NAME_ALIASES = ["player name","in game name","ingame name","chief name","character name"];
@@ -485,7 +477,7 @@ const RFC_ALIASES = ["refined fire crystal","refined fire crystals"];
 const FC_ALIASES = ["fire crystals","fire crystal","how many fire crystals","fc count"];
 const SHARD_ALIASES = ["fire crystal shards","fire crystal shard","fire shards","fire shard","fc shards","fc shard","shards for research"];
 const COMMENT_ALIASES = ["any additional comments","additional comments","comments","notes","anything else"];
-const RESOURCE_EXCLUDE = ["time slot","time range","what time","availability","appointment","apply for","selected buff","which ministry","plan to use"];
+const RESOURCE_EXCLUDE = ["time slot","time range","what time","availability","appointment","apply for","selected buff","which ministry","plan to use","benefit","preferred","unavailable"];
 function dayResourceAliases(day){
   if (day.key==="construction") return ["construction points","construction score","construction speedups","construction speedup","construction su","construction","build speedups"];
   if (day.key==="research") return ["research points","research score","research speedups","research speedup","research su","research"];
@@ -521,27 +513,33 @@ function buildMapping(headers){
       else if (norm.includes("speedup")||/\bsu\b/.test(norm)) s += 150;
       scored.push([s,-i,col]);
     });
-    if (!scored.length) throw new SchedulerError(
-      `I couldn't find the ${day.label.toLowerCase()} speedups column. It's usually a question like "How much ${day.key==="training"?"troop training":day.key} speed up time do you have?"`);
     scored.sort((a,b)=>b[0]-a[0]||b[1]-a[1]);
-    dayResource[day.key] = scored[0][2];
+    dayResource[day.key] = scored.length ? scored[0][2] : null;
   }
 
   const availColumn = resolveBestColumn(columns, AVAIL_ALIASES, {minScore:650});
   const dayAvail = {};
   for (const day of DAY_SPECS){
     const direct = resolveBestColumn(columns,
-      day.aliases.flatMap(a => [`${a} availability`,`${a} time slots`,`${a} time slot`,`${a} preferred time`,`${a} time range`]),
+      day.aliases.flatMap(a => [`${a} availability`,`${a} time slots`,`${a} time slot`,`${a} time range`]),
       {minScore:650});
     dayAvail[day.key] = direct || availColumn;
   }
   if (DAY_SPECS.some(d => !dayAvail[d.key])) throw new SchedulerError(
     "I couldn't find the availability question (the one asking which time ranges people can use the buff).");
 
-  if (!generalColumn) warnings.push("No “general speedups” question was found, so no shared general pool is counted.");
+  const exactColumn = name => columns.find(c=>normalizeText(c)===normalizeText(name)) || null;
+  const preferences={}, unavailable={}, benefits={};
+  for (const d of DAY_SPECS){
+    const title=d.key[0].toUpperCase()+d.key.slice(1);
+    preferences[d.key]=exactColumn(title+" preferred UTC");
+    unavailable[d.key]=exactColumn(title+" unavailable UTC");
+    benefits[d.key]=exactColumn(title+" buff benefit minutes");
+  }
+  const historyColumn=exactColumn("Prior appointments");
   if (!tagColumn) warnings.push("No alliance column was found — the schedule will show IDs and names only.");
   return { columns, idColumn, tagColumn, nameColumn, timestampColumn, selectedColumn,
-           commentColumn, generalColumn, rfcColumn, shardColumn, fcColumn, dayResource, dayAvail, warnings };
+           commentColumn, generalColumn, rfcColumn, shardColumn, fcColumn, dayResource, dayAvail, preferences, unavailable, benefits, historyColumn, warnings };
 }
 
 class SchedulerError extends Error {}
@@ -606,30 +604,44 @@ function buildPlayers(rows, mapping, slotMinutes){
 
   const players = kept.map((entry) => {
     const { row } = entry;
-    const basePoints = {};
-    for (const day of DAY_SPECS)
-      basePoints[day.key] = resourceValueToPoints(row[mapping.dayResource[day.key]], mapping.dayResource[day.key]);
-    if (mapping.fcColumn)
-      basePoints.construction += Math.round(parseNumber(row[mapping.fcColumn]) * POINTS_PER_FIRE_CRYSTAL);
-    if (mapping.rfcColumn)
-      basePoints.construction += Math.round(parseNumber(row[mapping.rfcColumn]) * POINTS_PER_REFINED_FIRE_CRYSTAL);
-    if (mapping.shardColumn)
-      basePoints.research += Math.round(parseNumber(row[mapping.shardColumn]) * POINTS_PER_FIRE_CRYSTAL_SHARD);
-    const generalPoints = mapping.generalColumn
-      ? resourceValueToPoints(row[mapping.generalColumn], mapping.generalColumn) : 0;
-
-    const availableSlots = {};
-    for (const day of DAY_SPECS)
-      availableSlots[day.key] = parseAvailability(row[mapping.dayAvail[day.key]], slotMinutes);
-
-    let selectedDays;
-    if (mapping.selectedColumn) selectedDays = parseSelectedDays(row[mapping.selectedColumn]);
-    else {
-      selectedDays = new Set();
-      for (const day of DAY_SPECS)
-        if (availableSlots[day.key].size && (basePoints[day.key] > 0 || generalPoints > 0))
-          selectedDays.add(day.key);
+    const declaredResources={};
+    for(const day of DAY_SPECS) if(mapping.dayResource[day.key]) declaredResources[mapping.dayResource[day.key]]=row[mapping.dayResource[day.key]];
+    for(const col of [mapping.generalColumn,mapping.fcColumn,mapping.rfcColumn,mapping.shardColumn]) if(col) declaredResources[col]=row[col];
+    const availableSlots={}, preferredSlots={}, benefitMinutes={}, inputIssues=[];
+    for (const day of DAY_SPECS){
+      const dk=day.key;
+      const availability=row[mapping.dayAvail[dk]];
+      const bad=ambiguousAvailability(availability);
+      if (bad) inputIssues.push(day.label+": "+bad);
+      availableSlots[dk]=bad ? new Set() : parseAvailability(availability,slotMinutes);
+      if (!isBlank(availability) && !bad && !availableSlots[dk].size) inputIssues.push(day.label+": no full 30-minute slot could be read from availability");
+      const exclusion=mapping.unavailable[dk] ? row[mapping.unavailable[dk]] : null;
+      if (!isBlank(exclusion)){
+        const issue=ambiguousAvailability(exclusion);
+        if(issue) { availableSlots[dk].clear(); inputIssues.push(day.label+" unavailable: "+issue); }
+        else {
+          const ranges=parseTimeRanges(exclusion);
+          const blocked=parseAvailability(exclusion,slotMinutes);
+          if(!ranges.length && !blocked.size){ availableSlots[dk].clear(); inputIssues.push(day.label+": unreadable unavailable window"); }
+          for(const start of [...availableSlots[dk]]){
+            const overlaps=ranges.some(([a,b,was24])=>{const hi=was24?1440:b;return hi>a ? start<hi && start+slotMinutes>a : start<hi || start+slotMinutes>a;});
+            if(overlaps || blocked.has(start)) availableSlots[dk].delete(start);
+          }
+        }
+      }
+      const pref=mapping.preferences[dk] ? row[mapping.preferences[dk]] : null;
+      preferredSlots[dk]=ambiguousAvailability(pref) ? new Set() : parseAvailability(pref,slotMinutes);
+      if(!isBlank(pref) && !preferredSlots[dk].size) inputIssues.push(day.label+": preferred UTC window needs review");
+      const val=mapping.benefits[dk] ? row[mapping.benefits[dk]] : null;
+      benefitMinutes[dk]=isBlank(val) ? null : strictNonnegative(val);
+      if(!isBlank(val) && benefitMinutes[dk]===null) inputIssues.push(day.label+": benefit must be a nonnegative whole number of additional minutes saved");
     }
+    let selectedDays;
+    if (mapping.selectedColumn) selectedDays=parseSelectedDays(row[mapping.selectedColumn]);
+    else selectedDays=new Set(DAY_SPECS.filter(d=>availableSlots[d.key].size).map(d=>d.key));
+    const rawHistory=mapping.historyColumn ? row[mapping.historyColumn] : null;
+    const historyCount=isBlank(rawHistory) ? 0 : strictNonnegative(rawHistory);
+    if(historyCount===null) throw new SchedulerError("Prior appointments must be a nonnegative whole number for "+entry.pid+". Correct that cell or remove the history column; malformed history is not treated as zero.");
     const comment = mapping.commentColumn && !isBlank(row[mapping.commentColumn])
       ? String(row[mapping.commentColumn]).trim() : "";
     return {
@@ -637,8 +649,8 @@ function buildPlayers(rows, mapping, slotMinutes){
       tag: mapping.tagColumn ? canonicalTag(row[mapping.tagColumn]) : "",
       name: mapping.nameColumn && !isBlank(row[mapping.nameColumn]) ? String(row[mapping.nameColumn]).trim() : "",
       sourceOrder: entry.order,   // original row order, mirrors Python
-      selectedDays, availableSlots, basePoints, generalPoints, comment,
-      wishRanges: comment ? parseTimeRanges(comment) : [],
+      selectedDays, availableSlots, declaredResources, comment,
+      preferredSlots, benefitMinutes, historyCount:historyCount??0, historyKnown:!isBlank(rawHistory), inputIssues, wishRanges:[],
     };
   });
   return { players, duplicates: [...new Set(duplicates)] };
@@ -677,130 +689,143 @@ class MinCostFlow {
   flowOn(id){ return this.cap[id^1]; }
 }
 
-function solveSchedule(players, options){
-  const { slotMinutes=30, maxTotalPerPlayer=3, dayWindow=[0,1440], honorWishes=true } = options || {};
-  const slotStarts = [];
-  for (let s=dayWindow[0]; s+slotMinutes<=dayWindow[1]; s+=slotMinutes) slotStarts.push(s);
-  const openSet = new Set(slotStarts);
-
-  const candidates = [];
-  for (const p of players)
-    for (const day of DAY_SPECS){
-      if (!p.selectedDays.has(day.key)) continue;
-      if (p.basePoints[day.key] <= 0 && p.generalPoints <= 0) continue;
-      for (const s of [...p.availableSlots[day.key]].sort((a,b)=>a-b))
-        if (openSet.has(s)) candidates.push([p, day.key, s]);
-    }
-
-  const totalSlots = slotStarts.length * DAY_SPECS.length;
-  const maxOrder = players.reduce((m,p)=>Math.max(m,p.sourceOrder), 0);
-  const wishOn = honorWishes ? 1 : 0;
-  const tieBoundNum = 1_000_000 + 47*10_000 + maxOrder + 1;   // wish + scarcity + order
-  const TIE_BOUND = BigInt(tieBoundNum);
-  const FILL = BigInt(totalSlots) * TIE_BOUND + 1n;
-  const SCALE = BigInt(totalSlots) * (FILL + TIE_BOUND) + 1n;
-
-  const wishBonus = (p, start) => {
-    if (!wishOn || !p.wishRanges.length) return 0n;
-    const end = start + slotMinutes;
-    for (const [a,b,was24] of p.wishRanges){
-      const hi = was24 ? 1440 : b;
-      const overlaps = hi > a
-        ? (start < hi && end > a)
-        : (start < hi || end > a);   // overnight wish
-      if (overlaps) return 1_000_000n;
-    }
-    return 0n;
-  };
-  const tieWeight = (p, dayKey, start) => {
-    const avail = Math.max(1, p.availableSlots[dayKey].size);
-    const scarcity = Math.max(0, 48 - avail);
-    return wishBonus(p, start) + BigInt(scarcity*10_000 + (maxOrder - p.sourceOrder));
-  };
-
-  // node layout
-  const SRC=0, SNK=1;
-  let next=2;
-  const pNode=new Map(), zNode=new Map(), pdNode=new Map(), slotNode=new Map();
-  for (const [p] of candidates) if(!pNode.has(p.playerId)) pNode.set(p.playerId, next++);
-  for (const [p,dk] of candidates){
-    const k=p.playerId+"|"+dk;
-    if(!pdNode.has(k)) pdNode.set(k,next++);
-    if(p.basePoints[dk]<=0 && !zNode.has(p.playerId)) zNode.set(p.playerId,next++);
+function strictNonnegative(value){
+  if(typeof value==='string' && !/^\s*\d+\s*$/.test(value)) return null;
+  const n=Number(value); return Number.isSafeInteger(n)&&n>=0 ? n : null;
+}
+function ambiguousAvailability(value){
+  if(isBlank(value)) return null;
+  const t=String(value).trim();
+  if(/\b(?:can't|cannot|not|except|only after|only before|after|before|maybe)\b/i.test(t)) return 'use explicit positive UTC ranges; prose limits need clarification';
+  if(/\b(?:PST|PDT|EST|EDT|CST|CDT|MST|MDT|HST|local|GMT\s*[+-]|UTC\s*[+-])\b/i.test(t)) return 'convert this value to UTC explicitly before scheduling';
+  if(/\b(?:all day|anytime|any time|open availability)\b/i.test(t)) return null;
+  const ranges=parseTimeRanges(t);
+  if(ranges.some(([a,b,was24])=>a===b&&!was24)) return 'equal range endpoints are ambiguous; write All day or an explicit end';
+  // Inherited suffixes such as 8–10pm cannot be read safely by the legacy parser.
+  for(const part of t.split(/[;,\n]/)){
+    const suffixes=part.match(/(?:a\.?m\.?|p\.?m\.?)(?=\s|$|[^a-z])/gi)||[];
+    if(suffixes.length===1 && /[-–—]|\bto\b/.test(part)) return 'write AM/PM on both endpoints or use 24-hour UTC times';
   }
-  for (const [,dk,s] of candidates){
-    const k=dk+"|"+s;
-    if(!slotNode.has(k)) slotNode.set(k,next++);
+  return null;
+}
+function solveSchedule(players, options={}){
+  const {slotMinutes=30,maxTotalPerPlayer=3,dayWindow=[0,1440],honorWishes=true,policy='balanced',locks=[]}=options;
+  if(slotMinutes!==30) throw new SchedulerError('The game holds a seat for at least 30 minutes. Use 30-minute appointments.');
+  if(!Number.isInteger(maxTotalPerPlayer)||maxTotalPerPlayer<1||maxTotalPerPlayer>3) throw new SchedulerError('Choose an event appointment cap from 1 to 3.');
+  if(!Array.isArray(dayWindow)||dayWindow.length!==2||dayWindow.some(n=>!Number.isInteger(n)||n%30)||dayWindow[0]<0||dayWindow[1]>1440||dayWindow[0]>=dayWindow[1]) throw new SchedulerError('Use an increasing UTC window aligned to 30 minutes.');
+  if(!['team','balanced','benefit'].includes(policy)) throw new SchedulerError('Unknown team policy.');
+  const byId=new Map(players.map(p=>[p.playerId,p]));
+  if(byId.size!==players.length) throw new SchedulerError('Duplicate player IDs must be resolved before scheduling.');
+  const slotStarts=[]; for(let s=dayWindow[0];s+slotMinutes<=dayWindow[1];s+=slotMinutes)slotStarts.push(s);
+  const open=new Set(slotStarts), lockedSlots=new Set(),lockedPD=new Set(),lockedCounts=new Map(),lockedPeople=new Set(),assignments=[],externalPlayers=[];
+  for(const l of locks){
+    if(!DAY_SPECS.some(d=>d.key===l.dayKey)||!open.has(l.start)||!l.playerId) throw new SchedulerError('An accepted appointment is outside the chosen days/window. Expand the window or resolve the input; it was not moved.');
+    const sk=l.dayKey+'|'+l.start,pk=l.playerId+'|'+l.dayKey;
+    if(lockedSlots.has(sk)||lockedPD.has(pk)) throw new SchedulerError('Accepted appointments conflict (same seat or same member/day). Resolve these records; none were moved.');
+    let p=byId.get(l.playerId);
+    if(p && (!p.selectedDays.has(l.dayKey)||!p.availableSlots[l.dayKey].has(l.start))) throw new SchedulerError('Accepted appointment for '+l.playerId+' conflicts with their current selected day or availability. Resolve the conflict before rescheduling.');
+    if(!p){p={playerId:l.playerId,name:l.name||'',tag:l.tag||'',external:true};byId.set(p.playerId,p);externalPlayers.push(p);}
+    lockedSlots.add(sk);lockedPD.add(pk);lockedPeople.add(l.playerId);
+    lockedCounts.set(l.playerId,(lockedCounts.get(l.playerId)||0)+1);
+    if(lockedCounts.get(l.playerId)>maxTotalPerPlayer) throw new SchedulerError('Accepted appointments exceed the selected event cap for '+l.playerId+'. Increase the cap or resolve the input; none were removed.');
+    assignments.push({...l,locked:true});
+  }
+  const candidates=[],eligibleCounts=new Map();
+  for(const p of players){
+    if(!Number.isSafeInteger(p.historyCount??0)||(p.historyCount??0)<0) throw new SchedulerError('Invalid appointment history for '+p.playerId+'.');
+    if((lockedCounts.get(p.playerId)||0)>=maxTotalPerPlayer)continue;
+    for(const d of DAY_SPECS){
+      if(!p.selectedDays.has(d.key)||lockedPD.has(p.playerId+'|'+d.key))continue;
+      const gain=p.benefitMinutes?.[d.key]??null;
+      if(gain!==null&&strictNonnegative(gain)===null)throw new SchedulerError('Benefit minutes must be nonnegative safe integers.');
+      const starts=[...p.availableSlots[d.key]].filter(s=>open.has(s)&&!lockedSlots.has(d.key+'|'+s)).sort((a,b)=>a-b);
+      if(policy==='benefit' && starts.length && gain===null)throw new SchedulerError('Benefit-first needs measured extra minutes for '+p.playerId+' / '+d.key+'. Supply an estimate for each eligible request or use broad team access; inventory is not a substitute.');
+      eligibleCounts.set(p.playerId+'|'+d.key,starts.length);
+      for(const start of starts)candidates.push([p,d.key,start]);
+    }
+  }
+  const completeBenefits=candidates.every(([p,dk])=>p.benefitMinutes?.[dk]!==null&&p.benefitMinutes?.[dk]!==undefined);
+  const completeHistory=players.every(p=>p.historyKnown!==false);
+  const effectivePolicy=policy==='balanced'&&!completeBenefits ? 'team' : policy;
+  const nSlots=slotStarts.length*DAY_SPECS.length;
+  const nPeople=players.length;
+  const maxHistory=Math.max(0,...players.map(p=>p.historyCount||0));
+  const maxGain=candidates.reduce((n,[p,dk])=>Math.max(n,p.benefitMinutes?.[dk]||0),0);
+  const stableMax=nSlots, scarcityMax=nSlots*slotStarts.length;
+  const keys=(effectivePolicy==='benefit'
+    ? ['benefit','people','requests','preferences','rotation','stability','scarcity','deterministic']
+    : effectivePolicy==='balanced'
+      ? ['people','benefit','requests','preferences','rotation','stability','scarcity','deterministic']
+      : ['people','requests','preferences','rotation',...(completeBenefits?['benefit']:[]),'stability','scarcity','deterministic']).filter(k=>k!=='rotation'||completeHistory);
+  const sortedIds=[...players.map(p=>p.playerId)].sort();const idRank=new Map(sortedIds.map((id,i)=>[id,i]));
+  const maxOrder=Math.max(0,...players.map(p=>p.sourceOrder||0));
+  const bounds={people:BigInt(nPeople),requests:BigInt(nSlots),preferences:BigInt(nSlots),rotation:BigInt(nPeople)*BigInt(maxHistory),benefit:BigInt(nSlots)*BigInt(maxGain),stability:BigInt(stableMax),scarcity:BigInt(scarcityMax),deterministic:BigInt(nSlots)*BigInt((maxOrder+1)*(nPeople+1)+nPeople+1)};
+  const weights={};let below=0n;
+  for(const key of [...keys].reverse()){weights[key]=below+1n;below+=bounds[key]*weights[key];}
+  const score=components=>Object.entries(components).reduce((v,[k,n])=>v+(weights[k]===undefined?0n:BigInt(n)*weights[k]),0n);
+  const SRC=0,SNK=1;let next=2;const pNodes=new Map(),pdNodes=new Map(),sNodes=new Map();
+  for(const [p,dk,start]of candidates){
+    if(!pNodes.has(p.playerId))pNodes.set(p.playerId,next++);
+    const pk=p.playerId+'|'+dk,sk=dk+'|'+start;
+    if(!pdNodes.has(pk))pdNodes.set(pk,next++);
+    if(!sNodes.has(sk))sNodes.set(sk,next++);
   }
   const net=new MinCostFlow(next);
-  const byId=new Map(players.map(p=>[p.playerId,p]));
-  for (const [pid,node] of pNode){
-    const p=byId.get(pid);
-    if (p.generalPoints>0){
-      net.addEdge(SRC,node,1, -(BigInt(p.generalPoints)*SCALE));
-      if (maxTotalPerPlayer>1) net.addEdge(SRC,node,maxTotalPerPlayer-1,0n);
-    } else net.addEdge(SRC,node,maxTotalPerPlayer,0n);
+  for(const [pid,node]of pNodes){
+    const remaining=maxTotalPerPlayer-(lockedCounts.get(pid)||0);if(!remaining)continue;
+    if(!lockedPeople.has(pid)){
+      const p=byId.get(pid);net.addEdge(SRC,node,1,-score({people:1,rotation:maxHistory-(p.historyCount||0)}));
+      if(remaining>1)net.addEdge(SRC,node,remaining-1,0n);
+    }else net.addEdge(SRC,node,remaining,0n);
   }
-  for (const [k,node] of pdNode){
-    const [pid,dk]=k.split("|"); const p=byId.get(pid);
-    if (p.basePoints[dk]<=0) net.addEdge(zNode.get(pid),node,1,0n);
-    else net.addEdge(pNode.get(pid),node,1,0n);
+  for(const[pk,node]of pdNodes){const split=pk.lastIndexOf('|');net.addEdge(pNodes.get(pk.slice(0,split)),node,1,0n);}
+  const edgeRefs=[];
+  for(const[p,dk,start]of candidates){
+    const stable=(p.previousSlots?.[dk]===start)?1:0;
+    const components={requests:1,preferences:honorWishes&&p.preferredSlots?.[dk]?.has(start)?1:0,benefit:p.benefitMinutes?.[dk]||0,stability:stable,scarcity:slotStarts.length-eligibleCounts.get(p.playerId+'|'+dk),deterministic:(maxOrder-(p.sourceOrder||0))*(nPeople+1)+(nPeople-idRank.get(p.playerId))};
+    const e=net.addEdge(pdNodes.get(p.playerId+'|'+dk),sNodes.get(dk+'|'+start),1,-score(components));edgeRefs.push([e,p,dk,start]);
   }
-  for (const [pid,znode] of zNode) net.addEdge(pNode.get(pid),znode,1,0n);
-  const candEdges=[];
-  for (const [p,dk,s] of candidates){
-    const profit = BigInt(p.basePoints[dk])*SCALE + FILL + tieWeight(p,dk,s);
-    const id=net.addEdge(pdNode.get(p.playerId+"|"+dk), slotNode.get(dk+"|"+s), 1, -profit);
-    candEdges.push([id,p,dk,s]);
-  }
-  for (const node of slotNode.values()) net.addEdge(node,SNK,1,0n);
+  for(const n of sNodes.values())net.addEdge(n,SNK,1,0n);
   net.maxProfitFlow(SRC,SNK);
-
-  const assignments=[];
-  const perPlayer=new Map();
-  for (const [id,p,dk,s] of candEdges)
-    if (net.flowOn(id)===1){
-      assignments.push({ playerId:p.playerId, dayKey:dk, start:s });
-      if(!perPlayer.has(p.playerId)) perPlayer.set(p.playerId,[]);
-      perPlayer.get(p.playerId).push([dk,s]);
-    }
-  const dayOrder=Object.fromEntries(DAY_SPECS.map((d,i)=>[d.key,i]));
-  assignments.sort((a,b)=> dayOrder[a.dayKey]-dayOrder[b.dayKey] || a.start-b.start || a.playerId.localeCompare(b.playerId));
-
-  let totalPoints=0;
-  for (const a of assignments) totalPoints += byId.get(a.playerId).basePoints[a.dayKey];
-  for (const pid of perPlayer.keys()) totalPoints += byId.get(pid).generalPoints;
-
-  // ---- self-audit: every hard rule re-checked from scratch ----
-  const seenSlot=new Set(), seenPD=new Set();
-  for (const a of assignments){
-    const p=byId.get(a.playerId);
-    const slotKey=a.dayKey+"|"+a.start, pdKey=a.playerId+"|"+a.dayKey;
-    if (seenSlot.has(slotKey)) throw new SchedulerError("Internal check failed: a slot was double-booked.");
-    if (seenPD.has(pdKey)) throw new SchedulerError("Internal check failed: a player was booked twice on one day.");
-    if (!p.selectedDays.has(a.dayKey)) throw new SchedulerError("Internal check failed: assignment on an unselected day.");
-    if (!p.availableSlots[a.dayKey].has(a.start)) throw new SchedulerError("Internal check failed: assignment outside availability.");
-    seenSlot.add(slotKey); seenPD.add(pdKey);
+  for(const[e,p,dk,start]of edgeRefs)if(net.flowOn(e)===1)assignments.push({playerId:p.playerId,dayKey:dk,start,locked:false});
+  const order=Object.fromEntries(DAY_SPECS.map((d,i)=>[d.key,i]));
+  assignments.sort((a,b)=>order[a.dayKey]-order[b.dayKey]||a.start-b.start||a.playerId.localeCompare(b.playerId));
+  const perPlayer=new Map(),seenSlot=new Set(),seenPD=new Set();
+  for(const a of assignments){
+    const sk=a.dayKey+'|'+a.start,pk=a.playerId+'|'+a.dayKey,p=byId.get(a.playerId);
+    if(seenSlot.has(sk)||seenPD.has(pk)||!open.has(a.start))throw new SchedulerError('Internal verification failed: duplicate or out-of-window assignment.');
+    if(!a.locked&&(!p.selectedDays.has(a.dayKey)||!p.availableSlots[a.dayKey].has(a.start)))throw new SchedulerError('Internal verification failed: assignment outside a requested available day.');
+    seenSlot.add(sk);seenPD.add(pk);if(!perPlayer.has(a.playerId))perPlayer.set(a.playerId,[]);perPlayer.get(a.playerId).push([a.dayKey,a.start]);
   }
-  for (const [pid,list] of perPlayer)
-    if (list.length > maxTotalPerPlayer) throw new SchedulerError("Internal check failed: event-wide limit exceeded.");
-
-  return { assignments, totalPoints, perPlayer, slotStarts };
+  for(const list of perPlayer.values())if(list.length>maxTotalPerPlayer)throw new SchedulerError('Internal verification failed: event cap.');
+  for(const l of locks)if(!assignments.some(a=>a.locked&&a.playerId===l.playerId&&a.dayKey===l.dayKey&&a.start===l.start))throw new SchedulerError('Internal verification failed: accepted appointment was lost.');
+  const memberAssignments=assignments.filter(a=>!byId.get(a.playerId).external);
+  const coveredPlayers=new Set(memberAssignments.map(a=>a.playerId)).size;
+  const totalRequests=players.reduce((n,p)=>n+p.selectedDays.size,0);
+  const measuredRequests=players.reduce((n,p)=>n+[...p.selectedDays].filter(d=>p.benefitMinutes?.[d]!==null&&p.benefitMinutes?.[d]!==undefined).length,0);
+  const totalBenefitMinutes=memberAssignments.reduce((n,a)=>n+(byId.get(a.playerId).benefitMinutes?.[a.dayKey]||0),0);
+  const preferenceHits=memberAssignments.filter(a=>honorWishes&&byId.get(a.playerId).preferredSlots?.[a.dayKey]?.has(a.start)).length;
+  const result={assignments,perPlayer,slotStarts,coveredPlayers,coveredRequests:memberAssignments.length,totalRequests,measuredRequests,totalBenefitMinutes,preferenceHits,policyOrder:keys,lockCount:locks.length,externalPlayers,completeBenefits,completeHistory,effectivePolicy,status:'OPTIMAL_WITHIN_SURVEY_MODEL'};
+  if(completeBenefits&&candidates.length&&!options.skipComparison){
+    const benefit=policy==='benefit'?result:solveSchedule(players,{...options,policy:'benefit',skipComparison:true});
+    const balanced=effectivePolicy==='balanced'?result:solveSchedule(players,{...options,policy:'balanced',skipComparison:true});
+    result.tradeoff={benefitFirst:{people:benefit.coveredPlayers,requests:benefit.coveredRequests,minutes:benefit.totalBenefitMinutes},balanced:{people:balanced.coveredPlayers,requests:balanced.coveredRequests,minutes:balanced.totalBenefitMinutes}};
+  }
+  return result;
 }
-
-function analyzeUnplaced(players, solve, options){
-  const placed=new Set(solve.assignments.map(a=>a.playerId));
-  const notes=[];
-  for (const p of players){
-    if (placed.has(p.playerId)) continue;
-    let reason;
-    const anyAvail = DAY_SPECS.some(d=>p.availableSlots[d.key].size);
-    const anyValue = p.generalPoints>0 || DAY_SPECS.some(d=>p.basePoints[d.key]>0);
-    if (!p.selectedDays.size) reason = "didn't pick any buff day on the form";
-    else if (!anyAvail) reason = "didn't tick any time ranges, so there's no window to place them in";
-    else if (!anyValue) reason = "listed no speedups or crystals, so an appointment wouldn't add points";
-    else reason = "all of their free time slots were needed by players bringing more points";
-    notes.push({ player:p, reason });
+function analyzeUnplaced(players,solve,options){
+  const notes=[];const bySlot=new Map(solve.assignments.map(a=>[a.dayKey+'|'+a.start,a]));const open=new Set(solve.slotStarts);
+  for(const p of players){
+    const placed=new Set((solve.perPlayer.get(p.playerId)||[]).map(([dk])=>dk));
+    if(!p.selectedDays.size){notes.push({player:p,reason:'no requested buff day was recognized; clarify the selected-day answer'});continue;}
+    for(const dk of p.selectedDays){
+      if(placed.has(dk))continue;
+      const feasible=[...p.availableSlots[dk]].filter(s=>open.has(s));let reason;
+      if(!feasible.length)reason='no full available slot in the chosen UTC window';
+      else if(placed.size>=options.maxTotalPerPlayer)reason='the event appointment cap was reached';
+      else {const fixed=feasible.filter(s=>bySlot.get(dk+'|'+s)?.locked).length;reason=fixed===feasible.length?'all feasible seats are preserved accepted appointments':'competing requests use the feasible seats under the selected team policy';}
+      notes.push({player:p,reason:dk+': '+reason});
+    }
   }
   return notes;
 }
@@ -836,9 +861,30 @@ if (typeof document !== "undefined") (function(){
   ["dragleave","drop"].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove("dragover"); }));
   drop.addEventListener("drop", e=>{ const f=e.dataTransfer.files?.[0]; if(f) handleFile(f); });
   fileInput.addEventListener("change", ()=>{ const f=fileInput.files?.[0]; if(f) handleFile(f); fileInput.value=""; });
-  ["optMax","optSlot","optStart","optEnd","optNames","optWishes"].forEach(id =>
+  ["optMax","optSlot","optStart","optEnd","optNames","optWishes","optPolicy"].forEach(id =>
     $(id).addEventListener("change", ()=>{ if(state?.file) handleFile(state.file); }));
 
+  let importedLocks=[];
+  $("lockInput").addEventListener("change",async()=>{
+    const f=$("lockInput").files?.[0]; if(!f) return;
+    try{
+      if(typeof XLSX==="undefined") throw new SchedulerError("Spreadsheet reader is unavailable.");
+      const wb=XLSX.read(await f.arrayBuffer(),{type:"array"});
+      const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:""});
+      const parsed=rows.map((r,i)=>{
+        const dk=String(r.Day||"").trim().toLowerCase();
+        const start=parseClockToken(String(r["Start UTC"]||""),false);
+        const playerId=canonicalPlayerId(r["Player ID"]);
+        if(!DAY_SPECS.some(d=>d.key===dk)||start===null||start%30||!playerId) throw new SchedulerError("Existing appointments row "+(i+2)+": use Day, Start UTC (HH:MM) and Player ID.");
+        return {dayKey:dk,start,playerId,tag:canonicalTag(r.Alliance),name:String(r["Player Name"]||"")};
+      });
+      importedLocks=parsed; $("lockStatus").textContent=parsed.length+" fixed appointments imported.";
+      if(state?.file) await handleFile(state.file);
+    }catch(e){setStatus(escapeHtml(e.message),"err");}
+    $("lockInput").value="";
+  });
+  $("clearLocks").addEventListener("click",()=>{importedLocks=[];$("lockStatus").textContent="No existing appointments imported.";if(state?.file)handleFile(state.file);});
+  $("reviewComments").addEventListener("change",()=>{if(state)renderAudit();});
   function options(){
     let start=+$("optStart").value, end=+$("optEnd").value;
     if (end<=start){ end=1440; $("optEnd").value="1440"; }
@@ -848,6 +894,7 @@ if (typeof document !== "undefined") (function(){
       dayWindow:[start,end],
       includeNames:$("optNames").checked,
       honorWishes:$("optWishes").checked,
+      policy:$("optPolicy").value, locks:importedLocks,
     };
   }
 
@@ -884,9 +931,16 @@ if (typeof document !== "undefined") (function(){
       const opts=options();
       const mapping=buildMapping(headers);
       const { players, duplicates }=buildPlayers(rows, mapping, opts.slotMinutes);
+      if(state?.file===file){
+        for(const p of players){
+          p.previousSlots={};
+          for(const a of state.solve.assignments) if(a.playerId===p.playerId&&!a.locked) p.previousSlots[a.dayKey]=a.start;
+        }
+      }
       const solve=solveSchedule(players, opts);
       const unplaced=analyzeUnplaced(players, solve, opts);
       const weekdays=extractWeekdayLabels(rows.map(r=>mapping.selectedColumn?r[mapping.selectedColumn]:null));
+      $("reviewComments").checked=false;
       state={ file, mapping, players, solve, unplaced, duplicates, opts, weekdays,
               responses: rows.length, stateName: guessStateName(file.name) };
       render();
@@ -913,10 +967,11 @@ if (typeof document !== "undefined") (function(){
 
   function render(){
     const { players, solve, unplaced, duplicates, opts, weekdays }=state;
-    const byId=new Map(players.map(p=>[p.playerId,p]));
-    $("cPlayers").textContent=new Set(solve.assignments.map(a=>a.playerId)).size+" / "+players.length;
+    const byId=new Map([...players,...(solve.externalPlayers||[])].map(p=>[p.playerId,p]));
+    $("cPlayers").textContent=solve.coveredPlayers+" / "+players.length;
     $("cAppointments").textContent=solve.assignments.length;
-    $("cPoints").textContent=abbreviate(solve.totalPoints);
+    $("cPoints").textContent=solve.measuredRequests ? abbreviate(solve.totalBenefitMinutes) : "Not measured";
+    renderAudit();
     $("cResponses").textContent=state.responses;
 
     // attention list
@@ -930,11 +985,8 @@ if (typeof document !== "undefined") (function(){
         attention.push(`<span class="who">${escapeHtml(playerLabel(p))}</span> gave an unusual player ID (<span class="mono">${escapeHtml(p.playerId)}</span>) — worth double-checking in game.`);
     for (const { player, reason } of unplaced)
       attention.push(`<span class="who">${escapeHtml(playerLabel(player))}</span> couldn't be scheduled: ${reason}.`);
-    for (const p of players){
-      const missing=[...p.selectedDays].filter(dk=>p.basePoints[dk]<=0 && p.generalPoints<=0);
-      if (missing.length)
-        attention.push(`<span class="who">${escapeHtml(playerLabel(p))}</span> asked for ${missing.map(dk=>DAY_SPECS.find(d=>d.key===dk).label).join(" and ")} but listed no matching speedups, so that day was skipped for them.`);
-    }
+    for(const p of players) for(const issue of p.inputIssues||[]) attention.push(`<span class="who">${escapeHtml(playerLabel(p))}</span>: ${escapeHtml(issue)}.`);
+    for(const warning of state.mapping.warnings) attention.push(escapeHtml(warning));
     $("attentionPanel").hidden=!attention.length;
     $("attentionList").innerHTML=attention.map(a=>`<li>${a}</li>`).join("");
 
@@ -957,6 +1009,17 @@ if (typeof document !== "undefined") (function(){
     results.classList.add("show");
   }
 
+  function reviewStatus(){
+    const issues=state.players.some(p=>p.inputIssues?.length);
+    const comments=state.players.some(p=>p.comment);
+    return issues ? "DRAFT — input issues need resolution" : comments && !$("reviewComments").checked ? "DRAFT — comments need review" : "Planning draft — reviewed inputs";
+  }
+  function renderAudit(){
+    const {solve,opts}=state;
+    const missing=solve.totalRequests-solve.measuredRequests;
+    $("auditText").innerHTML=`<p><b>${escapeHtml(reviewStatus())}</b></p><p>Policy: ${escapeHtml(solve.policyOrder.join(" → "))}. ${solve.coveredRequests} / ${solve.totalRequests} requested days covered; ${solve.preferenceHits} structured preferences honored. ${solve.lockCount} accepted appointments preserved.</p><p>${missing} requested days have no measured benefit. ${!solve.completeBenefits?"Benefit ranking is disabled for every member while eligible estimates are incomplete. ":""}${!solve.completeHistory?"History rotation is disabled for everyone because history is incomplete. ":""}Resource stock and comments never become invented prep-point gains. No cross-day general allocation is inferred.</p>${solve.tradeoff?`<p><b>Trade-off:</b> broad first access serves ${solve.tradeoff.balanced.people} members for ${solve.tradeoff.balanced.minutes} measured extra minutes; benefit-first serves ${solve.tradeoff.benefitFirst.people} members for ${solve.tradeoff.benefitFirst.minutes} minutes. Select the policy in Options. These are model estimates, not game-score guarantees.</p>`:""}`;
+    $("reviewComments").parentElement.hidden=!state.players.some(p=>p.comment);
+  }
   function dayDisplay(day, weekdays){
     const wd=weekdays[day.key]||day.defaultWeekday;
     return day.label+(wd ? " ("+wd+")" : "");
@@ -964,7 +1027,7 @@ if (typeof document !== "undefined") (function(){
 
   function renderDay(dayKey){
     const { players, solve, opts }=state;
-    const byId=new Map(players.map(p=>[p.playerId,p]));
+    const byId=new Map([...players,...(solve.externalPlayers||[])].map(p=>[p.playerId,p]));
     const bySlot=new Map(solve.assignments.filter(a=>a.dayKey===dayKey).map(a=>[a.start,a]));
     const tbody=$("dayTable").querySelector("tbody"); tbody.innerHTML="";
     for (const s of solve.slotStarts){
@@ -972,7 +1035,7 @@ if (typeof document !== "undefined") (function(){
       const a=bySlot.get(s);
       const p=a?byId.get(a.playerId):null;
       const wish=p && p.comment ? `<span class="note">✎ ${escapeHtml(p.comment.length>90?p.comment.slice(0,90)+"…":p.comment)}</span>`:"";
-      tr.innerHTML=`<td class="time">${slotLabel(s,opts.slotMinutes)}</td>`+
+      tr.innerHTML=`<td class="time">${slotLabel(s,opts.slotMinutes)}${a?.locked?"<span class=note>accepted · fixed</span>":""}</td>`+
         (p?`<td>${escapeHtml(p.name||"—")}${wish}</td><td>${escapeHtml(p.tag||"—")}</td><td class="mono">${escapeHtml(p.playerId)}</td>`
           :`<td class="empty-slot">open</td><td class="empty-slot">—</td><td class="empty-slot">—</td>`);
       tbody.appendChild(tr);
@@ -989,7 +1052,7 @@ if (typeof document !== "undefined") (function(){
   $("downloadBtn").addEventListener("click", ()=>{
     if (!state) return;
     const { players, solve, unplaced, opts, weekdays, stateName }=state;
-    const byId=new Map(players.map(p=>[p.playerId,p]));
+    const byId=new Map([...players,...(solve.externalPlayers||[])].map(p=>[p.playerId,p]));
     const wb=XLSX.utils.book_new();
 
     for (const day of DAY_SPECS){
@@ -1007,22 +1070,36 @@ if (typeof document !== "undefined") (function(){
     }
 
     // Summary sheet
-    const sum=[["Player"+(opts.includeNames?"":" ID"),"Alliance","Player ID","Construction","Research","Troop Training","Est. points if all kept"]];
+    const sum=[["Player"+(opts.includeNames?"":" ID"),"Alliance","Player ID","Construction","Research","Troop Training","Measured extra minutes saved"]];
     const perPlayerDay=new Map();
     for (const a of solve.assignments) perPlayerDay.set(a.playerId+"|"+a.dayKey, slotLabel(a.start,opts.slotMinutes));
     for (const p of players){
       const cells=DAY_SPECS.map(d=>perPlayerDay.get(p.playerId+"|"+d.key)||"");
       const scheduledDays=DAY_SPECS.filter(d=>perPlayerDay.has(p.playerId+"|"+d.key));
-      const pts=scheduledDays.reduce((t,d)=>t+p.basePoints[d.key],0)+(scheduledDays.length?p.generalPoints:0);
-      sum.push([opts.includeNames?(p.name||""):p.playerId, p.tag, p.playerId, ...cells, pts]);
+      const measured=scheduledDays.filter(d=>p.benefitMinutes[d.key]!==null);
+      const gain=measured.length?measured.reduce((t,d)=>t+p.benefitMinutes[d.key],0):"Not measured";
+      sum.push([opts.includeNames?(p.name||""):p.playerId, p.tag, p.playerId, ...cells, gain]);
     }
     const wsSum=XLSX.utils.aoa_to_sheet(sum);
     wsSum["!cols"]=[{wch:20},{wch:12},{wch:16},{wch:14},{wch:14},{wch:14},{wch:20}];
     XLSX.utils.book_append_sheet(wb, wsSum, "Summary");
 
+    const context=[["Player ID","Declared resource field","Original answer","Interpretation"]];
+    for(const p of players) for(const [question,answer] of Object.entries(p.declaredResources||{})) context.push([p.playerId,question,isBlank(answer)?"":String(answer),"Preserve the question's inventory vs intended-spend meaning; no title-created points inferred."]);
+    const wsContext=XLSX.utils.aoa_to_sheet(context); wsContext["!cols"]=[{wch:16},{wch:48},{wch:32},{wch:80}];
+    XLSX.utils.book_append_sheet(wb,wsContext,"Declared resources");
+
     // Scheduler notes
     const notes=[["Scheduler notes — not for public posting"],[""],
-      ["All times are UTC. Availability answers were treated as hard rules."]];
+      ["All times are UTC. Availability answers were treated as hard rules."],
+      [reviewStatus()],
+      ["Policy: "+solve.policyOrder.join(" → ")],
+      ["Inventory is context, not title-created points. Members may contribute without an appointment."],
+      ["Benefit minutes are explicit per-request estimates; shared general pools must already be allocated once."],
+      ["Fixed accepted appointments preserved: "+solve.lockCount]];
+    for(const warning of state.mapping.warnings) notes.push([warning]);
+    for(const pid of state.duplicates) notes.push(["Duplicate submission; most recent retained: "+pid]);
+    for(const p of players) for(const issue of p.inputIssues||[]) notes.push([p.playerId+": "+issue]);
     if (unplaced.length){
       notes.push([""],["Could not be scheduled:"]);
       for (const {player,reason} of unplaced)
@@ -1038,7 +1115,7 @@ if (typeof document !== "undefined") (function(){
     wsNotes["!cols"]=[{wch:110}];
     XLSX.utils.book_append_sheet(wb, wsNotes, "Scheduler notes");
 
-    const fname=(stateName?stateName+" - ":"")+"Optimised Buff Schedule.xlsx";
+    const fname=(stateName?stateName+" - ":"")+"Whiteout v4 - "+(reviewStatus().startsWith("DRAFT")?"DRAFT - ":"")+"Buff Schedule.xlsx";
     XLSX.writeFile(wb, fname);
   });
 

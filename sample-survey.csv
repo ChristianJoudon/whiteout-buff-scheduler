@@ -1,0 +1,6 @@
+Player ID,Player name,Alliance,Desired buffs,General availability,Construction preferred UTC,Research preferred UTC,Training preferred UTC,Construction unavailable UTC,Construction buff benefit minutes,Research buff benefit minutes,Training buff benefit minutes,Prior appointments,Comments
+100001,Aster,NTH,construction; research; training,08:00-10:00,09:00-10:00,,,08:00-08:15,50,40,80,2,Research after the lab prerequisite; verify readiness before booking.
+100002,Birch,NTH,construction,08:00-08:30,,,,,15,,,0,
+100003,Cedar,STH,research; training,08:00-09:00,,08:30-09:00,,,,40,120,1,
+100004,Dawn,STH,construction; research; training,08:00-10:00,,,09:00-10:00,,90,60,100,4,
+100005,Elm,NTH,research,08:00-08:30,,,,,,,,0,No speedups; starting a long research.

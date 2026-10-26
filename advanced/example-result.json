@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "status": "OPTIMAL",
+  "optimal": true,
+  "engine": "cp-sat",
+  "objective_unit": "saved_timer_minutes",
+  "policy": "balanced",
+  "objective_order": [
+    "people",
+    "benefit",
+    "requested_days",
+    "preferences",
+    "history",
+    "stability"
+  ],
+  "metrics": {
+    "benefit": 12,
+    "people": 2,
+    "requested_days": 3,
+    "preferences": 3,
+    "history": -1,
+    "stability": -2
+  },
+  "stages": [
+    {
+      "name": "people",
+      "status": "OPTIMAL",
+      "value": 2,
+      "best_bound": 2.0,
+      "wall_seconds": 0.01874
+    },
+    {
+      "name": "benefit",
+      "status": "OPTIMAL",
+      "value": 12,
+      "best_bound": 12.0,
+      "wall_seconds": 0.00078
+    },
+    {
+      "name": "requested_days",
+      "status": "OPTIMAL",
+      "value": 3,
+      "best_bound": 3.0,
+      "wall_seconds": 7.8e-05
+    },
+    {
+      "name": "preferences",
+      "status": "OPTIMAL",
+      "value": 3,
+      "best_bound": 3.0,
+      "wall_seconds": 6.9e-05
+    },
+    {
+      "name": "history",
+      "status": "OPTIMAL",
+      "value": -1,
+      "best_bound": -1.0,
+      "wall_seconds": 6.1e-05
+    },
+    {
+      "name": "stability",
+      "status": "OPTIMAL",
+      "value": -2,
+      "best_bound": -2.0,
+      "wall_seconds": 6.4e-05
+    }
+  ],
+  "selected_plans": [
+    {
+      "member_id": "alpha",
+      "plan_id": "split",
+      "baseline": false,
+      "incremental_benefit": 9,
+      "consumption": {
+        "general_minutes": "100"
+      }
+    },
+    {
+      "member_id": "bravo",
+      "plan_id": "construction-request",
+      "baseline": false,
+      "incremental_benefit": 3,
+      "consumption": {}
+    }
+  ],
+  "assignments": [
+    {
+      "member_id": "alpha",
+      "plan_id": "split",
+      "slot_id": "c1",
+      "day": "construction-day",
+      "office": "vice-president",
+      "start": "2026-10-26T08:00:00Z",
+      "end": "2026-10-26T08:30:00Z",
+      "locked": false,
+      "external": false
+    },
+    {
+      "member_id": "bravo",
+      "plan_id": "construction-request",
+      "slot_id": "c2",
+      "day": "construction-day",
+      "office": "vice-president",
+      "start": "2026-10-26T08:30:00Z",
+      "end": "2026-10-26T09:00:00Z",
+      "locked": false,
+      "external": false
+    },
+    {
+      "member_id": "alpha",
+      "plan_id": "split",
+      "slot_id": "r1",
+      "day": "research-day",
+      "office": "vice-president",
+      "start": "2026-10-27T08:00:00Z",
+      "end": "2026-10-27T08:30:00Z",
+      "locked": false,
+      "external": false
+    },
+    {
+      "member_id": "external-fixed-member",
+      "plan_id": null,
+      "slot_id": "t1",
+      "day": "troop-day",
+      "office": "education-minister",
+      "start": "2026-10-29T08:00:00Z",
+      "end": "2026-10-29T08:30:00Z",
+      "locked": true,
+      "external": true
+    }
+  ],
+  "notes": [],
+  "model_scope": [
+    "Benefit is a caller-declared increment over that member's no-appointment baseline, in the single declared objective unit.",
+    "Resource inventories do not generate benefit or reliability penalties. Only declared plan consumption and budgets are checked.",
+    "Task prerequisites are checked in declared execution order; game timers, action timing and title effects are not simulated.",
+    "Availability, when supplied, means the entire appointment must fit inside its UTC windows.",
+    "History is prior event service count and is disabled globally if any member lacks it; stability counts changed member-slot relationships.",
+    "External fixed appointments are honored but excluded from member benefit and coverage metrics."
+  ],
+  "elapsed_seconds": 0.445235,
+  "office_conflict_pairs": 2
+}

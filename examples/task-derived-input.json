@@ -1,0 +1,298 @@
+{
+  "objective_unit": "secondsSaved",
+  "policy": "balanced",
+  "deadline_seconds": 60,
+  "slots": [
+    {
+      "id": "vp-0800",
+      "day": "build-day",
+      "office": "VP",
+      "start": "2026-11-02T08:00:00Z",
+      "end": "2026-11-02T08:30:00Z"
+    },
+    {
+      "id": "vp-0830",
+      "day": "build-day",
+      "office": "VP",
+      "start": "2026-11-02T08:30:00Z",
+      "end": "2026-11-02T09:00:00Z"
+    }
+  ],
+  "members": [
+    {
+      "id": "flexible-long-start",
+      "requested_days": [
+        "build-day"
+      ],
+      "budgets": {
+        "general_minutes": 0
+      },
+      "history_count": 0,
+      "availability": [
+        {
+          "start": "2026-11-02T08:00:00Z",
+          "end": "2026-11-02T09:00:00Z"
+        }
+      ],
+      "plans": [
+        {
+          "id": "without-public-title",
+          "baseline": true,
+          "incremental_benefit": 0,
+          "appointments": [],
+          "baseline_work": "Same new work starts without the additional title; contribution still occurs."
+        },
+        {
+          "id": "start-0805",
+          "appointments": [
+            "vp-0800"
+          ],
+          "objective_unit": "secondsSaved",
+          "incremental_benefit": 1100,
+          "consumption": {
+            "general_minutes": "0"
+          },
+          "work_items": [
+            {
+              "schema_version": 1,
+              "mode": "same-work",
+              "objective_unit": "secondsSaved",
+              "baseline_timer_seconds": "23100",
+              "title_timer_seconds": "22000",
+              "saved_seconds": "1100",
+              "exact_seconds": {
+                "baseline": {
+                  "numerator": "23100",
+                  "denominator": "1"
+                },
+                "title": {
+                  "numerator": "22000",
+                  "denominator": "1"
+                },
+                "saved": {
+                  "numerator": "1100",
+                  "denominator": "1"
+                }
+              },
+              "eligibility": {
+                "title_applies": true,
+                "action_state": "new",
+                "timing_evidence": "checked_supplied_utc_intervals",
+                "matching_appointment_ids": [
+                  "vp-0800"
+                ],
+                "reason": "New action starts inside a matching office interval."
+              },
+              "inputs": {
+                "base_work_seconds": "46200",
+                "existing_speed_percent": "100",
+                "requested_title_speed_percent": "10",
+                "applied_title_speed_percent": "10",
+                "fixed_reduction_seconds": "0",
+                "fixed_reduction_stage": null
+              },
+              "model_assumptions": [
+                "Compare the same quantity of new work; existing_speed_percent excludes the requested title and already combines every other supplied additive speed bonus.",
+                "Title speed is snapshotted at action start. The title need not remain active for the entire resulting timer.",
+                "Any fixed reduction is applied to both counterfactuals using only the caller's explicit effect order, clamped at zero.",
+                "For preexisting queues, both outputs are the same supplied-work reference timer; the remaining live queue time is not inferred.",
+                "No multiplicative buffs, alliance helps, spending/reinvestment, prerequisites or resource feasibility are simulated."
+              ],
+              "task_id": null,
+              "input_evidence": {
+                "source": "Synthetic supplied workload and percentages. No assertion of live state settings."
+              },
+              "evidence_status": "Caller-supplied inputs and provenance; not independently verified in the game.",
+              "caller_assumptions": [],
+              "arithmetic": {
+                "decimal_significant_digits": 50,
+                "rounding": "Decimal views only; integer floors and plan compilation use exact rational values."
+              }
+            }
+          ],
+          "assumptions": [
+            "This is an advanced-plan fragment; caller supplies appointments, task provenance and the feasible whole-plan resource allocation.",
+            "general_minutes is declared once for the whole plan, not multiplied by work-item count. No reinvestment of saved time or duplicate baseline spending is inferred.",
+            "The advanced optimizer checks the declared plan consumption against its budgets; this helper does not derive spending from timers."
+          ]
+        },
+        {
+          "id": "start-0835",
+          "appointments": [
+            "vp-0830"
+          ],
+          "objective_unit": "secondsSaved",
+          "incremental_benefit": 1100,
+          "consumption": {
+            "general_minutes": "0"
+          },
+          "work_items": [
+            {
+              "schema_version": 1,
+              "mode": "same-work",
+              "objective_unit": "secondsSaved",
+              "baseline_timer_seconds": "23100",
+              "title_timer_seconds": "22000",
+              "saved_seconds": "1100",
+              "exact_seconds": {
+                "baseline": {
+                  "numerator": "23100",
+                  "denominator": "1"
+                },
+                "title": {
+                  "numerator": "22000",
+                  "denominator": "1"
+                },
+                "saved": {
+                  "numerator": "1100",
+                  "denominator": "1"
+                }
+              },
+              "eligibility": {
+                "title_applies": true,
+                "action_state": "new",
+                "timing_evidence": "checked_supplied_utc_intervals",
+                "matching_appointment_ids": [
+                  "vp-0830"
+                ],
+                "reason": "New action starts inside a matching office interval."
+              },
+              "inputs": {
+                "base_work_seconds": "46200",
+                "existing_speed_percent": "100",
+                "requested_title_speed_percent": "10",
+                "applied_title_speed_percent": "10",
+                "fixed_reduction_seconds": "0",
+                "fixed_reduction_stage": null
+              },
+              "model_assumptions": [
+                "Compare the same quantity of new work; existing_speed_percent excludes the requested title and already combines every other supplied additive speed bonus.",
+                "Title speed is snapshotted at action start. The title need not remain active for the entire resulting timer.",
+                "Any fixed reduction is applied to both counterfactuals using only the caller's explicit effect order, clamped at zero.",
+                "For preexisting queues, both outputs are the same supplied-work reference timer; the remaining live queue time is not inferred.",
+                "No multiplicative buffs, alliance helps, spending/reinvestment, prerequisites or resource feasibility are simulated."
+              ],
+              "task_id": null,
+              "input_evidence": {
+                "source": "Synthetic supplied workload and percentages. No assertion of live state settings."
+              },
+              "evidence_status": "Caller-supplied inputs and provenance; not independently verified in the game.",
+              "caller_assumptions": [],
+              "arithmetic": {
+                "decimal_significant_digits": 50,
+                "rounding": "Decimal views only; integer floors and plan compilation use exact rational values."
+              }
+            }
+          ],
+          "assumptions": [
+            "This is an advanced-plan fragment; caller supplies appointments, task provenance and the feasible whole-plan resource allocation.",
+            "general_minutes is declared once for the whole plan, not multiplied by work-item count. No reinvestment of saved time or duplicate baseline spending is inferred.",
+            "The advanced optimizer checks the declared plan consumption against its budgets; this helper does not derive spending from timers."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "short-window-long-start",
+      "requested_days": [
+        "build-day"
+      ],
+      "budgets": {
+        "general_minutes": 0
+      },
+      "history_count": 0,
+      "availability": [
+        {
+          "start": "2026-11-02T08:00:00Z",
+          "end": "2026-11-02T08:30:00Z"
+        }
+      ],
+      "plans": [
+        {
+          "id": "without-public-title",
+          "baseline": true,
+          "incremental_benefit": 0,
+          "appointments": [],
+          "baseline_work": "Same new work starts without the additional title; contribution still occurs."
+        },
+        {
+          "id": "start-0805",
+          "appointments": [
+            "vp-0800"
+          ],
+          "objective_unit": "secondsSaved",
+          "incremental_benefit": 500,
+          "consumption": {
+            "general_minutes": "0"
+          },
+          "work_items": [
+            {
+              "schema_version": 1,
+              "mode": "same-work",
+              "objective_unit": "secondsSaved",
+              "baseline_timer_seconds": "10500",
+              "title_timer_seconds": "10000",
+              "saved_seconds": "500",
+              "exact_seconds": {
+                "baseline": {
+                  "numerator": "10500",
+                  "denominator": "1"
+                },
+                "title": {
+                  "numerator": "10000",
+                  "denominator": "1"
+                },
+                "saved": {
+                  "numerator": "500",
+                  "denominator": "1"
+                }
+              },
+              "eligibility": {
+                "title_applies": true,
+                "action_state": "new",
+                "timing_evidence": "checked_supplied_utc_intervals",
+                "matching_appointment_ids": [
+                  "vp-0800"
+                ],
+                "reason": "New action starts inside a matching office interval."
+              },
+              "inputs": {
+                "base_work_seconds": "21000",
+                "existing_speed_percent": "100",
+                "requested_title_speed_percent": "10",
+                "applied_title_speed_percent": "10",
+                "fixed_reduction_seconds": "0",
+                "fixed_reduction_stage": null
+              },
+              "model_assumptions": [
+                "Compare the same quantity of new work; existing_speed_percent excludes the requested title and already combines every other supplied additive speed bonus.",
+                "Title speed is snapshotted at action start. The title need not remain active for the entire resulting timer.",
+                "Any fixed reduction is applied to both counterfactuals using only the caller's explicit effect order, clamped at zero.",
+                "For preexisting queues, both outputs are the same supplied-work reference timer; the remaining live queue time is not inferred.",
+                "No multiplicative buffs, alliance helps, spending/reinvestment, prerequisites or resource feasibility are simulated."
+              ],
+              "task_id": null,
+              "input_evidence": {
+                "source": "Synthetic supplied workload and percentages. No assertion of live state settings."
+              },
+              "evidence_status": "Caller-supplied inputs and provenance; not independently verified in the game.",
+              "caller_assumptions": [],
+              "arithmetic": {
+                "decimal_significant_digits": 50,
+                "rounding": "Decimal views only; integer floors and plan compilation use exact rational values."
+              }
+            }
+          ],
+          "assumptions": [
+            "This is an advanced-plan fragment; caller supplies appointments, task provenance and the feasible whole-plan resource allocation.",
+            "general_minutes is declared once for the whole plan, not multiplied by work-item count. No reinvestment of saved time or duplicate baseline spending is inferred.",
+            "The advanced optimizer checks the declared plan consumption against its budgets; this helper does not derive spending from timers."
+          ]
+        }
+      ]
+    }
+  ],
+  "assumptions": [
+    "Both new builds are ready to start. General spend is zero. All other costs and feasibility are explicitly assumed ready for this synthetic example. No game account or event is consulted."
+  ]
+}

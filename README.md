@@ -1,97 +1,97 @@
-# ❄ Whiteout Buff Scheduler
+# Whiteout Buff Scheduler v4
 
-A free, browser-based **schedule optimizer for Whiteout Survival SvS buff days** — Construction,
-Research, and Troop Training. Drop in the sign-ups your members submit through Microsoft Forms and get
-the arrangement that earns the **most total prep points**, while never placing anyone outside a time they
-said they were free.
+Create a reviewable appointment draft from a Whiteout Survival survey. Version 4 prioritizes broad first access, then the additional benefit a title creates. Resource inventory is context. It is not automatically converted into a claim about the gain from an appointment.
 
-**▶ Use it now: https://christianjoudon.github.io/whiteout-buff-scheduler/**
+[Launch the scheduler](https://christianjoudon.github.io/whiteout-buff-scheduler/Whiteout%20Buff%20Scheduler.html) · [Illustrated walkthrough](https://christianjoudon.github.io/whiteout-buff-scheduler/walkthrough.html) · [Project case study](https://christianjoudon.github.io/whiteout-buff-scheduler/)
 
-- **[Launch the scheduler](https://christianjoudon.github.io/whiteout-buff-scheduler/Whiteout%20Buff%20Scheduler.html)** — runs entirely in your browser
-- **[Walkthrough and explainer](ALGORITHM.md)** with an [illustrated browser edition](https://christianjoudon.github.io/whiteout-buff-scheduler/walkthrough.html)
-- **[Written project case study](https://christianjoudon.github.io/whiteout-buff-scheduler/)** and [case study PDF](docs/Whiteout%20Buff%20Scheduler%20Case%20Study.pdf).
-- **[Walkthrough PDF](docs/Whiteout%20Buff%20Scheduler%20Walkthrough.pdf)** for offline reference.
-- Survey data is processed locally. The initial page loads external libraries and fonts.
-
----
+Edition: 26 October 2026. The existing project, app, walkthrough, explainer and PDF addresses remain in use.
 
 ## The easy way (no Python, no terminal)
 
-Open the **[hosted scheduler](https://christianjoudon.github.io/whiteout-buff-scheduler/Whiteout%20Buff%20Scheduler.html)**,
-or download **Whiteout Buff Scheduler.html** and double-click it in any browser. Drag the responses file
-your members download from Microsoft Forms onto the big panel, glance at the schedule and the
-"needs a quick look" notes, and press **Download the schedule (.xlsx)**. That's the whole workflow.
+Read the [illustrated guide](ALGORITHM.md) or follow its [website edition](https://christianjoudon.github.io/whiteout-buff-scheduler/walkthrough.html). Set Options, choose the survey, optionally import accepted appointments, review the results and comments, inspect the three days, and download the workbook. Choosing a file schedules it automatically. Options changes recalculate it and reset comment review.
 
-The browser processes the selected file locally. Selecting a file schedules it automatically; changing Options recalculates that same file. Review the attention messages and all three day tabs before downloading. The workbook contains three day sheets, Summary and Scheduler notes. The notes contain unplaced reasons and original comments, but do not copy every on page warning.
+Try [sample-survey.csv](sample-survey.csv) and [sample-accepted.csv](sample-accepted.csv). They contain invented members only. The guide uses 08:00 to 10:00 UTC; the app initially offers a full UTC day. Each seat lasts 30 minutes. The default event cap permits up to one appointment on each of the three days.
 
-Defaults are 30 minute appointments, up to one per day and three across the event, with a full UTC day window. Names can be hidden in the day sheets and Summary, but Scheduler notes can still contain names and comments. Review that sheet before sharing.
+Accepted appointments stay fixed, including members absent from the survey. Conflicting commitments stop the calculation. A generated or reviewed draft is not an appointment booked in the game.
 
 ## What the optimizer guarantees
 
-Within the rules that can never be broken — nobody placed outside a time they're free, nobody placed on a
-day they didn't pick, at most one player per slot, and a per-player appointment cap — it finds the arrangement
-with the **highest total estimated prep points**, then fills as many remaining slots as possible, then
-breaks ties fairly (favoring players with the fewest free times, and earlier sign-ups among equals).
+The browser solves its additive three day appointment model exactly, under the selected objective order and parsed constraints. Available times, requested days, seat occupancy and event caps remain hard rules. Broad first access, team access and benefit first are different policies; the guide explains their order and tradeoffs.
 
-It is an **exact optimizer, not a rough sort**: the three-day problem is modeled as a minimum-cost flow
-network whose optimum is provably the true optimum (total unimodularity guarantees integer solutions). A
-player's shared *general* speedups are credited exactly once across the whole event. Read the full
-plain-language walkthrough in **[ALGORITHM.md](ALGORITHM.md)**.
+Benefit estimates are additional whole minutes saved against the same plan without the title. Leave unknown estimates blank. If eligible estimates are incomplete, benefit ranking is disabled for everyone; selecting benefit first instead produces a concrete blocker. Incomplete history disables rotation for everyone. Free text comments never become automatic preferences or invented gains.
 
-The implemented point model uses: speedups **30 pts/minute**, Fire Crystals **2,000**,
-Refined Fire Crystals **30,000**, Fire Crystal Shards **1,000**.
+The browser does not allocate coupled resources across tasks, simulate the whole game or guarantee a real event score. Use the separate advanced model for supplied whole event alternatives, shared budgets, absolute dates, prerequisites and physical offices.
 
 ## Verification
 
-Project documentation records comparisons against exhaustive enumeration on 400 Python cases and 150 JavaScript cases. These are historical verification reports. The public snapshot used for the October 2026 documentation review does not include those test files, and the counts were not rerun for that review.
+The [current release checks](release-checks.json) ran on 26 October 2026:
 
-The browser checks assignment constraints before displaying results. The Python pipeline has a separate verifier that reopens the written workbook. The browser does not reopen the downloaded workbook. The illustrated synthetic example was run through the actual browser tool, and its downloaded workbook was inspected for the documentation.
+* Browser: 23 targeted regressions and 300 comparisons with exhaustive enumeration, plus a 120 member scale example.
+* Advanced optimizer: 38 tests run, with 37 passing and one dependency specific test skipped.
+* Mechanics calculator: 25 tests passed.
+* Integrated task example: `OPTIMAL`, two members, 1,600 additional timer seconds saved, zero general speedups consumed.
 
-Use explicit resource amounts and units. Ambiguous values such as `300/250` or a range still need review; do not assume the parser always selects a conservative amount. A recognized completion time takes priority when resolving duplicate player IDs, with the latest recognized timestamp winning. When timestamps tie or both are unavailable, the later source row wins.
+The illustrated guide was exercised in the actual browser with synthetic inputs. Its downloaded workbook was reopened to confirm all six sheets and the displayed example. These checks establish specific behavior, not reader usability, actual community adoption or live game outcomes. [verification.json](verification.json) retains the earlier local development record; its local publication status describes that earlier run.
 
-## Power-user commands (Python script)
+## Advanced plan optimizer
 
-The `SortingAlgorithm_v3.py` pipeline runs the same exact solver from the command line and can fill an
-existing shared workbook in place.
+Clone or download this repository, then run these commands from its folder on macOS or Linux:
 
 ```bash
-python -m pip install -r requirements-whiteout.txt   # pandas + openpyxl; ortools optional
-
-python SortingAlgorithm_v3.py --inspect --verbose    # map both workbooks, no scheduling
-
-python SortingAlgorithm_v3.py \
-  --applications "/path/to/Forms responses.xlsx" \
-  --output "/path/to/Optimised Buff Schedule.xlsx" \
-  --verbose
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python advanced/optimizer.py --input advanced/example.json --output advanced/result.json
 ```
 
-`--template` may point at your state's shared schedule workbook to fill it in place (existing entries stay
-locked); if it's omitted or missing, the clean three-sheet layout is created. `--max-total-per-player 1`
-enforces one appointment for the whole event, `--resource-unit days|hours|minutes|points` sets the meaning
-of plain numeric columns, and `--solver auto|cpsat|network` chooses the optimizer (the built-in `network`
-solver is exact and needs no external dependencies). The Python output writes only time, Player ID, and
-Alliance — never emails.
+Read [advanced/schema.txt](advanced/schema.txt) before changing the input. Supply exactly one no title baseline per member and complete alternative plans. A baseline may still contribute and consume resources. Benefits are signed integer differences in one declared unit. The production solver selects supplied alternatives and validates declared constraints; it does not invent game feasible plans.
 
-v3 removes the OR-Tools requirement: it ships a built-in exact minimum-cost-flow solver that provably
-reaches the same optimum. If OR-Tools is installed, CP-SAT is still available via `--solver cpsat`.
+`OPTIMAL` requires proof at all six policy stages. `FEASIBLE` and `UNKNOWN` preserve uncertainty. The exhaustive reference engine is limited to small instances and is not an automatic production fallback.
+
+## Mechanics calculator
+
+[mechanics/README.md](mechanics/README.md) explains the separate `same-work` and `fixed-budget-training` routes. They evaluate explicitly supplied task statistics with exact fractions, title start gating and bounded training arithmetic. They do not infer live buff values, task readiness, collection windows, residual camps or resource reinvestment.
+
+Run the complete synthetic calculator to optimizer example:
+
+```bash
+.venv/bin/python examples/from_tasks.py
+```
+
+## Reproduce the checks
+
+```bash
+node tests/browser-core.test.cjs
+.venv/bin/python -m unittest discover -s advanced -p 'test_*.py' -q
+python3 -m unittest discover -s mechanics -p 'test_*.py' -q
+```
 
 ## Files
 
-| File | What it is |
+| File or folder | Purpose |
 | --- | --- |
-| `index.html` | Presentation / landing page (this is what GitHub Pages serves first) |
-| `Whiteout Buff Scheduler.html` | The scheduler — a single self-contained web app |
-| `SortingAlgorithm_v3.py` | The Python pipeline (same exact solver) |
-| `ALGORITHM.md` | Plain-language explainer of how the optimizer works |
-| `requirements-whiteout.txt` | Python dependencies (pandas + openpyxl; ortools optional) |
+| `index.html` | Current written project case study |
+| `walkthrough.html`, `ALGORITHM.md` | Illustrated v4 instructions at the existing addresses |
+| `Whiteout Buff Scheduler.html` | Browser survey planner |
+| `advanced/` | Complete alternative plan optimizer, schema, examples and tests |
+| `mechanics/` | Supplied task comparison calculator and tests |
+| `examples/` | Integration and clearly labeled documentation variations |
+| `tests/` | Browser solver regressions and exhaustive comparisons |
+| `research.html`, `research.json` | Development research, assumptions and source record |
+| `documentation-source.json` | Shared editable source for the guide and case study |
+| `docs/` | [Walkthrough PDF](docs/Whiteout%20Buff%20Scheduler%20Walkthrough.pdf) and [case study PDF](docs/Whiteout%20Buff%20Scheduler%20Case%20Study.pdf) |
+
+<a id="power-user-commands-python-script"></a>
+
+## Earlier Python pipeline
+
+[SortingAlgorithm_v3.py](SortingAlgorithm_v3.py) and [requirements-whiteout.txt](requirements-whiteout.txt) remain available for historical links. That pipeline uses the earlier inventory based model. It is separate from v4 and does not implement v4's incremental benefit policies. Current instructions use the browser planner or the advanced and mechanics routes above.
 
 ## Privacy note
 
-Real member sign-ups and generated schedules contain players' in-game names and numeric game IDs, so
-`.gitignore` excludes all spreadsheet files (`*.xlsx`, `*.xls`, `*.csv`) — please keep it that way when
-contributing. Survey data is processed locally. The browser initially loads external libraries and fonts. Free text in comments may contain personal information, and the names option does not anonymize Scheduler notes. Review exported sheets before sharing.
+Survey processing stays local. Initial loading uses external fonts and SheetJS. The six exported sheets are the three buff days, Summary, Declared resources and Scheduler notes. Excluding names from day sheets and Summary does not remove names and comments from private notes. Review the whole workbook before sharing.
+
+Keep real surveys, member details and generated private schedules out of Git. The committed CSV and workbook examples are synthetic teaching fixtures. The existing spreadsheet ignore rules remain in place.
 
 ## License
 
-[MIT](LICENSE) — a community tool for Whiteout Survival players. Not affiliated with or endorsed by the
-game's developers.
+[MIT](LICENSE). A community project for Whiteout Survival players. Not affiliated with or endorsed by the game's developers.
