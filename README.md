@@ -8,8 +8,10 @@ said they were free.
 **▶ Use it now: https://christianjoudon.github.io/whiteout-buff-scheduler/**
 
 - **[Launch the scheduler](https://christianjoudon.github.io/whiteout-buff-scheduler/Whiteout%20Buff%20Scheduler.html)** — runs entirely in your browser
-- **[How it works (the explainer)](ALGORITHM.md)** — plain-language walkthrough of the optimizer
-- No sign-up, no installs, nothing uploaded. The survey file never leaves your computer.
+- **[Walkthrough and explainer](ALGORITHM.md)** with an [illustrated browser edition](https://christianjoudon.github.io/whiteout-buff-scheduler/walkthrough.html)
+- **[Written project case study](https://christianjoudon.github.io/whiteout-buff-scheduler/)** and [case study PDF](docs/Whiteout%20Buff%20Scheduler%20Case%20Study.pdf).
+- **[Walkthrough PDF](docs/Whiteout%20Buff%20Scheduler%20Walkthrough.pdf)** for offline reference.
+- Survey data is processed locally. The initial page loads external libraries and fonts.
 
 ---
 
@@ -20,18 +22,14 @@ or download **Whiteout Buff Scheduler.html** and double-click it in any browser.
 your members download from Microsoft Forms onto the big panel, glance at the schedule and the
 "needs a quick look" notes, and press **Download the schedule (.xlsx)**. That's the whole workflow.
 
-The page runs entirely on the computer; the survey file is never uploaded anywhere. The download contains
-one sheet per buff day (Construction / Research / Troop Training) sorted by time, a Summary sheet with
-everyone's appointments and estimated points, and a "Scheduler notes" sheet listing anything worth
-checking by hand plus every comment people wrote on the form. Options for appointment length, per-player
-limits, the daily time window, and whether to include in-game names sit behind an "Options" fold, but the
-defaults match how the form is normally run (30-minute slots, up to one appointment per day, full 24-hour
-UTC coverage). Emails are never written to the output.
+The browser processes the selected file locally. Selecting a file schedules it automatically; changing Options recalculates that same file. Review the attention messages and all three day tabs before downloading. The workbook contains three day sheets, Summary and Scheduler notes. The notes contain unplaced reasons and original comments, but do not copy every on page warning.
+
+Defaults are 30 minute appointments, up to one per day and three across the event, with a full UTC day window. Names can be hidden in the day sheets and Summary, but Scheduler notes can still contain names and comments. Review that sheet before sharing.
 
 ## What the optimizer guarantees
 
 Within the rules that can never be broken — nobody placed outside a time they're free, nobody placed on a
-day they didn't pick, one player per slot, and a per-player appointment cap — it finds the arrangement
+day they didn't pick, at most one player per slot, and a per-player appointment cap — it finds the arrangement
 with the **highest total estimated prep points**, then fills as many remaining slots as possible, then
 breaks ties fairly (favoring players with the fewest free times, and earlier sign-ups among equals).
 
@@ -40,22 +38,16 @@ network whose optimum is provably the true optimum (total unimodularity guarante
 player's shared *general* speedups are credited exactly once across the whole event. Read the full
 plain-language walkthrough in **[ALGORITHM.md](ALGORITHM.md)**.
 
-The point model matches current community references: speedups **30 pts/minute**, Fire Crystals **2,000**,
+The implemented point model uses: speedups **30 pts/minute**, Fire Crystals **2,000**,
 Refined Fire Crystals **30,000**, Fire Crystal Shards **1,000**.
 
 ## Verification
 
-The built-in solver was checked against exhaustive brute-force enumeration on 400 randomized instances
-(including locked template slots and event-wide caps) and matched the true lexicographic optimum on all
-three layers — total points, then filled slots, then the scarcity/order tie-break — in every case. The web
-page's JavaScript engine passed the same brute-force check on 150 instances, and on a real state's July
-sign-ups it produces byte-identical column mapping, identical player records for all unique players, and
-the identical optimum as the Python pipeline. The written workbook is re-opened and every ID re-verified
-before a run reports success.
+Project documentation records comparisons against exhaustive enumeration on 400 Python cases and 150 JavaScript cases. These are historical verification reports. The public snapshot used for the October 2026 documentation review does not include those test files, and the counts were not rerun for that review.
 
-Messy answers such as `300/250`, `78days +`, and `350-400 day` no longer collapse to zero — ranges resolve
-to their conservative lower bound. The Forms "Completion time" column (including Excel serial dates) is
-recognized so duplicate submissions are resolved by actual submission time rather than by luck of row order.
+The browser checks assignment constraints before displaying results. The Python pipeline has a separate verifier that reopens the written workbook. The browser does not reopen the downloaded workbook. The illustrated synthetic example was run through the actual browser tool, and its downloaded workbook was inspected for the documentation.
+
+Use explicit resource amounts and units. Ambiguous values such as `300/250` or a range still need review; do not assume the parser always selects a conservative amount. A recognized completion time takes priority when resolving duplicate player IDs, with the latest recognized timestamp winning. When timestamps tie or both are unavailable, the later source row wins.
 
 ## Power-user commands (Python script)
 
@@ -97,7 +89,7 @@ reaches the same optimum. If OR-Tools is installed, CP-SAT is still available vi
 
 Real member sign-ups and generated schedules contain players' in-game names and numeric game IDs, so
 `.gitignore` excludes all spreadsheet files (`*.xlsx`, `*.xls`, `*.csv`) — please keep it that way when
-contributing. The tools themselves never transmit any data off your machine.
+contributing. Survey data is processed locally. The browser initially loads external libraries and fonts. Free text in comments may contain personal information, and the names option does not anonymize Scheduler notes. Review exported sheets before sharing.
 
 ## License
 

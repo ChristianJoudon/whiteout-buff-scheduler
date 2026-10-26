@@ -1,215 +1,250 @@
 # How the buff scheduler works
 
-This document explains, in plain language, how the SvS ministry scheduler decides who
-gets which appointment. It starts with an intuition anyone can follow, then gives the
-precise mechanics for anyone reviewing or extending the code.
+## Walkthrough and project explanation
 
-The one-line version: **it's a plumbing puzzle. One drop of water equals one booked
-appointment, the shape of the pipes encodes all the rules, the value stamped on each
-pipe encodes our priorities, and the water automatically finds the highest-scoring way
-through.**
+The illustrated operating guide and project case study now have matching, updated editions. This document stays at its original URL so existing links continue to work.
 
----
+[Read the illustrated walkthrough](https://christianjoudon.github.io/whiteout-buff-scheduler/walkthrough.html) · [Read the project case study](https://christianjoudon.github.io/whiteout-buff-scheduler/) · [Launch the scheduler](https://christianjoudon.github.io/whiteout-buff-scheduler/Whiteout%20Buff%20Scheduler.html)
 
-## The problem we're solving
+[Download the walkthrough PDF](docs/Whiteout%20Buff%20Scheduler%20Walkthrough.pdf) · [Download the case study PDF](docs/Whiteout%20Buff%20Scheduler%20Case%20Study.pdf)
 
-Every SvS cycle we run three buff days — Construction, Research, and Troop Training —
-and each day is divided into 30-minute appointment slots. Players fill out a form
-saying which days they want, when they're free, and how many speedups and crystals
-they'll bring. Each appointment is worth a number of "prep points" based on what that
-player brings.
+Edition: 26 October 2026. Screenshots use synthetic players.
 
-We want the arrangement that scores the most points overall, subject to rules that can
-never be broken:
+<a id="the-problem-were-solving"></a>
 
-- Nobody is placed outside a time window they said they were free.
-- Nobody is placed on a day they didn't pick.
-- Each slot holds exactly one player.
-- Each player gets at most a set number of appointments for the whole event (default: one per day, three total).
+## Turn survey responses into a schedule
 
-The tempting approach — give the biggest spender the best slot, then the next biggest,
-and so on — looks reasonable but gets stuck. Suppose two whales are *both* only free at
-exactly 08:00 on Construction day. One slot, two players. Hand 08:00 to the slightly
-bigger whale without thinking, and the other whale, who had no other free time, now
-scores nothing — when a smarter swap (slide whale A to a different slot he's also free
-for, give 08:00 to whale B) would have scored both. Simple sorting can't see trades
-like that. You need something that weighs the whole board at once.
+Use the browser tool to prepare appointments, review exceptions and download an Excel workbook.
 
----
+Open the project website and select Launch the scheduler. Start with the response file exported from Microsoft Forms, then follow the sequence below. The tool reads the answers and shows a schedule for review. You arrange the appointments in the game separately.
 
-## The intuition: a network of pipes
+1. Prepare clear survey answers
+2. Set the event rules
+3. Choose the response file
+4. Read the result
+5. Review attention messages and comments
+6. Inspect each buff day
+7. Download and share the right sheets
+8. Resolve common input problems
 
-Picture the whole problem as pipes that water flows through, from one starting tap on
-the left to one drain on the right.
+Before you begin: have a current response export, an agreed appointment length and a confirmed schedule window in UTC. The examples use invented players and a window from 08:00 to 13:00 UTC. These are demonstration settings, not event defaults.
 
-```
-                     pipe carries the
-                     appointment's points
-                            │
-   ┌─────┐   ┌──────────────▼──────────┐   ┌───────────┐   ┌───────┐
-   │ TAP │──►│         PLAYER           │──►│ TIME SLOT │──►│ DRAIN │
-   └─────┘   │   (at most 3 drops)      │   │ (1 drop)  │   └───────┘
-             └──────────────────────────┘   └───────────┘
+## Prepare clear survey answers
 
-        one drop that reaches the drain  =  one booked appointment
-```
+Keep the question headers and make units, player identity and availability unambiguous.
 
-Reading it left to right:
+### Use a supported response file
 
-The **tap** feeds a pipe into each player, and that pipe is only wide enough for three
-drops. That's the "at most three appointments per player" cap — it's built into the
-pipe itself, so it can't be violated.
+Export the responses as .xlsx or .csv. The file chooser also accepts .xlsm. Keep the survey header row. The tool needs a recognizable Player ID field, one speedups field for each buff day, and either shared availability or availability for each day.
 
-From each player, pipes branch out **only** to the slots they are actually free for, on
-the days they picked. There is simply no pipe to a slot they can't make, so scheduling
-someone outside their availability is physically impossible in the model. The illegal
-options have no plumbing.
+### Write explicit units and UTC ranges
 
-Each slot has one narrow pipe to the drain, wide enough for exactly one drop. That's
-"one player per slot."
+Use a value such as 12h, or put hours in the resource header. A bare number otherwise defaults to days unless the header identifies hours, minutes or points. Write availability such as 08:00 to 10:00 UTC. The tool does not convert local time zones.
 
-Every player-to-slot pipe is stamped with the points that appointment would earn — a
-thicker pipe is worth more. The whole job is to route the water so the total points
-stamped on the pipes it flows through is as high as possible. **That routing is the
-schedule.**
+### Keep optional answers useful
 
-The three clever parts are how we rank competing goals, how we count shared speedups
-fairly, and why the result is provably the best possible.
+Alliance, player name, completion time, selected buffs, general speedups, crystals and comments add context. If a selected buffs column is present, each player needs recognizable day choices. A blank choice is not treated as permission to schedule every day.
 
----
+### Resolve ambiguous resource answers
 
-## Ranking competing goals: the place-value trick
+Use one clear amount instead of a range or a value such as 300/250. Missing or unreadable resource values become zero. The optimizer can only work with the values the parser recognizes.
 
-We don't have just one goal, we have three, in strict priority order:
+| Field | Clear example | Meaning |
+| --- | --- | --- |
+| Player ID | 900000001 | Synthetic identifier |
+| Construction speedups (hours) | 12 | Twelve hours |
+| Selected buffs | Construction; Research | Requested days |
+| General availability | 08:00 to 10:00 | UTC time window |
 
-1. Most total points.
-2. As a tiebreaker, fill the most slots.
-3. As a final tiebreaker, be fair — favor players with barely any free time, and among
-   otherwise-equal players, whoever signed up earlier.
+For duplicate IDs, a recognized completion time takes priority and the latest recognized time wins. When timestamps tie or both are unavailable, the later source row wins. Review the duplicate notice after loading.
 
-Rather than run three separate passes, we bake all three into the single number stamped
-on each pipe, built like a multi-digit number with separate columns. Points go in the
-"millions" column, slot count in the "thousands," fairness in the "ones." Because one
-unit in the millions column always outweighs anything happening in the ones column, the
-water naturally chases points first, breaks ties by filling more slots, and only then
-leans on fairness — all in one solve.
+## Set the event rules
 
-The web version adds one optional nicety inside the fairness column: when it costs
-nothing at the points and fill levels, it nudges players toward specific times they
-requested in the form comments. It never overrides submitted availability, which always
-stays a hard rule.
+Open Options when the default appointment rules do not match your event.
 
----
+### Cap and appointment length
 
-## Counting shared speedups only once
+The default allows one appointment per buff day, three total. Reduce the event cap to two or one when needed. Appointment lengths are 30, 20, 15 or 60 minutes.
 
-A player's *general* speedups help whichever appointment they land in, but they
-shouldn't be counted three times if that player gets three appointments. So in the
-model each player actually has two side-by-side feed pipes from the tap: a first one,
-one drop wide, that carries the general-speedup bonus, and a second, wider one that
-carries zero bonus. However the water splits after that, the bonus rides along on
-exactly the first appointment and never repeats. Simple plumbing, exact accounting.
+### UTC schedule window
 
----
+Set Schedule day runs from and …until (UTC). Defaults cover 00:00 to 24:00. Every whole appointment must fit both this window and the player’s availability.
 
-## Why the answer is provably the best, not just good
+### Names and time wishes
 
-Two things make this an exact optimizer rather than a clever guess.
+The names checkbox affects day sheets and Summary, but does not anonymize Scheduler notes. The wishes option recognizes comment time ranges within tied results. It cannot override availability or reduce points or appointment count.
 
-First, the algorithm never commits blindly. Every pipe has a hidden reverse pipe, so
-when routing a new drop reveals that an earlier choice was a mistake, water can flow
-backward and re-route. That backtracking is exactly what separates it from the naive
-"sort by points" approach — it can discover the whale-swap on its own. It keeps grabbing
-the single most profitable route still open, undoing earlier choices as needed, until no
-profitable route remains.
+Changing an option after selecting a file recalculates that same file. Download again after making the final change.
 
-Second, networks shaped like this come with a mathematical guarantee: the best possible
-flow always lands on whole drops. You never end up with "half a player" in a slot that
-you'd have to round off and lose the optimum. So the best water routing is exactly the
-best real schedule.
+## Choose the response file
 
----
+Selecting a file starts scheduling automatically.
 
-## Under the hood (for engineers)
+### Choose the current export
 
-The intuition above is faithful to the implementation. Here is the precise model, as
-built in `solve_global_schedule_network` in `SortingAlgorithm_v3.py` (Python) and
-`solveSchedule` in the web app.
+Select Choose file… and pick the current response export, or drag the file into the drop area. Keep the original export available if you need to correct an answer and run it again.
 
-### The graph
+### Wait for the result
 
-A directed graph with a single source and sink:
+The tool reads the file and creates the schedule. There is no separate Generate button. Continue when the Done status and result cards appear.
 
-- `SOURCE → player`, as two parallel arcs. The first has capacity 1 and profit
-  `general_points × SCALE` — this is the "first appointment unlocks the general pool"
-  bonus. The second has capacity `max_total − 1` and profit 0. Together they cap the
-  player at `max_total` appointments while crediting general speedups exactly once.
-- `player → (player, day)`. Days on which the player has zero base points but nonzero
-  general points are routed through a per-player capacity-1 "zero-collector," which
-  enforces at most one general-only appointment.
-- `(player, day) → (day, slot)`, one arc per slot the player is available for, carrying
-  the appointment's profit.
-- `(day, slot) → SINK`, capacity 1, which enforces one player per slot.
+### If a required column cannot be found
 
-Because availability is expressed as *which arcs exist*, every hard constraint
-(availability, selected days, one-per-slot, per-player cap) is structural — no side
-constraints needed.
+Read the message identifying the missing field. Correct the corresponding survey header or export, then choose the corrected file. Renaming an unrelated field to pass the check would give the scheduler the wrong data.
 
-### Lexicographic objective via integer weights
+The browser processes the selected file locally. An internet connection is needed initially to load the page and its spreadsheet library.
 
-Let `S` be the total number of slots across all days and `maxOrder` the largest sign-up
-index. Priorities are layered so a higher layer dominates any possible swing in a lower
-one:
+## Read the result before exporting
 
-```
-tie(p, day, slot) = scarcity(p, day) * 10_000 + (maxOrder − order(p))
-TIE_BOUND         = 47 * 10_000 + maxOrder + 1        # > any single tie value
-FILL              = S * TIE_BOUND + 1                 # one fill > all ties combined
-SCALE             = S * (FILL + TIE_BOUND) + 1        # one point > all fills + ties
-```
+The four cards describe different parts of the calculation.
 
-The profit on a candidate arc `(p, day, slot)` is
-`base_points[p, day] × SCALE + FILL + tie(p, day, slot)`, and the source arc adds
-`general_points[p] × SCALE`. Maximizing total profit therefore maximizes points first,
-then filled slots, then the scarcity/order tiebreak — in a single solve. These weights
-grow large, so the implementation uses arbitrary-precision integers (Python `int`,
-JavaScript `BigInt`) to keep every layer exact.
+### Players placed is not appointments made
 
-### Solver and optimality
+One player can receive appointments on several requested days. In this example, six players receive twelve appointments. The event cap limits the total for each player; it does not promise an appointment to everyone.
 
-Profits are negated into costs and solved as a minimum-cost flow using
-successive-shortest-path augmentation (SPFA/Bellman-Ford, since costs are negative). The
-graph is a DAG and augmentation stops when no profit-positive path remains, yielding the
-maximum-profit flow.
+### Responses read can include duplicates
 
-Optimality is guaranteed by total unimodularity: the node-arc incidence matrix of a flow
-network is totally unimodular, so with integer capacities the min-cost-flow linear
-program has an integral optimal vertex. The flow optimum therefore equals the integer
-(ILP) optimum exactly — no rounding, no approximation. If OR-Tools is installed the
-CP-SAT solver can be used instead (`--solver cpsat`); it reaches the same optimum by a
-different route.
+Nine source responses become eight unique players because one ID appears twice. Compare the response count with the export and read any duplicate notice before accepting the result.
 
----
+### Points are an estimate
 
-## How this was verified
+The score uses the recognized resource amounts and the implemented points model. It assumes those resources are used. The schedule maximizes that model within the configured rules; it does not guarantee the eventual game score.
 
-The built-in solver was checked against exhaustive brute-force enumeration on 400
-randomized instances — including locked template slots and per-player caps — and matched
-the true lexicographic optimum on all three layers (points, then fills, then tiebreak)
-in every case. The web app's JavaScript engine passed the same brute-force check on 150
-instances and, on the real survey export, produced byte-identical column mapping,
-identical per-player records, and the identical optimum as the Python pipeline. Every
-generated workbook is re-opened and each assignment re-verified before a run reports
-success.
+A successful calculation can still contain entries that need your attention. Continue to the messages and day tabs before downloading.
 
----
+## Review attention messages and comments
 
-## Where to look in the code
+Resolve the input issues that matter before sharing a schedule.
 
-- `SortingAlgorithm_v3.py` — `build_input_mapping` (reads the form), `build_player_records`
-  (parses availability, speedups, crystals, dedupes submissions),
-  `solve_global_schedule_network` and `_MinCostFlow` (the solver described here), and the
-  output writer and verifier.
-- `Whiteout Buff Scheduler.html` — the same pipeline ported to run in a browser, with the
-  solver in `solveSchedule`. The core logic sits between the `CORE-BEGIN` and `CORE-END`
-  markers and is deliberately kept free of any page code so it can be tested in isolation.
+### Read the reason, then check the source
+
+An unplaced player may have no selected day, no usable resources, no full slot inside the window, or stronger competing requests. A short availability range can produce no valid slot even though the player supplied a time. Correct the source only when the answer is wrong, then load it again.
+
+### Keep the on page messages
+
+Read What people wrote in the comments separately from the attention warnings. Scheduler notes contains unplaced reasons and comments, but does not copy every warning. Review duplicate IDs and other on page issues before download. Retain any organizer follow up you still need to resolve.
+
+## Inspect each buff day
+
+Use the three tabs to review who is placed, when and on which day.
+
+### Use UTC and event dates
+
+Select all three day tabs in turn. Times are UTC. The displayed weekday is a label, not a calendar date. Use the agreed event dates when arranging appointments in the game.
+
+### Understand an open row
+
+Open means nobody was assigned to that slot. Empty slots are allowed. The tool cannot override availability, day selection or the appointment cap simply to fill a row.
+
+### Recalculate rule changes
+
+Update Options if the event window or cap changes, then review the new result. A manual workbook swap is not checked by the browser solver and can break the original constraints.
+
+## Download and share the right sheets
+
+Export only after the result and attention messages have been reviewed.
+
+### Open the downloaded workbook
+
+Select Download the schedule (.xlsx). Open the workbook in Excel or Google Sheets. Check that the three day sheets, Summary and Scheduler notes are present and that you are using the version downloaded after your final options change.
+
+### Use each sheet for its purpose
+
+The day sheets contain UTC slots, player IDs, alliances and optional names. Summary lists each player's assignments and estimated points. Scheduler notes holds unplaced reasons and the original comments for organizer review.
+
+### Review the notes before sharing
+
+The names checkbox does not remove names or comments from Scheduler notes. Free text may contain personal information. Share the appropriate day sheets with players and keep organizer notes restricted to the people who need them.
+
+### Arrange the appointments separately
+
+The workbook is a schedule to use in the game. Downloading it does not create or change any in game appointment. If you edit the workbook manually, review the affected availability and appointment limits yourself.
+
+## Resolve common input problems
+
+Use the reported issue to correct the file or the event settings.
+
+### A required column is missing
+
+Keep recognizable headers for Player ID, all three resource fields and shared or day specific availability. Check that the file is the response export rather than a previously generated schedule.
+
+### A player has no valid appointment
+
+Check selected buffs, usable resources, the full appointment length and the UTC window. An aligned single start or a clear time range can be recognized. A ten minute window cannot hold a thirty minute appointment.
+
+### A resource total looks wrong
+
+Use explicit units such as 12h or a header that says hours. Avoid ranges and mixed answers. Blank or unreadable values become zero. A resource field labeled points is interpreted as points rather than a duration.
+
+### A player appears twice
+
+The tool keeps one entry per normalized ID. It prefers a recognized completion time and retains the latest one. When timestamps tie or both are unavailable, the later source row wins. Confirm that the retained answers are the intended ones.
+
+### The spreadsheet library did not load
+
+Reload the page with an internet connection so its external spreadsheet library can load, then choose the file again. Keep the source export available because reloading clears the selected file.
+
+### A comment was not honored
+
+Time wishes are preferences within tied objectives. They do not override submitted availability, day selection, the event cap or higher priority scoring. General prose in a comment may not be recognized as a time preference.
+
+Reference edition: public source reviewed on 26 October 2026, commit 457e36e1fd5633fde36bb1ab7a529c73b91abaf8. The walkthrough covers the browser route. The repository README documents the separate Python route.
+
+## Read the input format examples
+
+Use these synthetic examples to make survey answers clear.
+
+### Keep durations and points separate
+
+A header that identifies points uses the amount as a final score. A speedups field uses a duration. In the implemented model, each speedup minute contributes 30 points; shared general speedups count once for a player across the event.
+
+### A whole slot must fit
+
+With 30 minute appointments, 08:00 to 08:30 can contain one slot. A range from 08:00 to 08:10 cannot. The configured schedule window can narrow the set further. Comments do not create new availability.
+
+| Field | Clear example | Meaning |
+| --- | --- | --- |
+| Player ID | 900000001 | Synthetic identifier |
+| Construction speedups (hours) | 12 | Twelve hours |
+| Selected buffs | Construction; Research | Requested days |
+| General availability | 08:00 to 10:00 | UTC time window |
+
+Input examples accompany the nine page walkthrough. They are reference material, not additional operating steps.
+
+<a id="the-intuition-a-network-of-pipes"></a>
+<a id="ranking-competing-goals-the-place-value-trick"></a>
+<a id="counting-shared-speedups-only-once"></a>
+<a id="why-the-answer-is-provably-the-best-not-just-good"></a>
+<a id="under-the-hood-for-engineers"></a>
+<a id="the-graph"></a>
+<a id="lexicographic-objective-via-integer-weights"></a>
+<a id="solver-and-optimality"></a>
+
+## The model behind the result
+
+The implementation represents appointments as flow through a network. A route passes through a player, a selected day and an available slot. Capacity limits control how many appointments can pass through each part. Missing connections rule out unavailable times. The minimum cost flow solver uses reverse connections to revise earlier choices as it finds a better arrangement. Integer capacities keep assignments whole, so the result does not depend on rounding a fraction of an appointment.
+Integer weights preserve the priority order: maximize estimated points, then fill more slots, then apply the tie rules. The lower layer considers limited availability and signup order; the browser can also consider time requests in comments when that option is enabled. None of those preferences overrides availability or the first two objectives. Python integers and JavaScript BigInt retain the large weights exactly. A separate capacity limited connection credits each player's general speedup pool once across the event, rather than adding the same shared resources to every appointment.
+
+[See the complete design explanation](https://christianjoudon.github.io/whiteout-buff-scheduler/#how)
+
+<a id="how-this-was-verified"></a>
+
+## Verification and limits
+
+### Demonstrated
+
+The synthetic walkthrough used nine responses representing eight unique players. The browser placed six players in twelve appointments and displayed 209k estimated points. Those figures describe this example. They do not measure community adoption, time saved, real event scores or improvement over a previous schedule.
+
+### Previously reported
+
+The repository documentation reports comparisons with exhaustive enumeration on 400 Python cases and 150 JavaScript cases. Those are historical verification claims, not tests rerun for this publication. The reviewed public snapshot does not include the test files needed to reproduce those counts directly.
+
+### Still limited
+
+The optimum applies to the parsed records, configured constraints and implemented point model. It cannot establish what a player will actually spend or whether an appointment will be kept. Unclear survey answers still need organizer judgment, and current game scoring rules need to agree with the constants used by the tool.
+
+<a id="where-to-look-in-the-code"></a>
+
+## Implementation references
+
+The browser implementation is in [Whiteout Buff Scheduler.html](Whiteout%20Buff%20Scheduler.html). The Python pipeline and workbook verifier are in [SortingAlgorithm_v3.py](SortingAlgorithm_v3.py). Installation and command line examples remain in [README.md](README.md).

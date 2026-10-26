@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Whiteout Buff Scheduler — SvS boost appointment optimizer</title>
-<meta name="description" content="A free, browser-based optimizer for Whiteout Survival SvS buff days. Drop in your Microsoft Forms sign-ups and get a provably optimal Construction / Research / Troop Training schedule that maximizes prep points. Runs entirely on your computer — nothing is uploaded.">
+<title>Whiteout Buff Scheduler | Project case study</title>
+<meta name="description" content="How Christian Joudon built a survey intake, constrained optimization and review workflow for Whiteout Survival buff appointments.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -140,110 +140,49 @@ footer.site a{font-weight:700}
 .links{display:flex;gap:18px;flex-wrap:wrap;margin:0 0 14px}
 </style>
 </head>
-<body>
-<div class="wrap">
 
-  <header class="site">
-    <div class="brand"><span class="flake">❄</span> Whiteout Buff Scheduler</div>
-    <div class="tagline">SvS ministry appointment optimizer — Construction · Research · Troop Training</div>
-  </header>
-  <div class="aurora-rule" aria-hidden="true"></div>
-
-  <div class="hero">
-    <h1>Turn a pile of sign-ups into the highest-scoring buff schedule — automatically.</h1>
-    <p class="lede">Every SvS cycle your state runs three buff days and everyone wants a slot. Drop in the
-      responses your members submit through Microsoft Forms and this tool builds the arrangement that earns
-      the <b>most total prep points</b> — while never placing anyone outside a time they said they were free.</p>
-    <p class="sub">Free, no sign-up, no installs. The page runs entirely in your browser — the survey file
-      never leaves your computer.</p>
-    <div class="cta">
-      <a class="btn big" href="./Whiteout%20Buff%20Scheduler.html">Launch the scheduler →</a>
-      <a class="btn ghost" href="#how">See how it works</a>
-    </div>
-  </div>
-
-  <ol class="steps" aria-label="How to use it">
-    <li><span class="n">1</span><div><b>Collect sign-ups</b><span>Members fill your Microsoft Forms survey: which buff days, when they're free, what speedups &amp; crystals they'll bring.</span></div></li>
-    <li><span class="n">2</span><div><b>Drop in the export</b><span>Download the Forms responses spreadsheet and drag it onto the scheduler. Everything is parsed locally.</span></div></li>
-    <li><span class="n">3</span><div><b>Download the schedule</b><span>Get an .xlsx with one sheet per buff day, a summary, and a notes page flagging anything to check by hand.</span></div></li>
-  </ol>
-
-  <section class="block" id="how">
-    <h2><span class="flake">❄</span> How it decides — in one line</h2>
-    <div class="oneliner">
-      It's a plumbing puzzle. One drop of water equals one booked appointment, the shape of the pipes
-      encodes all the rules, the value stamped on each pipe encodes our priorities, and the water
-      automatically finds the <b>highest-scoring way through</b>.
-    </div>
-    <p class="body">The tempting approach — hand the best slot to the biggest spender, then the next, and so
-      on — looks reasonable but gets stuck. If two whales are both only free at 08:00, giving it to the
-      slightly bigger one leaves the other scoring nothing, when a smarter swap would have scored both.
-      Simple sorting can't see trades like that. So the whole board is modeled as one flow network:</p>
-
-    <pre class="diagram" aria-label="Diagram of the flow network"><span class="pipe">                     pipe carries the
-                     appointment's points
-                            │</span>
-   ┌─────┐   ┌──────────────▼──────────┐   ┌───────────┐   ┌───────┐
-   │ TAP │──►│         PLAYER          │──►│ TIME SLOT │──►│ DRAIN │
-   └─────┘   │   (at most 3 drops)     │   │ (1 drop)  │   └───────┘
-             └─────────────────────────┘   └───────────┘
-
-        one drop that reaches the drain  =  one booked appointment</pre>
-    <p class="caption muted">Pipes only exist between a player and the slots they actually said they're free
-      for — so an illegal appointment isn't penalized, it's simply impossible. Availability, chosen days,
-      one-player-per-slot, and the per-player cap are all built into the plumbing.</p>
-  </section>
-
-  <section class="block">
-    <h2>Three goals, in strict priority order</h2>
-    <div class="goals">
-      <div class="goal"><div class="rank">Priority 1</div><b>Most total points</b><span>Speedups score 30 pts/minute; Fire Crystals 2,000; Refined 30,000; Shards 1,000. A player's shared general speedups are counted once across the whole event.</span></div>
-      <div class="goal"><div class="rank">Priority 2</div><b>Fill the most slots</b><span>Among arrangements that tie on points, prefer the one that seats more people.</span></div>
-      <div class="goal"><div class="rank">Priority 3</div><b>Be fair</b><span>Favor players with barely any free time, and among equals, whoever signed up earlier. The web app can also honor specific times people request in the comments — when it costs nothing.</span></div>
-    </div>
-    <p class="body muted" style="margin-top:14px">All three are baked into a single number stamped on each
-      pipe — like place-value columns in one multi-digit total — so the optimizer settles points first,
-      then fills, then fairness, in one solve.</p>
-  </section>
-
-  <section class="block">
-    <h2>Why it's provably the best, not just good</h2>
-    <p class="body">Every pipe has a hidden reverse pipe, so when a new drop reveals an earlier choice was a
-      mistake, water re-routes backward — that backtracking is exactly what lets it discover the whale-swap
-      on its own. And networks shaped like this carry a mathematical guarantee (total unimodularity): the
-      best possible flow always lands on whole drops, never "half a player" in a slot. So the best water
-      routing <em>is</em> the best real schedule — an exact optimum, not an approximation.</p>
-    <div class="callout">
-      <b>Verified.</b> The solver was checked against exhaustive brute-force enumeration on 400 randomized
-      instances and matched the true optimum every time. On a real state's July sign-ups, the in-browser
-      engine and the Python pipeline produced identical column mapping, identical per-player records, and
-      the identical optimum. Every generated workbook is re-opened and each assignment re-checked before a
-      run reports success.
-    </div>
-  </section>
-
-  <section class="block">
-    <h2>Two ways to run it</h2>
-    <div class="goals">
-      <div class="goal"><div class="rank">Easiest</div><b>In your browser</b><span>Launch the scheduler above (or download the single HTML file and double-click it). No Python, no terminal, nothing to install. Ideal for whoever runs your ministry.</span></div>
-      <div class="goal"><div class="rank">Power user</div><b>Python pipeline</b><span>SortingAlgorithm_v3.py runs the same exact solver from the command line, can fill an existing shared workbook in place, and exposes every option. See the README.</span></div>
-    </div>
-    <div class="cta" style="margin-top:18px">
-      <a class="btn" href="./Whiteout%20Buff%20Scheduler.html">Launch the scheduler →</a>
-    </div>
-  </section>
-
-  <footer class="site">
-    <p><b>Privacy.</b> Everything runs on your computer — the survey file is never uploaded. The downloaded
-      schedule contains time, Player ID, alliance, and (optionally) in-game name — never emails.</p>
-    <div class="links">
-      <a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler">Source on GitHub</a>
-      <a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler/blob/main/ALGORITHM.md">Full explainer</a>
-      <a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler/blob/main/README.md">Readme &amp; setup</a>
-    </div>
-    <p class="muted">Community tool for Whiteout Survival players. Not affiliated with or endorsed by the game's developers.</p>
-  </footer>
-
+<body><div class="wrap"><header class="site"><div class="brand"><span class="flake">❄</span> Whiteout Buff Scheduler</div><div class="tagline">SvS ministry appointments · Construction · Research · Troop Training</div></header><div class="aurora-rule" aria-hidden="true"></div>
+<div class="hero"><h1>Turn community signups into a clear, reviewable schedule.</h1><p class="lede">A community tool connecting survey intake, exact scheduling and an Excel workbook organizers can review.</p><p class="sub">Designed and developed by Christian Joudon. This case study explains the problem, the engineering choices and the evidence behind the result.</p><div class="cta"><a class="btn big" href="./Whiteout%20Buff%20Scheduler.html">Launch the scheduler</a><a class="btn ghost" href="./walkthrough.html">Read the illustrated walkthrough</a><a class="btn ghost" href="#how">How the optimizer works</a></div></div>
+<ol class="steps" aria-label="Project overview"><li><span class="n">1</span><div><b>Prepare the input</b><span>Translate survey answers into usable player records.</span></div></li><li><span class="n">2</span><div><b>Respect the constraints</b><span>Keep assignments inside selected days, availability and appointment limits.</span></div></li><li><span class="n">3</span><div><b>Make the result reviewable</b><span>Show the schedule, attention messages and an Excel export.</span></div></li></ol>
+<section class="block" id="context">
+<h2>A community schedule needs more than a ranked list.</h2><div class="oneliner">The task combines player availability, shared resources and limited appointments across three event days.</div>
+<p class="body">Whiteout Survival communities arrange appointments for Construction, Research and Troop Training during an SvS preparation event. Players submit their available times, chosen days and resources through Microsoft Forms. An organizer then needs a schedule that uses those resources well without booking anyone outside their availability. A promising total is only useful if the resulting appointments can actually be kept.</p>
+<p class="body">I developed the scheduler, its browser interface, the Python workflow and the explanation of how its decisions work. The project connects data preparation, mathematical optimization and practical output for community organizers. I wanted someone to start with the survey they already collect, understand what the tool produced and see which answers still need attention. This case study follows those connections from an incoming response to a schedule someone can review.</p>
+<figure style="margin:22px 0"><div style="position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);aspect-ratio:3.3315043824476986"><img src="assets/03-results.jpg" alt="Actual browser output using synthetic responses. The rounded display shows 209k estimated points; the downloaded summary totals 208,800." loading="lazy" style="position:absolute;max-width:none;width:125.0%;left:-12.5%;top:-220.93023255813952%;height:auto"></div><figcaption class="caption" style="margin-top:10px">Actual browser output using synthetic responses. The rounded display shows 209k estimated points; the downloaded summary totals 208,800.</figcaption></figure>
+</section>
+<section class="block" id="input">
+<h2>Reliable assignments begin with readable input.</h2><div class="oneliner">The scheduler translates varied survey answers into consistent player records before it assigns a time.</div>
+<p class="body">A survey workbook is not a clean scheduling model. Column headings vary, resources arrive as numbers or written durations, and a player may submit more than once. The intake stage locates the relevant sheet and columns, recognizes Player IDs and builds one retained record per player. Completion timestamps guide duplicate handling when they are available, including timestamps stored as Excel serial values. Missing or unreadable availability does not become permission to schedule someone.</p>
+<p class="body">Resource parsing recognizes days, hours and minutes, then converts supported inputs into estimated points. Explicit units matter because a bare number defaults to days unless its header identifies another unit. Ambiguous amounts need clarification before use. Availability becomes a set of eligible appointment starts, with the full appointment required to fit inside the stated window. Selected days, resource values and comments remain distinct. This separation lets the organizer review an unusual answer without confusing a preference with a hard availability rule.</p>
+<div class="facts" aria-label="Processing stages"><div class="fact"><div class="num">Survey</div><div class="lbl">Read responses</div></div><div class="fact"><div class="num">Records</div><div class="lbl">Normalize players</div></div><div class="fact"><div class="num">Slots</div><div class="lbl">Apply constraints</div></div><div class="fact"><div class="num">Schedule</div><div class="lbl">Optimize and review</div></div></div>
+</section>
+<section class="block" id="constraints">
+<h2>A flexible player can protect a scarce appointment.</h2><div class="oneliner">Choosing the largest contribution first can prevent a better arrangement for the whole event.</div>
+<div class="goals">
+<div class="goal"><div class="rank">The rules</div><span>An appointment must fall on a selected day and within submitted availability. A slot holds at most one player. A player can receive at most one appointment on a day, with an additional limit across the event. These are constraints, not preferences the optimizer may trade away for more points.</span></div>
+<div class="goal"><div class="rank">A small example</div><span>Player A can attend at 08:00 or 08:30. Player B can attend only at 08:00. If A has the larger contribution, a simple ranking might give A the first slot and leave B out. Putting B at 08:00 and A at 08:30 includes both. The important information is how their options overlap, not just which player brings more.</span></div>
+<div class="goal"><div class="rank">The design decision</div><span>I model the connected problem across all three days. The solver can reconsider an earlier assignment when another arrangement improves the result. That ability to revise a choice is what the simple ranked approach lacks.</span></div>
 </div>
-</body>
-</html>
+</section>
+<section class="block" id="how">
+<span id="algorithm"></span>
+<h2>The objective order is built into the solver.</h2><div class="oneliner">Estimated points come first, filled appointments second and preference rules only after those priorities.</div>
+<p class="body">The implementation represents appointments as flow through a network. A route passes through a player, a selected day and an available slot. Capacity limits control how many appointments can pass through each part. Missing connections rule out unavailable times. The minimum cost flow solver uses reverse connections to revise earlier choices as it finds a better arrangement. Integer capacities keep assignments whole, so the result does not depend on rounding a fraction of an appointment.</p>
+<p class="body">Integer weights preserve the priority order: maximize estimated points, then fill more slots, then apply the tie rules. The lower layer considers limited availability and signup order; the browser can also consider time requests in comments when that option is enabled. None of those preferences overrides availability or the first two objectives. Python integers and JavaScript BigInt retain the large weights exactly. A separate capacity limited connection credits each player&#x27;s general speedup pool once across the event, rather than adding the same shared resources to every appointment.</p>
+</section>
+<section class="block" id="output">
+<h2>Two routes make the result available for review.</h2><div class="oneliner">The browser serves a straightforward file workflow, while Python supports inspection and existing schedule templates.</div>
+<p class="body">In the browser, an organizer loads the Forms export, reviews the results and notes, then downloads an Excel workbook. Before displaying results, the solver checks assignments against the hard rules. The download separates the three buff days, summarizes each player&#x27;s appointments and includes Scheduler notes for unplaced players and comments. Spreadsheet data is processed locally, although the initial page load needs network access for its external libraries and fonts. Turning off player names does not anonymize Scheduler notes, so that sheet still needs review before sharing.</p>
+<p class="body">The Python route supports command line inspection and can fill an existing schedule template while preserving locked entries. Its output verifier reopens the written workbook and checks the assignments. The browser does not perform that same reopening step after download. Keeping the routes explicit makes the documentation more useful: organizers can choose a workflow, understand its checks and review the actual output without assuming both versions do everything identically.</p>
+<figure style="margin:22px 0"><div style="position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);aspect-ratio:4.775156281508368"><img src="assets/03-results.jpg" alt="Attention messages stay visible before download. Review these separately because not every warning is copied into Scheduler notes." loading="lazy" style="position:absolute;max-width:none;width:125.0%;left:-12.5%;top:-461.111111111111%;height:auto"></div><figcaption class="caption" style="margin-top:10px">Attention messages stay visible before download. Review these separately because not every warning is copied into Scheduler notes.</figcaption></figure>
+</section>
+<section class="block" id="evidence">
+<h2>Checks support the result and define its limits.</h2><div class="oneliner">Observed behavior and recorded verification reports provide different kinds of evidence.</div>
+<div class="goals">
+<div class="goal"><div class="rank">Demonstrated</div><span>The synthetic walkthrough used nine responses representing eight unique players. The browser placed six players in twelve appointments and displayed 209k estimated points. Those figures describe this example. They do not measure community adoption, time saved, real event scores or improvement over a previous schedule.</span></div>
+<div class="goal"><div class="rank">Previously reported</div><span>The repository documentation reports comparisons with exhaustive enumeration on 400 Python cases and 150 JavaScript cases. Those are historical verification claims, not tests rerun for this publication. The reviewed public snapshot does not include the test files needed to reproduce those counts directly.</span></div>
+<div class="goal"><div class="rank">Still limited</div><span>The optimum applies to the parsed records, configured constraints and implemented point model. It cannot establish what a player will actually spend or whether an appointment will be kept. Unclear survey answers still need organizer judgment, and current game scoring rules need to agree with the constants used by the tool.</span></div>
+</div>
+</section>
+<section class="block" id="documentation"><h2>Follow the workflow or inspect the source.</h2><div class="cta"><a class="btn" href="./walkthrough.html">Read the walkthrough</a><a class="btn ghost" href="./docs/Whiteout%20Buff%20Scheduler%20Case%20Study.pdf">Download the case study PDF</a><a class="btn ghost" href="./docs/Whiteout%20Buff%20Scheduler%20Walkthrough.pdf">Download the walkthrough PDF</a></div><p class="caption" style="margin-top:16px">Documentation edition: 26 October 2026. The illustrated example uses synthetic responses. Original project and explainer URLs remain available.</p></section>
+<footer class="site"><p>Survey data is processed locally. The initial page loads external libraries and fonts. Scheduler notes can retain names and original comments even when names are hidden elsewhere, so review that sheet before sharing.</p><div class="links"><a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler">Source on GitHub</a><a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler/blob/main/ALGORITHM.md">Walkthrough and explainer</a><a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler/blob/main/README.md">Readme and setup</a><a href="https://christianjoudon.github.io/">Christian Joudon’s portfolio</a></div><p class="muted">Community tool for Whiteout Survival players. Not affiliated with or endorsed by the game’s developers.</p></footer></div></body></html>

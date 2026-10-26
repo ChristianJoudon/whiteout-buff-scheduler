@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Whiteout Buff Scheduler | Illustrated walkthrough</title>
+<meta name="description" content="Prepare a survey export, set the event rules, review the schedule and download an Excel workbook.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#0a1420; --panel:#101f30; --panel-2:#152a40; --line:#23405c;
+  --ice:#e7f2fa; --steel:#8aa3b8; --ember:#f59a48; --ember-hot:#ffb56b;
+  --aurora:#63e2b7; --danger:#ff8896; --shadow:0 18px 44px rgba(2,8,16,.5);
+  --r:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1200px 500px at 78% -140px, rgba(99,226,183,.10), transparent 60%),
+    radial-gradient(900px 420px at 12% -160px, rgba(90,140,220,.14), transparent 60%),
+    var(--night);
+  color:var(--ice);
+  font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:17px; line-height:1.6;
+  min-height:100vh;
+}
+.wrap{max-width:980px;margin:0 auto;padding:28px 20px 80px}
+a{color:var(--ember-hot);text-decoration:none}
+a:hover{text-decoration:underline}
+
+header.site{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.brand{
+  font-family:"Bricolage Grotesque",system-ui,sans-serif;
+  font-weight:800;font-size:clamp(26px,4.4vw,40px);letter-spacing:.2px;line-height:1.08;
+}
+.brand .flake{color:var(--ember)}
+.tagline{color:var(--steel);font-size:15px}
+.aurora-rule{
+  height:3px;border-radius:3px;margin:14px 0 26px;
+  background:linear-gradient(90deg,#3d6ea8, var(--aurora) 34%, var(--ember) 78%, #3d6ea8);
+  background-size:220% 100%;
+}
+@media (prefers-reduced-motion: no-preference){
+  .aurora-rule{animation:aurora 14s linear infinite}
+  @keyframes aurora{0%{background-position:0% 0}100%{background-position:220% 0}}
+}
+
+.hero{
+  background:linear-gradient(180deg, rgba(21,42,64,.75), rgba(16,31,48,.9));
+  border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);
+  padding:30px 26px;margin-bottom:26px;
+}
+.hero h1{
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:800;
+  font-size:clamp(24px,4vw,34px);line-height:1.12;margin:0 0 10px;
+}
+.hero .lede{color:var(--ice);font-size:clamp(16px,2.4vw,19px);max-width:66ch;margin:0 0 8px}
+.hero .sub{color:var(--steel);font-size:15.5px;max-width:66ch;margin:8px 0 22px}
+.cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.btn{
+  display:inline-block;border:0;border-radius:12px;cursor:pointer;
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:16.5px;
+  padding:12px 22px;color:#1c1206;background:linear-gradient(180deg,var(--ember-hot),var(--ember));
+  box-shadow:0 6px 18px rgba(245,154,72,.28);
+}
+.btn:hover{filter:brightness(1.06);text-decoration:none}
+.btn:focus-visible{outline:3px solid rgba(255,181,107,.6);outline-offset:2px}
+.btn.big{font-size:18px;padding:14px 28px}
+.ghost{
+  background:transparent;color:var(--ice);border:1px solid var(--line);box-shadow:none;
+  font-weight:700;
+}
+.ghost:hover{border-color:var(--aurora);filter:none}
+
+.steps{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 26px;padding:0;list-style:none}
+.steps li{
+  flex:1 1 240px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  padding:14px 16px;display:flex;gap:12px;align-items:flex-start;
+}
+.steps .n{
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:800;color:var(--ember);
+  font-size:22px;line-height:1;padding-top:2px;
+}
+.steps b{display:block;font-size:15.5px}
+.steps span{color:var(--steel);font-size:14px}
+
+section.block{margin:0 0 30px}
+h2{
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:700;
+  font-size:clamp(20px,3vw,26px);margin:0 0 12px;
+}
+h2 .flake{color:var(--ember)}
+p.body{max-width:70ch;margin:0 0 14px}
+.muted{color:var(--steel)}
+
+.oneliner{
+  border-left:3px solid var(--ember);background:var(--panel);border-radius:0 var(--r) var(--r) 0;
+  padding:16px 20px;margin:0 0 22px;font-size:clamp(17px,2.6vw,20px);
+}
+.oneliner b{color:var(--aurora)}
+
+pre.diagram{
+  font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  font-size:13px;line-height:1.5;color:var(--ice);
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  padding:18px 16px;overflow-x:auto;margin:0 0 8px;
+}
+.diagram .pipe{color:var(--ember)}
+.caption{color:var(--steel);font-size:14px;margin:0 0 22px}
+
+.goals{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:0 0 8px}
+.goal{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.goal .rank{
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:13px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ember);margin-bottom:6px;
+}
+.goal b{display:block;font-size:16.5px;margin-bottom:4px}
+.goal span{color:var(--steel);font-size:14.5px}
+
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin:6px 0 8px}
+.fact{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 16px;text-align:center}
+.fact .num{
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:800;color:var(--aurora);
+  font-size:clamp(22px,3.4vw,28px);line-height:1.05;
+}
+.fact .lbl{color:var(--steel);font-size:13.5px;margin-top:6px}
+
+.callout{
+  background:rgba(99,226,183,.06);border:1px solid rgba(99,226,183,.35);
+  border-radius:var(--r);padding:16px 18px;margin:0 0 8px;
+}
+.callout b{color:var(--aurora)}
+
+footer.site{border-top:1px solid var(--line);margin-top:34px;padding-top:22px;color:var(--steel);font-size:14.5px}
+footer.site p{max-width:74ch;margin:0 0 12px}
+footer.site a{font-weight:700}
+.links{display:flex;gap:18px;flex-wrap:wrap;margin:0 0 14px}
+</style>
+</head>
+
+<body><div class="wrap"><header class="site"><div class="brand"><span class="flake">❄</span> Whiteout Buff Scheduler</div><div class="tagline">SvS ministry appointments · Construction · Research · Troop Training</div></header><div class="aurora-rule" aria-hidden="true"></div>
+<div class="hero"><h1>Create and review a buff schedule.</h1><p class="lede">An illustrated walkthrough for alliance organizers preparing Construction, Research and Troop Training appointments.</p><p class="sub">Follow the operating sequence, then use the input reference when an answer needs clarification. All screenshots use synthetic players.</p><div class="cta"><a class="btn big" href="./Whiteout%20Buff%20Scheduler.html">Launch the scheduler</a><a class="btn ghost" href="./index.html">Read the project case study</a><a class="btn ghost" href="./docs/Whiteout%20Buff%20Scheduler%20Walkthrough.pdf">Download the PDF</a></div></div>
+<nav class="block" aria-label="Walkthrough contents"><h2>Find a step.</h2><div class="links">
+<a href="#overview">1. Turn survey responses into a schedule</a>
+<a href="#prepare">2. Prepare clear survey answers</a>
+<a href="#options">3. Set the event rules</a>
+<a href="#load">4. Choose the response file</a>
+<a href="#result">5. Read the result before exporting</a>
+<a href="#attention">6. Review attention messages and comments</a>
+<a href="#days">7. Inspect each buff day</a>
+<a href="#download">8. Download and share the right sheets</a>
+<a href="#reference">9. Resolve common input problems</a>
+<a href="#input-examples">10. Read the input format examples</a>
+</div></nav>
+<section class="block" id="overview"><h2>Turn survey responses into a schedule</h2><div class="oneliner">Use the browser tool to prepare appointments, review exceptions and download an Excel workbook.</div>
+<p class="body">Open the project website and select Launch the scheduler. Start with the response file exported from Microsoft Forms, then follow the sequence below. The tool reads the answers and shows a schedule for review. You arrange the appointments in the game separately.</p>
+<ol><li><a href="#prepare">Prepare clear survey answers</a></li><li><a href="#options">Set the event rules</a></li><li><a href="#load">Choose the response file</a></li><li><a href="#result">Read the result</a></li><li><a href="#attention">Review attention messages and comments</a></li><li><a href="#days">Inspect each buff day</a></li><li><a href="#download">Download and share the right sheets</a></li><li><a href="#reference">Resolve common input problems</a></li></ol>
+<div class="callout">Before you begin: have a current response export, an agreed appointment length and a confirmed schedule window in UTC. The examples use invented players and a window from 08:00 to 13:00 UTC. These are demonstration settings, not event defaults.</div>
+</section>
+<section class="block" id="prepare"><h2>Prepare clear survey answers</h2><div class="oneliner">Keep the question headers and make units, player identity and availability unambiguous.</div>
+<h3>Use a supported response file</h3><p class="body">Export the responses as .xlsx or .csv. The file chooser also accepts .xlsm. Keep the survey header row. The tool needs a recognizable Player ID field, one speedups field for each buff day, and either shared availability or availability for each day.</p>
+<h3>Write explicit units and UTC ranges</h3><p class="body">Use a value such as 12h, or put hours in the resource header. A bare number otherwise defaults to days unless the header identifies hours, minutes or points. Write availability such as 08:00 to 10:00 UTC. The tool does not convert local time zones.</p>
+<h3>Keep optional answers useful</h3><p class="body">Alliance, player name, completion time, selected buffs, general speedups, crystals and comments add context. If a selected buffs column is present, each player needs recognizable day choices. A blank choice is not treated as permission to schedule every day.</p>
+<h3>Resolve ambiguous resource answers</h3><p class="body">Use one clear amount instead of a range or a value such as 300/250. Missing or unreadable resource values become zero. The optimizer can only work with the values the parser recognizes.</p>
+<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:10px;border-bottom:1px solid var(--line)">Field</th><th style="text-align:left;padding:10px;border-bottom:1px solid var(--line)">Clear example</th><th style="text-align:left;padding:10px;border-bottom:1px solid var(--line)">Meaning</th></tr></thead><tbody><tr><td style="padding:10px;border-bottom:1px solid var(--line)">Player ID</td><td style="padding:10px;border-bottom:1px solid var(--line)">900000001</td><td style="padding:10px;border-bottom:1px solid var(--line)">Synthetic identifier</td></tr><tr><td style="padding:10px;border-bottom:1px solid var(--line)">Construction speedups (hours)</td><td style="padding:10px;border-bottom:1px solid var(--line)">12</td><td style="padding:10px;border-bottom:1px solid var(--line)">Twelve hours</td></tr><tr><td style="padding:10px;border-bottom:1px solid var(--line)">Selected buffs</td><td style="padding:10px;border-bottom:1px solid var(--line)">Construction; Research</td><td style="padding:10px;border-bottom:1px solid var(--line)">Requested days</td></tr><tr><td style="padding:10px;border-bottom:1px solid var(--line)">General availability</td><td style="padding:10px;border-bottom:1px solid var(--line)">08:00 to 10:00</td><td style="padding:10px;border-bottom:1px solid var(--line)">UTC time window</td></tr></tbody></table></div>
+<div class="callout">For duplicate IDs, a recognized completion time takes priority and the latest recognized time wins. When timestamps tie or both are unavailable, the later source row wins. Review the duplicate notice after loading.</div>
+</section>
+<section class="block" id="options"><h2>Set the event rules</h2><div class="oneliner">Open Options when the default appointment rules do not match your event.</div>
+<figure style="margin:22px 0"><div style="position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);aspect-ratio:4.191892370331034"><img src="assets/02-options.jpg" alt="Options in the actual browser tool. This synthetic example uses 30 minute appointments and an 08:00 to 13:00 UTC window." loading="lazy" style="position:absolute;max-width:none;width:125.0%;left:-12.5%;top:-252.3809523809524%;height:auto"></div><figcaption class="caption" style="margin-top:10px">Options in the actual browser tool. This synthetic example uses 30 minute appointments and an 08:00 to 13:00 UTC window.</figcaption></figure>
+<h3>Cap and appointment length</h3><p class="body">The default allows one appointment per buff day, three total. Reduce the event cap to two or one when needed. Appointment lengths are 30, 20, 15 or 60 minutes.</p>
+<h3>UTC schedule window</h3><p class="body">Set Schedule day runs from and …until (UTC). Defaults cover 00:00 to 24:00. Every whole appointment must fit both this window and the player’s availability.</p>
+<h3>Names and time wishes</h3><p class="body">The names checkbox affects day sheets and Summary, but does not anonymize Scheduler notes. The wishes option recognizes comment time ranges within tied results. It cannot override availability or reduce points or appointment count.</p>
+<div class="callout">Changing an option after selecting a file recalculates that same file. Download again after making the final change.</div>
+</section>
+<section class="block" id="load"><h2>Choose the response file</h2><div class="oneliner">Selecting a file starts scheduling automatically.</div>
+<figure style="margin:22px 0"><div style="position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);aspect-ratio:2.8071007320036747"><img src="assets/01-choose-file.jpg" alt="Choose file… opens the file picker. You can also drop the response file into this area." loading="lazy" style="position:absolute;max-width:none;width:125.0%;left:-12.5%;top:-65.85365853658537%;height:auto"></div><figcaption class="caption" style="margin-top:10px">Choose file… opens the file picker. You can also drop the response file into this area.</figcaption></figure>
+<h3>Choose the current export</h3><p class="body">Select Choose file… and pick the current response export, or drag the file into the drop area. Keep the original export available if you need to correct an answer and run it again.</p>
+<h3>Wait for the result</h3><p class="body">The tool reads the file and creates the schedule. There is no separate Generate button. Continue when the Done status and result cards appear.</p>
+<h3>If a required column cannot be found</h3><p class="body">Read the message identifying the missing field. Correct the corresponding survey header or export, then choose the corrected file. Renaming an unrelated field to pass the check would give the scheduler the wrong data.</p>
+<div class="callout">The browser processes the selected file locally. An internet connection is needed initially to load the page and its spreadsheet library.</div>
+</section>
+<section class="block" id="result"><h2>Read the result before exporting</h2><div class="oneliner">The four cards describe different parts of the calculation.</div>
+<figure style="margin:22px 0"><div style="position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);aspect-ratio:5.056047827479449"><img src="assets/03-results.jpg" alt="Synthetic result: 9 responses, 8 unique players, 6 players placed and 12 appointments. The points display rounds 208,800 to 209k." loading="lazy" style="position:absolute;max-width:none;width:125.0%;left:-12.5%;top:-335.29411764705867%;height:auto"></div><figcaption class="caption" style="margin-top:10px">Synthetic result: 9 responses, 8 unique players, 6 players placed and 12 appointments. The points display rounds 208,800 to 209k.</figcaption></figure>
+<h3>Players placed is not appointments made</h3><p class="body">One player can receive appointments on several requested days. In this example, six players receive twelve appointments. The event cap limits the total for each player; it does not promise an appointment to everyone.</p>
+<h3>Responses read can include duplicates</h3><p class="body">Nine source responses become eight unique players because one ID appears twice. Compare the response count with the export and read any duplicate notice before accepting the result.</p>
+<h3>Points are an estimate</h3><p class="body">The score uses the recognized resource amounts and the implemented points model. It assumes those resources are used. The schedule maximizes that model within the configured rules; it does not guarantee the eventual game score.</p>
+<div class="callout">A successful calculation can still contain entries that need your attention. Continue to the messages and day tabs before downloading.</div>
+</section>
+<section class="block" id="attention"><h2>Review attention messages and comments</h2><div class="oneliner">Resolve the input issues that matter before sharing a schedule.</div>
+<figure style="margin:22px 0"><div style="position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);aspect-ratio:4.775156281508368"><img src="assets/03-results.jpg" alt="Needs a quick look from you flags the duplicate response and two unplaced synthetic players." loading="lazy" style="position:absolute;max-width:none;width:125.0%;left:-12.5%;top:-461.111111111111%;height:auto"></div><figcaption class="caption" style="margin-top:10px">Needs a quick look from you flags the duplicate response and two unplaced synthetic players.</figcaption></figure>
+<figure style="margin:22px 0"><div style="position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);aspect-ratio:4.939816842939694"><img src="assets/03-results.jpg" alt="What people wrote in the comments preserves requests for organizer review. A comment is not confirmation that a request was fulfilled." loading="lazy" style="position:absolute;max-width:none;width:125.0%;left:-12.5%;top:-586.2068965517244%;height:auto"></div><figcaption class="caption" style="margin-top:10px">What people wrote in the comments preserves requests for organizer review. A comment is not confirmation that a request was fulfilled.</figcaption></figure>
+<h3>Read the reason, then check the source</h3><p class="body">An unplaced player may have no selected day, no usable resources, no full slot inside the window, or stronger competing requests. A short availability range can produce no valid slot even though the player supplied a time. Correct the source only when the answer is wrong, then load it again.</p>
+<h3>Keep the on page messages</h3><p class="body">Read What people wrote in the comments separately from the attention warnings. Scheduler notes contains unplaced reasons and comments, but does not copy every warning. Review duplicate IDs and other on page issues before download. Retain any organizer follow up you still need to resolve.</p>
+</section>
+<section class="block" id="days"><h2>Inspect each buff day</h2><div class="oneliner">Use the three tabs to review who is placed, when and on which day.</div>
+<figure style="margin:22px 0"><div style="position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);aspect-ratio:3.551769135006225"><img src="assets/03-results.jpg" alt="Construction Day in the synthetic example. Bravo receives 08:00 and Alpha receives 08:30. Empty rows are allowed." loading="lazy" style="position:absolute;max-width:none;width:125.0%;left:-12.5%;top:-515.702479338843%;height:auto"></div><figcaption class="caption" style="margin-top:10px">Construction Day in the synthetic example. Bravo receives 08:00 and Alpha receives 08:30. Empty rows are allowed.</figcaption></figure>
+<h3>Use UTC and event dates</h3><p class="body">Select all three day tabs in turn. Times are UTC. The displayed weekday is a label, not a calendar date. Use the agreed event dates when arranging appointments in the game.</p>
+<h3>Understand an open row</h3><p class="body">Open means nobody was assigned to that slot. Empty slots are allowed. The tool cannot override availability, day selection or the appointment cap simply to fill a row.</p>
+<h3>Recalculate rule changes</h3><p class="body">Update Options if the event window or cap changes, then review the new result. A manual workbook swap is not checked by the browser solver and can break the original constraints.</p>
+</section>
+<section class="block" id="download"><h2>Download and share the right sheets</h2><div class="oneliner">Export only after the result and attention messages have been reviewed.</div>
+<figure style="margin:22px 0"><div style="position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);aspect-ratio:10.232477746089367"><img src="assets/03-results.jpg" alt="Download the schedule (.xlsx) creates the current result as an Excel workbook." loading="lazy" style="position:absolute;max-width:none;width:125.0%;left:-12.5%;top:-885.7142857142861%;height:auto"></div><figcaption class="caption" style="margin-top:10px">Download the schedule (.xlsx) creates the current result as an Excel workbook.</figcaption></figure>
+<h3>Open the downloaded workbook</h3><p class="body">Select Download the schedule (.xlsx). Open the workbook in Excel or Google Sheets. Check that the three day sheets, Summary and Scheduler notes are present and that you are using the version downloaded after your final options change.</p>
+<h3>Use each sheet for its purpose</h3><p class="body">The day sheets contain UTC slots, player IDs, alliances and optional names. Summary lists each player&#x27;s assignments and estimated points. Scheduler notes holds unplaced reasons and the original comments for organizer review.</p>
+<h3>Review the notes before sharing</h3><p class="body">The names checkbox does not remove names or comments from Scheduler notes. Free text may contain personal information. Share the appropriate day sheets with players and keep organizer notes restricted to the people who need them.</p>
+<h3>Arrange the appointments separately</h3><p class="body">The workbook is a schedule to use in the game. Downloading it does not create or change any in game appointment. If you edit the workbook manually, review the affected availability and appointment limits yourself.</p>
+</section>
+<section class="block" id="reference"><h2>Resolve common input problems</h2><div class="oneliner">Use the reported issue to correct the file or the event settings.</div>
+<h3>A required column is missing</h3><p class="body">Keep recognizable headers for Player ID, all three resource fields and shared or day specific availability. Check that the file is the response export rather than a previously generated schedule.</p>
+<h3>A player has no valid appointment</h3><p class="body">Check selected buffs, usable resources, the full appointment length and the UTC window. An aligned single start or a clear time range can be recognized. A ten minute window cannot hold a thirty minute appointment.</p>
+<h3>A resource total looks wrong</h3><p class="body">Use explicit units such as 12h or a header that says hours. Avoid ranges and mixed answers. Blank or unreadable values become zero. A resource field labeled points is interpreted as points rather than a duration.</p>
+<h3>A player appears twice</h3><p class="body">The tool keeps one entry per normalized ID. It prefers a recognized completion time and retains the latest one. When timestamps tie or both are unavailable, the later source row wins. Confirm that the retained answers are the intended ones.</p>
+<h3>The spreadsheet library did not load</h3><p class="body">Reload the page with an internet connection so its external spreadsheet library can load, then choose the file again. Keep the source export available because reloading clears the selected file.</p>
+<h3>A comment was not honored</h3><p class="body">Time wishes are preferences within tied objectives. They do not override submitted availability, day selection, the event cap or higher priority scoring. General prose in a comment may not be recognized as a time preference.</p>
+<div class="callout">Reference edition: public source reviewed on 26 October 2026, commit 457e36e1fd5633fde36bb1ab7a529c73b91abaf8. The walkthrough covers the browser route. The repository README documents the separate Python route.</div>
+</section>
+<section class="block" id="input-examples"><h2>Read the input format examples</h2><div class="oneliner">Use these synthetic examples to make survey answers clear.</div>
+<h3>Keep durations and points separate</h3><p class="body">A header that identifies points uses the amount as a final score. A speedups field uses a duration. In the implemented model, each speedup minute contributes 30 points; shared general speedups count once for a player across the event.</p>
+<h3>A whole slot must fit</h3><p class="body">With 30 minute appointments, 08:00 to 08:30 can contain one slot. A range from 08:00 to 08:10 cannot. The configured schedule window can narrow the set further. Comments do not create new availability.</p>
+<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:10px;border-bottom:1px solid var(--line)">Field</th><th style="text-align:left;padding:10px;border-bottom:1px solid var(--line)">Clear example</th><th style="text-align:left;padding:10px;border-bottom:1px solid var(--line)">Meaning</th></tr></thead><tbody><tr><td style="padding:10px;border-bottom:1px solid var(--line)">Player ID</td><td style="padding:10px;border-bottom:1px solid var(--line)">900000001</td><td style="padding:10px;border-bottom:1px solid var(--line)">Synthetic identifier</td></tr><tr><td style="padding:10px;border-bottom:1px solid var(--line)">Construction speedups (hours)</td><td style="padding:10px;border-bottom:1px solid var(--line)">12</td><td style="padding:10px;border-bottom:1px solid var(--line)">Twelve hours</td></tr><tr><td style="padding:10px;border-bottom:1px solid var(--line)">Selected buffs</td><td style="padding:10px;border-bottom:1px solid var(--line)">Construction; Research</td><td style="padding:10px;border-bottom:1px solid var(--line)">Requested days</td></tr><tr><td style="padding:10px;border-bottom:1px solid var(--line)">General availability</td><td style="padding:10px;border-bottom:1px solid var(--line)">08:00 to 10:00</td><td style="padding:10px;border-bottom:1px solid var(--line)">UTC time window</td></tr></tbody></table></div>
+<div class="callout">Input examples accompany the nine page walkthrough. They are reference material, not additional operating steps.</div>
+</section>
+<footer class="site"><p>Survey data is processed locally. The initial page loads external libraries and fonts. Scheduler notes can retain names and original comments even when names are hidden elsewhere, so review that sheet before sharing.</p><div class="links"><a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler">Source on GitHub</a><a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler/blob/main/ALGORITHM.md">Walkthrough and explainer</a><a href="https://github.com/ChristianJoudon/whiteout-buff-scheduler/blob/main/README.md">Readme and setup</a><a href="https://christianjoudon.github.io/">Christian Joudon’s portfolio</a></div><p class="muted">Community tool for Whiteout Survival players. Not affiliated with or endorsed by the game’s developers.</p></footer></div></body></html>
